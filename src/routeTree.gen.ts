@@ -9,38 +9,214 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ScheduleRouteImport } from './routes/schedule'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HelpDocumentRouteImport } from './routes/help.document'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScheduleRoute = ScheduleRouteImport.update({
+  id: '/schedule',
+  path: '/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpDocumentRoute = HelpDocumentRouteImport.update({
+  id: '/document',
+  path: '/document',
+  getParentRoute: () => HelpRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/help': typeof HelpRouteWithChildren
+  '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/schedule': typeof ScheduleRoute
+  '/terms': typeof TermsRoute
+  '/help/document': typeof HelpDocumentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/help': typeof HelpRouteWithChildren
+  '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/schedule': typeof ScheduleRoute
+  '/terms': typeof TermsRoute
+  '/help/document': typeof HelpDocumentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
+  '/help': typeof HelpRouteWithChildren
+  '/offline': typeof OfflineRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/schedule': typeof ScheduleRoute
+  '/terms': typeof TermsRoute
+  '/help/document': typeof HelpDocumentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/help'
+    | '/offline'
+    | '/privacy'
+    | '/resources'
+    | '/schedule'
+    | '/terms'
+    | '/help/document'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/help'
+    | '/offline'
+    | '/privacy'
+    | '/resources'
+    | '/schedule'
+    | '/terms'
+    | '/help/document'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/help'
+    | '/offline'
+    | '/privacy'
+    | '/resources'
+    | '/schedule'
+    | '/terms'
+    | '/help/document'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
+  HelpRoute: typeof HelpRouteWithChildren
+  OfflineRoute: typeof OfflineRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResourcesRoute: typeof ResourcesRoute
+  ScheduleRoute: typeof ScheduleRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedule': {
+      id: '/schedule'
+      path: '/schedule'
+      fullPath: '/schedule'
+      preLoaderRoute: typeof ScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +224,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help/document': {
+      id: '/help/document'
+      path: '/document'
+      fullPath: '/help/document'
+      preLoaderRoute: typeof HelpDocumentRouteImport
+      parentRoute: typeof HelpRoute
+    }
   }
 }
 
+interface HelpRouteChildren {
+  HelpDocumentRoute: typeof HelpDocumentRoute
+}
+
+const HelpRouteChildren: HelpRouteChildren = {
+  HelpDocumentRoute: HelpDocumentRoute,
+}
+
+const HelpRouteWithChildren = HelpRoute._addFileChildren(HelpRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
+  HelpRoute: HelpRouteWithChildren,
+  OfflineRoute: OfflineRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResourcesRoute: ResourcesRoute,
+  ScheduleRoute: ScheduleRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
