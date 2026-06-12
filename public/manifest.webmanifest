@@ -1,0 +1,16 @@
+{
+  "name": "The PLACE Online",
+  "short_name": "PLACE Online",
+  "description": "Online support inspired by The PLACE in Amarillo. Understand documents, find resources, view classes, and connect with help.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D4538",
+  "theme_color": "#0D4538",
+  "categories": ["education", "social", "lifestyle"],
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
