@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
+import logoAsset from "@/assets/theplace-logo.webp.asset.json";
 
 const nav = [
   { to: "/", labelKey: "nav.home", icon: Home },
@@ -26,13 +27,11 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-warm/85 backdrop-blur supports-[backdrop-filter]:bg-warm/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:py-4">
         <Link to="/" className="flex items-center gap-2.5 group" aria-label={t("app.name")}>
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-soft transition group-hover:scale-105">
-            <HeartHandshake className="h-5 w-5" aria-hidden />
-          </span>
-          <span className="flex flex-col leading-tight">
-            <span className="font-display text-base font-semibold text-primary-deep">The PLACE</span>
-            <span className="text-[11px] font-medium uppercase tracking-wider text-accent">Online</span>
-          </span>
+          <img
+            src={logoAsset.url}
+            alt="The PLACE Online"
+            className="h-10 w-auto rounded-lg bg-primary-deep px-1.5 py-1"
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1" aria-label="Primary">
