@@ -178,7 +178,7 @@ function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallb
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={() => setCursor(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}>
-            Today
+            {t("schedule.todayBtn")}
           </Button>
           <Button variant="outline" size="icon" onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="Next month">
             <ChevronRight className="h-4 w-4" />
@@ -231,7 +231,7 @@ function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallb
             {parseLocalDate(selected).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
           </h3>
           {selectedItems.length === 0 ? (
-            <p className="mt-2 text-muted-foreground">Nothing scheduled on this day.</p>
+            <p className="mt-2 text-muted-foreground">{t("schedule.nothingDay")}</p>
           ) : (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {selectedItems.map((s) => (
