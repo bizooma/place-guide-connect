@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, FileText, Briefcase, Receipt, CalendarDays, HeartHandshake } from "lucide-react";
+import { ArrowRight, HeartHandshake } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { useI18n } from "@/lib/i18n";
+import { triageCategories } from "@/data/mock";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -19,15 +21,10 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const features = [
-  { icon: FileText, titleKey: "feature.document.title", descKey: "feature.document.desc", to: "/help/document" },
-  { icon: Briefcase, titleKey: "feature.job.title", descKey: "feature.job.desc", to: "/help" },
-  { icon: Receipt, titleKey: "feature.bill.title", descKey: "feature.bill.desc", to: "/help" },
-  { icon: CalendarDays, titleKey: "feature.classes.title", descKey: "feature.classes.desc", to: "/schedule" },
-] as const;
-
 function HomePage() {
   const { t } = useI18n();
+  const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
+
   return (
     <>
       {/* Hero with background image */}
@@ -60,27 +57,32 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Feature cards */}
+      {/* Triage cards */}
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">What can we help with?</h2>
         <p className="mt-2 max-w-2xl text-muted-foreground">Tap any card to get started. You don't have to know exactly what you need.</p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f) => (
-            <Link
-              key={f.titleKey}
-              to={f.to}
-              className="group surface-card p-6 transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5"
-            >
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-primary-deep transition group-hover:bg-primary group-hover:text-primary-foreground">
-                <f.icon className="h-6 w-6" aria-hidden />
-              </span>
-              <h3 className="mt-5 font-display text-xl font-semibold text-primary-deep">{t(f.titleKey)}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(f.descKey)}</p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent">
-                Start <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-          ))}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {active.map((cat) => {
+            const Icon = (Icons as any)[cat.icon] ?? Icons.HelpCircle;
+            const isDoc = cat.slug === "document";
+            return (
+              <Link
+                key={cat.id}
+                to={isDoc ? "/help/document" : "/help"}
+                search={isDoc ? undefined : { category: cat.slug }}
+                className="surface-card group flex w-full items-start gap-4 p-5 text-left transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5"
+              >
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary-deep transition group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Icon className="h-6 w-6" aria-hidden />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-display text-lg font-semibold text-primary-deep">{cat.title}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{cat.description}</span>
+                </span>
+                <ArrowRight className="mt-2 h-5 w-5 text-accent transition group-hover:translate-x-1" />
+              </Link>
+            );
+          })}
         </div>
       </section>
 

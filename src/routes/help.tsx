@@ -1,7 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import * as Icons from "lucide-react";
-import { ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,13 +21,17 @@ export const Route = createFileRoute("/help")({
       { property: "og:description", content: "Guided help in plain English." },
     ],
   }),
+  validateSearch: (search) => ({
+    category: (search.category as string | undefined) ?? undefined,
+  }),
   component: HelpPage,
 });
 
 function HelpPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<string | null>(null);
+  const search = useSearch({ from: "/help" });
+  const [selected, setSelected] = useState<string | null>(search.category ?? null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -36,6 +40,7 @@ function HelpPage() {
 
   function reset() {
     setSelected(null); setAnswers({}); setSubmitted(false);
+    navigate({ to: "/help", search: {} });
   }
 
   if (!selected) {
