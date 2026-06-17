@@ -99,6 +99,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => { registerServiceWorker(); }, []);
+  return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <div className="flex min-h-dvh flex-col">
