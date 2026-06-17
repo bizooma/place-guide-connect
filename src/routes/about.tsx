@@ -67,7 +67,7 @@ function AboutPage() {
         By bringing the physical heart of the PLACE into a 24/7 digital space, we are making it easier than ever to access language resources, community development tools, and creative empowerment opportunities.
       </p>
       <p className="mt-4 text-lg leading-relaxed text-foreground/85">
-        Whether you are walking through our physical doors or tapping on your phone screen, you belong at the PLACE.
+        Whether you are walking through our physical doors or tapping on your phone screen, everyone deserves a PLACE.
       </p>
 
       <h2 className="mt-10 font-display text-2xl font-semibold text-primary-deep">What we don't do</h2>
