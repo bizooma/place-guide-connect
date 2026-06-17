@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
+import logoAsset from "@/assets/theplace-logo.webp.asset.json";
 
 export function SiteFooter() {
   const { t } = useI18n();
@@ -7,8 +8,12 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-border/60 bg-primary-deep text-primary-foreground">
       <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 md:grid-cols-3">
         <div>
-          <p className="font-display text-lg font-semibold">{t("app.name")}</p>
-          <p className="mt-2 text-sm text-primary-foreground/80">{t("app.inspiredBy")}</p>
+          <img
+            src={logoAsset.url}
+            alt="The PLACE Online"
+            className="h-10 w-auto object-contain"
+          />
+          <p className="mt-3 text-sm text-primary-foreground/80">{t("app.inspiredBy")}</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-wider text-primary-foreground/60">Explore</p>
