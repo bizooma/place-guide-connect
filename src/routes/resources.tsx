@@ -62,7 +62,7 @@ function ResourcesPage() {
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
       <header>
         <h1 className="font-display text-4xl font-semibold text-primary-deep md:text-5xl">{t("resources.title")}</h1>
-        <p className="mt-2 text-muted-foreground">When The PLACE can't help directly, here are trusted partners.</p>
+        <p className="mt-2 text-muted-foreground">{t("resources.subtitle")}</p>
       </header>
 
       <div className="mt-6 grid gap-3 md:grid-cols-[1fr_auto_auto]">
@@ -71,18 +71,18 @@ function ResourcesPage() {
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("resources.search")} className="h-12 pl-9 rounded-full" />
         </div>
         <select value={cat} onChange={(e) => setCat(e.target.value)} className="h-12 rounded-full border border-input bg-background px-4 text-sm">
-          <option value="All">All categories</option>
+          <option value="All">{t("resources.allCategories")}</option>
           {resourceCategories.map((c) => <option key={c}>{c}</option>)}
         </select>
         <select value={lang} onChange={(e) => setLang(e.target.value)} className="h-12 rounded-full border border-input bg-background px-4 text-sm">
-          <option value="All">All languages</option>
+          <option value="All">{t("resources.allLanguages")}</option>
           {langs.map((l) => <option key={l}>{l}</option>)}
         </select>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {isLoading && <p className="col-span-full text-muted-foreground">Loading resources…</p>}
-        {!isLoading && filtered.length === 0 && <p className="col-span-full text-muted-foreground">No resources match. Try clearing a filter.</p>}
+        {isLoading && <p className="col-span-full text-muted-foreground">{t("resources.loading")}</p>}
+        {!isLoading && filtered.length === 0 && <p className="col-span-full text-muted-foreground">{t("resources.none")}</p>}
         {filtered.map((r) => (
           <article key={r.id} className="surface-card flex flex-col p-5">
             <span className="text-xs font-medium uppercase tracking-wider text-accent">{r.category}</span>
@@ -91,8 +91,8 @@ function ResourcesPage() {
             <ul className="mt-4 space-y-1.5 text-sm">
               {r.hours && <li className="text-muted-foreground">{r.hours}</li>}
               {r.address && <li className="text-muted-foreground">{r.address}</li>}
-              <li className="text-muted-foreground">Languages: {(r.languages ?? []).join(", ")}</li>
-              <li className="text-muted-foreground">Cost: {r.cost}{r.eligibility ? ` · ${r.eligibility}` : ""}</li>
+              <li className="text-muted-foreground">{t("resources.languages")}: {(r.languages ?? []).join(", ")}</li>
+              <li className="text-muted-foreground">{t("resources.cost")}: {r.cost}{r.eligibility ? ` · ${r.eligibility}` : ""}</li>
             </ul>
             <div className="mt-auto pt-4 flex flex-wrap gap-2">
               {r.phone && <Button asChild size="sm" className="rounded-full bg-primary hover:bg-primary-deep gap-1.5"><a href={`tel:${r.phone}`}><Phone className="h-3.5 w-3.5" />{t("resources.call")}</a></Button>}

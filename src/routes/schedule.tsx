@@ -76,12 +76,12 @@ function SchedulePage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-semibold text-primary-deep md:text-5xl">{t("schedule.title")}</h1>
-          <p className="mt-2 text-muted-foreground">Walk-in welcome unless noted. Times may change.</p>
+          <p className="mt-2 text-muted-foreground">{t("schedule.subtitle")}</p>
         </div>
         <div className="inline-flex rounded-full border border-border bg-warm p-1">
           {[
-            { id: "calendar" as const, label: "Calendar", icon: CalendarRange },
-            { id: "cards" as const, label: "Cards", icon: LayoutGrid },
+            { id: "calendar" as const, label: t("schedule.calendar"), icon: CalendarRange },
+            { id: "cards" as const, label: t("schedule.cards"), icon: LayoutGrid },
           ].map((v) => {
             const Icon = v.icon;
             return (
@@ -111,12 +111,12 @@ function SchedulePage() {
       </div>
 
       {mode === "calendar" ? (
-        <CalendarView items={filteredItems} />
+        <CalendarView items={filteredItems} t={t} />
       ) : (
         <CardsView items={filteredItems} view={cardsView} setView={setCardsView} t={t} />
       )}
 
-      <Disclaimer className="mt-10">Schedule changes happen. If something is important to you, call The PLACE to confirm.</Disclaimer>
+      <Disclaimer className="mt-10">{t("schedule.disclaimer")}</Disclaimer>
     </div>
   );
 }
