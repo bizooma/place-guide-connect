@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as HelpDocumentRouteImport } from './routes/help.document'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -73,6 +74,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpIndexRoute = HelpIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HelpRoute,
+} as any)
 const HelpDocumentRoute = HelpDocumentRouteImport.update({
   id: '/document',
   path: '/document',
@@ -108,12 +114,12 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
+  '/help/': typeof HelpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/help': typeof HelpRouteWithChildren
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
@@ -123,6 +129,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
+  '/help': typeof HelpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +147,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
+  '/help/': typeof HelpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,12 +165,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/api/tts'
     | '/help/document'
+    | '/help/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/auth'
-    | '/help'
     | '/offline'
     | '/privacy'
     | '/resources'
@@ -172,6 +180,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/api/tts'
     | '/help/document'
+    | '/help'
   id:
     | '__root__'
     | '/'
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/api/tts'
     | '/help/document'
+    | '/help/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -276,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help/': {
+      id: '/help/'
+      path: '/'
+      fullPath: '/help/'
+      preLoaderRoute: typeof HelpIndexRouteImport
+      parentRoute: typeof HelpRoute
+    }
     '/help/document': {
       id: '/help/document'
       path: '/document'
@@ -322,10 +339,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface HelpRouteChildren {
   HelpDocumentRoute: typeof HelpDocumentRoute
+  HelpIndexRoute: typeof HelpIndexRoute
 }
 
 const HelpRouteChildren: HelpRouteChildren = {
   HelpDocumentRoute: HelpDocumentRoute,
+  HelpIndexRoute: HelpIndexRoute,
 }
 
 const HelpRouteWithChildren = HelpRoute._addFileChildren(HelpRouteChildren)
