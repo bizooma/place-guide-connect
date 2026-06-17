@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, Loader2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { translateRow } from "@/lib/translate.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +47,10 @@ type ScheduleItem = {
   language: string;
   registration_required: boolean;
   active: boolean;
+  translations?: Record<string, Record<string, string>> | null;
 };
+
+const REQUIRED_LANGS = ["es", "fa", "ps", "so", "ar"];
 
 const CATEGORIES = [
   "English Language Classes",
@@ -77,6 +82,27 @@ export function ScheduleEditor() {
   const [creating, setCreating] = useState<Omit<ScheduleItem, "id"> | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const translateFn = useServerFn(translateRow);
+
+  async function handleTranslate(id: string) {
+    setTranslatingId(id);
+    try {
+      await translateFn({ data: { table: "schedule_items", id } });
+      toast.success("Translations generated");
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Translation failed");
+    } finally {
+      setTranslatingId(null);
+    }
+  }
+
+  function translationStatus(it: ScheduleItem) {
+    const tr = it.translations ?? {};
+    const present = REQUIRED_LANGS.filter((l) => tr[l] && Object.keys(tr[l]).length > 0).length;
+    return { present, total: REQUIRED_LANGS.length, complete: present === REQUIRED_LANGS.length };
+  }
 
   async function load() {
     const { data, error } = await supabase
@@ -141,30 +167,53 @@ export function ScheduleEditor() {
           <table className="w-full text-sm">
             <thead className="bg-warm">
               <tr>
-                {["Title", "Category", "When", "Location", "Status"].map((h) => (
+                {["Title", "Category", "When", "Location", "Status", "Translations"].map((h) => (
                   <th key={h} className="text-left px-4 py-2 font-medium text-muted-foreground">{h}</th>
                 ))}
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => (
-                <tr key={it.id} className="border-t border-border">
-                  <td className="px-4 py-2">{it.title}</td>
-                  <td className="px-4 py-2">{it.category}</td>
-                  <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
-                  <td className="px-4 py-2">{it.location}</td>
-                  <td className="px-4 py-2">{it.active ? "Active" : "Hidden"}</td>
-                  <td className="px-4 py-2 text-right whitespace-nowrap">
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(it)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setDeleteId(it.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {items.map((it) => {
+                const st = translationStatus(it);
+                return (
+                  <tr key={it.id} className="border-t border-border">
+                    <td className="px-4 py-2">{it.title}</td>
+                    <td className="px-4 py-2">{it.category}</td>
+                    <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
+                    <td className="px-4 py-2">{it.location}</td>
+                    <td className="px-4 py-2">{it.active ? "Active" : "Hidden"}</td>
+                    <td className="px-4 py-2">
+                      {st.complete ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          <Check className="h-3 w-3" />All {st.total}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          {st.present}/{st.total}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="Generate translations"
+                        disabled={translatingId === it.id}
+                        onClick={() => handleTranslate(it.id)}
+                      >
+                        {translatingId === it.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LanguagesIcon className="h-4 w-4" />}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditing(it)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setDeleteId(it.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

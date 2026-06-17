@@ -34,6 +34,7 @@ interface ScheduleRow {
   description: string;
   language: string;
   registration_required: boolean;
+  translations?: Record<string, Record<string, string>> | null;
 }
 
 type Mode = "calendar" | "cards";
@@ -49,7 +50,7 @@ function toISO(d: Date) {
 }
 
 function SchedulePage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [category, setCategory] = useState("All");
   const [mode, setMode] = useState<Mode>("calendar");
   const [cardsView, setCardsView] = useState<CardsView>("week");
@@ -72,19 +73,41 @@ function SchedulePage() {
     [scheduleItems, category],
   );
 
+  const dbOverrides = useMemo(() => {
+    const map = new Map<string, string>();
+    if (language === "en") return map;
+    const fields = ["title", "category", "description", "location", "language"] as const;
+    for (const s of scheduleItems) {
+      const tr = s.translations?.[language];
+      if (!tr) continue;
+      for (const f of fields) {
+        const src = (s as any)[f];
+        const dst = tr[f];
+        if (typeof src === "string" && typeof dst === "string" && src && dst) {
+          map.set(src, dst);
+        }
+      }
+    }
+    return map;
+  }, [scheduleItems, language]);
+
   const allTexts = useMemo(() => {
     const out: string[] = [];
     for (const s of scheduleItems) {
-      if (s.title) out.push(s.title);
-      if (s.category) out.push(s.category);
-      if (s.description) out.push(s.description);
-      if (s.location) out.push(s.location);
-      if (s.language) out.push(s.language);
+      if (s.title && !dbOverrides.has(s.title)) out.push(s.title);
+      if (s.category && !dbOverrides.has(s.category)) out.push(s.category);
+      if (s.description && !dbOverrides.has(s.description)) out.push(s.description);
+      if (s.location && !dbOverrides.has(s.location)) out.push(s.location);
+      if (s.language && !dbOverrides.has(s.language)) out.push(s.language);
     }
     for (const c of scheduleCategories) out.push(c);
     return out;
-  }, [scheduleItems]);
-  const tx = useTranslatedTexts(allTexts);
+  }, [scheduleItems, dbOverrides]);
+  const txAi = useTranslatedTexts(allTexts);
+  const tx = (s: string | null | undefined) => {
+    if (!s) return s ?? "";
+    return dbOverrides.get(s) ?? txAi(s);
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">

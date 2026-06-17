@@ -4,8 +4,9 @@ import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as L
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { triageCategories, scheduleItems, resources, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
+import { triageCategories, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
+import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -86,11 +87,7 @@ function AdminPage() {
           <ScheduleEditor />
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
-          <CrudTable
-            title="Resources"
-            rows={resources.map((r) => [r.name, r.category, r.phone ?? "—", r.languages.join(", ")])}
-            head={["Name", "Category", "Phone", "Languages"]}
-          />
+          <ResourcesTranslateList />
         </TabsContent>
         <TabsContent value="requests" className="mt-6">
           <EmptyState title="Document uploads" desc="Anonymous document uploads are stored in the Supabase 'document-uploads' bucket and the 'document_uploads' table. Review them from your Supabase dashboard." />

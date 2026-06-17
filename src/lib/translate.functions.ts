@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -6,69 +7,131 @@ const InputSchema = z.object({
   target: z.string().min(2).max(50),
 });
 
+async function callGemini(target: string, texts: string[]): Promise<string[]> {
+  if (!target || /^en(glish)?$/i.test(target)) return texts;
+  if (texts.length === 0) return [];
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+
+  const body = {
+    system_instruction: {
+      parts: [
+        {
+          text: `You are a professional translator. Translate each input string into ${target}. Preserve proper nouns (organization names, place names, people's names) in their original form. Keep tone warm, simple, and natural. Return ONLY a JSON object matching the schema, where "translations" is an array with the SAME length and order as the input.`,
+        },
+      ],
+    },
+    contents: [
+      { role: "user", parts: [{ text: JSON.stringify({ target, texts }) }] },
+    ],
+    generationConfig: {
+      response_mime_type: "application/json",
+      response_schema: {
+        type: "object",
+        properties: { translations: { type: "array", items: { type: "string" } } },
+        required: ["translations"],
+      },
+      temperature: 0.2,
+    },
+  };
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+  );
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Translation failed: ${res.status} ${errText.slice(0, 200)}`);
+  }
+  const json: any = await res.json();
+  const text: string = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  try {
+    const parsed = JSON.parse(text) as { translations: string[] };
+    if (Array.isArray(parsed.translations) && parsed.translations.length === texts.length) {
+      return parsed.translations;
+    }
+  } catch {
+    // fall through
+  }
+  return texts;
+}
+
 /**
- * Batch-translate short UI strings (resource names, categories, schedule
- * titles, etc.) into the target language using Gemini. Returns translations
- * in the same order as the input. If target is English, returns input as-is.
+ * Batch-translate short UI strings (client-side cached) into the target language.
  */
 export const translateBatch = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<string[]> => {
-    const target = data.target.trim();
-    if (!target || /^en(glish)?$/i.test(target)) return data.texts;
-    if (data.texts.length === 0) return [];
+    return callGemini(data.target.trim(), data.texts);
+  });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+// ---- Admin: pre-translate a DB row into all supported languages ----
 
-    const body = {
-      system_instruction: {
-        parts: [
-          {
-            text: `You are a professional translator. Translate each input string into ${target}. Preserve proper nouns (organization names, place names, people's names) in their original form. Keep tone warm, simple, and natural. Return ONLY a JSON object matching the schema, where "translations" is an array with the SAME length and order as the input.`,
-          },
-        ],
-      },
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: JSON.stringify({ target, texts: data.texts }) }],
-        },
-      ],
-      generationConfig: {
-        response_mime_type: "application/json",
-        response_schema: {
-          type: "object",
-          properties: {
-            translations: { type: "array", items: { type: "string" } },
-          },
-          required: ["translations"],
-        },
-        temperature: 0.2,
-      },
-    };
+const TARGET_LANGS: Record<string, string> = {
+  es: "Spanish",
+  fa: "Dari (Farsi)",
+  ps: "Pashto",
+  so: "Somali",
+  ar: "Arabic",
+};
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      },
-    );
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Translation failed: ${res.status} ${errText.slice(0, 200)}`);
-    }
-    const json: any = await res.json();
-    const text: string = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    try {
-      const parsed = JSON.parse(text) as { translations: string[] };
-      if (Array.isArray(parsed.translations) && parsed.translations.length === data.texts.length) {
-        return parsed.translations;
+const RESOURCE_FIELDS = ["name", "category", "description", "hours", "eligibility"] as const;
+const SCHEDULE_FIELDS = ["title", "category", "description", "location", "language"] as const;
+
+const RowInput = z.object({
+  table: z.enum(["resources", "schedule_items"]),
+  id: z.string().uuid(),
+});
+
+export const translateRow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => RowInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // Verify admin
+    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (roleErr) throw new Error(roleErr.message);
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const fields = data.table === "resources" ? RESOURCE_FIELDS : SCHEDULE_FIELDS;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: row, error: readErr } = await supabaseAdmin
+      .from(data.table)
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!row) throw new Error("Row not found");
+
+    // Build ordered text list of non-empty fields
+    const keys: string[] = [];
+    const texts: string[] = [];
+    for (const f of fields) {
+      const v = (row as any)[f];
+      if (typeof v === "string" && v.trim()) {
+        keys.push(f);
+        texts.push(v);
       }
-    } catch {
-      // fall through
     }
-    return data.texts;
+
+    const translations: Record<string, Record<string, string>> = {};
+    for (const [code, name] of Object.entries(TARGET_LANGS)) {
+      const out = await callGemini(name, texts);
+      const map: Record<string, string> = {};
+      keys.forEach((k, i) => { map[k] = out[i] ?? texts[i]; });
+      translations[code] = map;
+    }
+
+    const { error: updErr } = await supabaseAdmin
+      .from(data.table)
+      .update({ translations })
+      .eq("id", data.id);
+    if (updErr) throw new Error(updErr.message);
+
+    return { ok: true, languages: Object.keys(TARGET_LANGS) };
   });

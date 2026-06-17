@@ -135,6 +135,7 @@ export type Database = {
           phone: string | null
           sort_order: number
           tags: string[]
+          translations: Json
           updated_at: string
           website: string | null
         }
@@ -153,6 +154,7 @@ export type Database = {
           phone?: string | null
           sort_order?: number
           tags?: string[]
+          translations?: Json
           updated_at?: string
           website?: string | null
         }
@@ -171,6 +173,7 @@ export type Database = {
           phone?: string | null
           sort_order?: number
           tags?: string[]
+          translations?: Json
           updated_at?: string
           website?: string | null
         }
@@ -191,6 +194,7 @@ export type Database = {
           registration_required: boolean
           start_time: string
           title: string
+          translations: Json
           updated_at: string
         }
         Insert: {
@@ -207,6 +211,7 @@ export type Database = {
           registration_required?: boolean
           start_time: string
           title: string
+          translations?: Json
           updated_at?: string
         }
         Update: {
@@ -223,6 +228,7 @@ export type Database = {
           registration_required?: boolean
           start_time?: string
           title?: string
+          translations?: Json
           updated_at?: string
         }
         Relationships: []

@@ -22,7 +22,7 @@ export const Route = createFileRoute("/resources")({
 });
 
 function ResourcesPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const [lang, setLang] = useState("All");
@@ -45,19 +45,42 @@ function ResourcesPage() {
     [resources]
   );
 
+  // Build override map from DB translations for the active language.
+  const dbOverrides = useMemo(() => {
+    const map = new Map<string, string>();
+    if (language === "en") return map;
+    const fields = ["name", "category", "description", "hours", "eligibility"] as const;
+    for (const r of resources as any[]) {
+      const tr = r.translations?.[language];
+      if (!tr) continue;
+      for (const f of fields) {
+        const src = r[f];
+        const dst = tr[f];
+        if (typeof src === "string" && typeof dst === "string" && src && dst) {
+          map.set(src, dst);
+        }
+      }
+    }
+    return map;
+  }, [resources, language]);
+
   const allTexts = useMemo(() => {
     const out: string[] = [];
     for (const r of resources) {
-      if (r.name) out.push(r.name);
-      if (r.category) out.push(r.category);
-      if (r.description) out.push(r.description);
-      if (r.hours) out.push(r.hours);
-      if (r.eligibility) out.push(r.eligibility);
+      if (r.name && !dbOverrides.has(r.name)) out.push(r.name);
+      if (r.category && !dbOverrides.has(r.category)) out.push(r.category);
+      if (r.description && !dbOverrides.has(r.description)) out.push(r.description);
+      if (r.hours && !dbOverrides.has(r.hours)) out.push(r.hours);
+      if (r.eligibility && !dbOverrides.has(r.eligibility)) out.push(r.eligibility);
     }
     for (const c of resourceCategories) out.push(c);
     return out;
-  }, [resources]);
-  const tx = useTranslatedTexts(allTexts);
+  }, [resources, dbOverrides]);
+  const txAi = useTranslatedTexts(allTexts);
+  const tx = (s: string | null | undefined) => {
+    if (!s) return s ?? "";
+    return dbOverrides.get(s) ?? txAi(s);
+  };
 
   const filtered = useMemo(
     () =>

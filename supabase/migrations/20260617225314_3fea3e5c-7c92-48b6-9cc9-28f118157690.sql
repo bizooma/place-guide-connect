@@ -1,0 +1,2 @@
+ALTER TABLE public.resources ADD COLUMN IF NOT EXISTS translations jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.schedule_items ADD COLUMN IF NOT EXISTS translations jsonb NOT NULL DEFAULT '{}'::jsonb;
