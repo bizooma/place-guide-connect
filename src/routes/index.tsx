@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
 import { triageCategories } from "@/data/mock";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
@@ -59,8 +60,13 @@ function HomePage() {
 
       {/* Triage cards */}
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
-        <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">What can we help with?</h2>
-        <p className="mt-2 max-w-2xl text-muted-foreground">Tap any card to get started. You don't have to know exactly what you need.</p>
+        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">What can we help with?</h2>
+            <p className="mt-2 max-w-2xl text-muted-foreground">Tap any card to get started. You don't have to know exactly what you need.</p>
+          </div>
+          <LanguageSelector />
+        </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {active.map((cat) => {
             const Icon = (Icons as any)[cat.icon] ?? Icons.HelpCircle;
