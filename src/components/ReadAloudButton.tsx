@@ -151,20 +151,20 @@ export function ReadAloudButton({
   return (
     <Button
       type="button"
-      variant="ghost"
-      size="sm"
+      variant="default"
+      size="default"
       onClick={toggle}
       aria-label={label}
-      className="gap-2 text-primary-deep hover:bg-secondary"
+      className="gap-2 rounded-full px-5 py-2.5 text-base font-semibold shadow-md hover:shadow-lg transition-shadow"
     >
       {state === "loading" ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-5 w-5 animate-spin" />
       ) : state === "playing" ? (
-        <Square className="h-4 w-4" />
+        <Square className="h-5 w-5 fill-current" />
       ) : (
-        <Volume2 className="h-4 w-4" />
+        <Volume2 className="h-5 w-5" />
       )}
-      <span className="text-sm">{label}</span>
+      <span>{state === "playing" ? "Stop" : label}</span>
     </Button>
   );
 }
