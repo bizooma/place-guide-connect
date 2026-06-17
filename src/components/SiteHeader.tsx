@@ -30,7 +30,7 @@ export function SiteHeader() {
           <img
             src={logoAsset.url}
             alt="The PLACE Online"
-            className="h-10 w-auto rounded-lg bg-primary-deep px-1.5 py-1"
+            className="h-12 w-auto max-w-[200px] rounded-md bg-primary-deep object-contain px-1 py-0.5"
           />
         </Link>
 
