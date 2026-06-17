@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { triageCategories, scheduleItems, resources, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
+import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -82,11 +83,7 @@ function AdminPage() {
           />
         </TabsContent>
         <TabsContent value="schedule" className="mt-6">
-          <CrudTable
-            title="Schedule items"
-            rows={scheduleItems.map((s) => [s.title, s.category, `${s.day} ${s.startTime}`, s.location])}
-            head={["Title", "Category", "When", "Location"]}
-          />
+          <ScheduleEditor />
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
           <CrudTable

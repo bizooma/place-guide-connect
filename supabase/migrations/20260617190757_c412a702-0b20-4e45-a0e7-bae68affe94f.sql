@@ -1,0 +1,4 @@
+CREATE POLICY "Admins manage schedule items insert" ON public.schedule_items FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins manage schedule items update" ON public.schedule_items FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins manage schedule items delete" ON public.schedule_items FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "Admins view all schedule items" ON public.schedule_items FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
