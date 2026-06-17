@@ -92,12 +92,6 @@ export function ReadAloudButton({
         started = true;
         setState("playing");
       }
-      const lastEnd = playhead;
-      source.onended = () => {
-        if (ctxRef.current && ctx.currentTime >= lastEnd - 0.05) {
-          setState((s) => (s === "playing" ? "idle" : s));
-        }
-      };
     };
 
     try {
@@ -127,6 +121,15 @@ export function ReadAloudButton({
         if (done) break;
         parser.feed(value);
       }
+
+      // Stream finished — wait until playback drains, then mark idle.
+      const remainingMs = Math.max(0, (playhead - ctx.currentTime) * 1000);
+      window.setTimeout(() => {
+        if (abortRef.current === controller) {
+          cleanup();
+          setState("idle");
+        }
+      }, remainingMs + 100);
     } catch (err) {
       if ((err as Error)?.name === "AbortError") return;
       console.error(err);
