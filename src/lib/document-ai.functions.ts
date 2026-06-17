@@ -24,8 +24,13 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: file, error } = await supabaseAdmin.storage
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabasePublic = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: file, error } = await supabasePublic.storage
       .from("document-uploads")
       .download(data.storagePath);
     if (error || !file) throw new Error("Could not load uploaded document.");
