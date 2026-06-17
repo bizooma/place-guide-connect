@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, HeartHandshake } from "lucide-react";
-import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
@@ -8,6 +7,21 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
 import { triageCategories } from "@/data/mock";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
+import cardBill from "@/assets/cards/bill.jpg";
+import cardJob from "@/assets/cards/job.jpg";
+import cardDocument from "@/assets/cards/document.jpg";
+import cardEnglish from "@/assets/cards/english.jpg";
+import cardNeeds from "@/assets/cards/needs.jpg";
+import cardUnsure from "@/assets/cards/unsure.jpg";
+
+const CARD_IMAGES: Record<string, string> = {
+  bill: cardBill,
+  job: cardJob,
+  document: cardDocument,
+  english: cardEnglish,
+  needs: cardNeeds,
+  unsure: cardUnsure,
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
