@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Phone, Globe, MapPin, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { resourceCategories, resources } from "@/data/mock";
+import { resourceCategories } from "@/data/mock";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
@@ -24,17 +26,37 @@ function ResourcesPage() {
   const [cat, setCat] = useState("All");
   const [lang, setLang] = useState("All");
 
-  const langs = useMemo(() => Array.from(new Set(resources.flatMap((r) => r.languages))), []);
+  const { data: resources = [], isLoading } = useQuery({
+    queryKey: ["resources"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resources")
+        .select("*")
+        .eq("active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
-  const filtered = useMemo(() => resources.filter((r) => {
-    if (cat !== "All" && r.category !== cat) return false;
-    if (lang !== "All" && !r.languages.includes(lang)) return false;
-    if (q) {
-      const text = (r.name + " " + r.description + " " + r.tags.join(" ")).toLowerCase();
-      if (!text.includes(q.toLowerCase())) return false;
-    }
-    return true;
-  }), [q, cat, lang]);
+  const langs = useMemo(
+    () => Array.from(new Set(resources.flatMap((r) => r.languages ?? []))),
+    [resources]
+  );
+
+  const filtered = useMemo(
+    () =>
+      resources.filter((r) => {
+        if (cat !== "All" && r.category !== cat) return false;
+        if (lang !== "All" && !(r.languages ?? []).includes(lang)) return false;
+        if (q) {
+          const text = (r.name + " " + r.description + " " + (r.tags ?? []).join(" ")).toLowerCase();
+          if (!text.includes(q.toLowerCase())) return false;
+        }
+        return true;
+      }),
+    [q, cat, lang, resources]
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
@@ -59,7 +81,8 @@ function ResourcesPage() {
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.length === 0 && <p className="col-span-full text-muted-foreground">No resources match. Try clearing a filter.</p>}
+        {isLoading && <p className="col-span-full text-muted-foreground">Loading resources…</p>}
+        {!isLoading && filtered.length === 0 && <p className="col-span-full text-muted-foreground">No resources match. Try clearing a filter.</p>}
         {filtered.map((r) => (
           <article key={r.id} className="surface-card flex flex-col p-5">
             <span className="text-xs font-medium uppercase tracking-wider text-accent">{r.category}</span>
@@ -68,7 +91,7 @@ function ResourcesPage() {
             <ul className="mt-4 space-y-1.5 text-sm">
               {r.hours && <li className="text-muted-foreground">{r.hours}</li>}
               {r.address && <li className="text-muted-foreground">{r.address}</li>}
-              <li className="text-muted-foreground">Languages: {r.languages.join(", ")}</li>
+              <li className="text-muted-foreground">Languages: {(r.languages ?? []).join(", ")}</li>
               <li className="text-muted-foreground">Cost: {r.cost}{r.eligibility ? ` · ${r.eligibility}` : ""}</li>
             </ul>
             <div className="mt-auto pt-4 flex flex-wrap gap-2">

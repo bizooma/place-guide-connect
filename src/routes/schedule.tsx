@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Clock, MapPin, Languages as LanguagesIcon, CalendarDays } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
-import { scheduleCategories, scheduleItems } from "@/data/mock";
+import { scheduleCategories } from "@/data/mock";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/schedule")({
@@ -19,10 +21,37 @@ export const Route = createFileRoute("/schedule")({
   component: SchedulePage,
 });
 
+interface ScheduleRow {
+  id: string;
+  title: string;
+  category: string;
+  day: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  location: string;
+  description: string;
+  language: string;
+  registration_required: boolean;
+}
+
 function SchedulePage() {
   const { t } = useI18n();
   const [category, setCategory] = useState("All");
   const [view, setView] = useState<"today" | "week" | "all">("week");
+
+  const { data: scheduleItems = [], isLoading } = useQuery({
+    queryKey: ["schedule_items"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("schedule_items")
+        .select("*")
+        .eq("active", true)
+        .order("date");
+      if (error) throw error;
+      return (data ?? []) as ScheduleRow[];
+    },
+  });
 
   const items = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -33,7 +62,7 @@ function SchedulePage() {
       if (view === "week" && (s.date < today || s.date > weekEnd)) return false;
       return true;
     });
-  }, [category, view]);
+  }, [category, view, scheduleItems]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
@@ -82,12 +111,12 @@ function SchedulePage() {
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
             <dl className="mt-4 space-y-1.5 text-sm">
               <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /><span>{s.day} · {s.date}</span></div>
-              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.startTime} – {s.endTime}</span></div>
+              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{s.location}</span></div>
               <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{s.language}</span></div>
             </dl>
             <div className="mt-auto pt-4">
-              {s.registrationRequired && <p className="mb-2 text-xs font-medium text-accent">Registration required</p>}
+              {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">Registration required</p>}
               <Button className="w-full rounded-full bg-primary hover:bg-primary-deep" onClick={() => toast.success("We'll save your interest — a staff member will follow up.")}>
                 {t("schedule.interested")}
               </Button>
