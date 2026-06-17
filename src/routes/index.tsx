@@ -30,39 +30,32 @@ function HomePage() {
   const { t } = useI18n();
   return (
     <>
-      {/* Hero */}
-      <section className="bg-hero-warm">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:py-20 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-warm/60 px-3 py-1 text-xs font-medium text-primary-deep">
+      {/* Hero with background image */}
+      <section
+        className="relative overflow-hidden"
+        style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="absolute inset-0 bg-primary-deep/85" aria-hidden />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-28">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
               <HeartHandshake className="h-3.5 w-3.5 text-accent" /> {t("app.inspiredBy")}
             </span>
-            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.05] text-primary-deep sm:text-5xl md:text-6xl">
+            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.05] text-white sm:text-5xl md:text-6xl">
               {t("app.tagline")}
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-foreground/80">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
               {t("app.subtitle")}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-14 rounded-full px-7 text-base bg-primary hover:bg-primary-deep">
+              <Button asChild size="lg" className="h-14 rounded-full px-7 text-base bg-accent hover:bg-accent/90 text-white">
                 <Link to="/help">{t("cta.help")} <ArrowRight className="ml-2 h-5 w-5" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-7 text-base border-primary/30 hover:bg-secondary">
+              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-7 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white">
                 <Link to="/schedule">{t("cta.schedule")}</Link>
               </Button>
               <InstallAppButton />
             </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-[2.5rem] bg-accent/10 blur-2xl" aria-hidden />
-            <img
-              src={hero}
-              alt="People from many backgrounds learning and helping each other at a community table."
-              width={1536}
-              height={1024}
-              className="relative rounded-[2rem] border border-border shadow-lift"
-            />
           </div>
         </div>
       </section>
