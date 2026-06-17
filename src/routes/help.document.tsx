@@ -29,16 +29,12 @@ export const Route = createFileRoute("/help/document")({
 // Languages the user can ask the AI to explain the document in.
 // These are sent to Gemini as the target language for both summary and TTS.
 const LANGUAGES = [
-  "English",
-  "Spanish",
-  "Vietnamese",
-  "Simplified Chinese",
-  "Arabic",
-  "French",
-  "Haitian Creole",
-  "Russian",
-  "Tagalog",
-  "Korean",
+  { label: "🇺🇸 English", value: "English" },
+  { label: "🇪🇸 Español (Spanish)", value: "Spanish" },
+  { label: "🇦🇫 دری (Dari)", value: "Dari" },
+  { label: "🇦🇫 پښتو (Pashto)", value: "Pashto" },
+  { label: "🇸🇴 Soomaali (Somali)", value: "Somali" },
+  { label: "🇸🇦 العربية (Arabic)", value: "Arabic" },
 ] as const;
 
 interface Result extends DocumentAnalysis {
