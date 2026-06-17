@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { HeroChat } from "@/components/home/HeroChat";
 import { useI18n } from "@/lib/i18n";
 import { triageCategories } from "@/data/mock";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
@@ -48,25 +49,30 @@ function HomePage() {
         style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="absolute inset-0 bg-primary-deep/85" aria-hidden />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-28">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
-              <HeartHandshake className="h-3.5 w-3.5 text-accent" /> {t("app.inspiredBy")}
-            </span>
-            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.05] text-white sm:text-5xl md:text-6xl">
-              {t("app.tagline")}
-            </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
-              {t("app.subtitle")}
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-14 rounded-full px-7 text-base bg-accent hover:bg-accent/90 text-white">
-                <Link to="/help">{t("cta.help")} <ArrowRight className="ml-2 h-5 w-5" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-7 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white">
-                <Link to="/schedule">{t("cta.schedule")}</Link>
-              </Button>
-              <InstallAppButton />
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
+                <HeartHandshake className="h-3.5 w-3.5 text-accent" /> {t("app.inspiredBy")}
+              </span>
+              <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.05] text-white sm:text-5xl md:text-6xl">
+                {t("app.tagline")}
+              </h1>
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
+                {t("app.subtitle")}
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button asChild size="lg" className="h-14 rounded-full px-7 text-base bg-accent hover:bg-accent/90 text-white">
+                  <Link to="/help">{t("cta.help")} <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-7 text-base border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+                  <Link to="/schedule">{t("cta.schedule")}</Link>
+                </Button>
+                <InstallAppButton />
+              </div>
+            </div>
+            <div className="lg:pl-4">
+              <HeroChat />
             </div>
           </div>
         </div>
