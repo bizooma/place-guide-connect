@@ -167,30 +167,53 @@ export function ScheduleEditor() {
           <table className="w-full text-sm">
             <thead className="bg-warm">
               <tr>
-                {["Title", "Category", "When", "Location", "Status"].map((h) => (
+                {["Title", "Category", "When", "Location", "Status", "Translations"].map((h) => (
                   <th key={h} className="text-left px-4 py-2 font-medium text-muted-foreground">{h}</th>
                 ))}
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => (
-                <tr key={it.id} className="border-t border-border">
-                  <td className="px-4 py-2">{it.title}</td>
-                  <td className="px-4 py-2">{it.category}</td>
-                  <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
-                  <td className="px-4 py-2">{it.location}</td>
-                  <td className="px-4 py-2">{it.active ? "Active" : "Hidden"}</td>
-                  <td className="px-4 py-2 text-right whitespace-nowrap">
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(it)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => setDeleteId(it.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {items.map((it) => {
+                const st = translationStatus(it);
+                return (
+                  <tr key={it.id} className="border-t border-border">
+                    <td className="px-4 py-2">{it.title}</td>
+                    <td className="px-4 py-2">{it.category}</td>
+                    <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
+                    <td className="px-4 py-2">{it.location}</td>
+                    <td className="px-4 py-2">{it.active ? "Active" : "Hidden"}</td>
+                    <td className="px-4 py-2">
+                      {st.complete ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          <Check className="h-3 w-3" />All {st.total}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          {st.present}/{st.total}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="Generate translations"
+                        disabled={translatingId === it.id}
+                        onClick={() => handleTranslate(it.id)}
+                      >
+                        {translatingId === it.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LanguagesIcon className="h-4 w-4" />}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditing(it)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setDeleteId(it.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
