@@ -144,7 +144,9 @@ const CATEGORY_DOT: Record<string, string> = {
   "Job Help": "bg-muted-foreground",
 };
 
-function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallback?: string) => string }) {
+type Tx = (s: string | null | undefined) => string;
+
+function CalendarView({ items, t, tx }: { items: ScheduleRow[]; t: (k: string, fallback?: string) => string; tx: Tx }) {
   const initial = useMemo(() => {
     const now = new Date();
     if (items.some((i) => {
@@ -227,11 +229,11 @@ function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallb
                   {dayItems.slice(0, 3).map((it) => (
                     <div key={it.id} className="flex items-center gap-1 truncate text-[11px] text-primary-deep/85">
                       <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + (CATEGORY_DOT[it.category] ?? "bg-primary")} />
-                      <span className="truncate">{it.title}</span>
+                      <span className="truncate">{tx(it.title)}</span>
                     </div>
                   ))}
                   {dayItems.length > 3 && (
-                    <div className="text-[10px] font-medium text-muted-foreground">+{dayItems.length - 3} more</div>
+                    <div className="text-[10px] font-medium text-muted-foreground">+{dayItems.length - 3}</div>
                   )}
                 </div>
               </button>
@@ -251,12 +253,12 @@ function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallb
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {selectedItems.map((s) => (
                 <article key={s.id} className="surface-card p-4">
-                  <span className="text-xs font-medium uppercase tracking-wider text-accent">{s.category}</span>
-                  <h4 className="mt-1 font-display text-lg font-semibold text-primary-deep">{s.title}</h4>
-                  <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
+                  <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
+                  <h4 className="mt-1 font-display text-lg font-semibold text-primary-deep">{tx(s.title)}</h4>
+                  <p className="mt-1 text-sm text-muted-foreground">{tx(s.description)}</p>
                   <dl className="mt-3 space-y-1 text-sm">
                     <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
-                    <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{s.location}</span></div>
+                    <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
                   </dl>
                 </article>
               ))}
@@ -268,7 +270,7 @@ function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallb
   );
 }
 
-function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: CardsView; setView: (v: CardsView) => void; t: (k: string) => string }) {
+function CardsView({ items, view, setView, t, tx }: { items: ScheduleRow[]; view: CardsView; setView: (v: CardsView) => void; t: (k: string) => string; tx: Tx }) {
   const filtered = useMemo(() => {
     const today = toISO(new Date());
     const weekEnd = toISO(new Date(Date.now() + 6 * 86400000));
@@ -303,14 +305,14 @@ function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: Ca
         )}
         {filtered.map((s) => (
           <article key={s.id} className="surface-card flex flex-col p-5">
-            <span className="text-xs font-medium uppercase tracking-wider text-accent">{s.category}</span>
-            <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{s.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+            <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
+            <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{tx(s.title)}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tx(s.description)}</p>
             <dl className="mt-4 space-y-1.5 text-sm">
               <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /><span>{s.day} · {s.date}</span></div>
               <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{s.location}</span></div>
-              <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{s.language}</span></div>
+              <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
+              <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{tx(s.language)}</span></div>
             </dl>
             <div className="mt-auto pt-4">
               {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">{t("schedule.regRequired")}</p>}
