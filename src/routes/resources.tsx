@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { resourceCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -43,6 +44,20 @@ function ResourcesPage() {
     () => Array.from(new Set(resources.flatMap((r) => r.languages ?? []))),
     [resources]
   );
+
+  const allTexts = useMemo(() => {
+    const out: string[] = [];
+    for (const r of resources) {
+      if (r.name) out.push(r.name);
+      if (r.category) out.push(r.category);
+      if (r.description) out.push(r.description);
+      if (r.hours) out.push(r.hours);
+      if (r.eligibility) out.push(r.eligibility);
+    }
+    for (const c of resourceCategories) out.push(c);
+    return out;
+  }, [resources]);
+  const tx = useTranslatedTexts(allTexts);
 
   const filtered = useMemo(
     () =>
