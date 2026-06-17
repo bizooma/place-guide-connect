@@ -35,6 +35,148 @@ export type Database = {
         }
         Relationships: []
       }
+      chatbot_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string
+          id: string
+          token_estimate: number | null
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding: string
+          id?: string
+          token_estimate?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string
+          id?: string
+          token_estimate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "chatbot_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chatbot_conversations: {
+        Row: {
+          id: string
+          last_message_at: string
+          message_count: number
+          started_at: string
+          visitor_label: string | null
+        }
+        Insert: {
+          id?: string
+          last_message_at?: string
+          message_count?: number
+          started_at?: string
+          visitor_label?: string | null
+        }
+        Update: {
+          id?: string
+          last_message_at?: string
+          message_count?: number
+          started_at?: string
+          visitor_label?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_documents: {
+        Row: {
+          byte_size: number | null
+          chunk_count: number
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          id: string
+          mime_type: string | null
+          source_filename: string
+          status: string
+          storage_path: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          byte_size?: number | null
+          chunk_count?: number
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          mime_type?: string | null
+          source_filename: string
+          status?: string
+          storage_path: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          byte_size?: number | null
+          chunk_count?: number
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          mime_type?: string | null
+          source_filename?: string
+          status?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chatbot_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+          sources: Json
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+          sources?: Json
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+          sources?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chatbot_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_uploads: {
         Row: {
           admin_notes: string | null
@@ -286,6 +428,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      match_chatbot_chunks: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          chunk_index: number
+          content: string
+          document_id: string
+          id: string
+          similarity: number
+        }[]
       }
     }
     Enums: {
