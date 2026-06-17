@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Download, RefreshCw, FileText } from "lucide-react";
+import { Download, RefreshCw, FileText, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -66,12 +66,13 @@ export function DocumentUploadsList() {
     });
   }, [rows, statusFilter, categoryFilter]);
 
-  async function download(row: DocRow) {
+  async function openSigned(row: DocRow, mode: "view" | "download") {
+    const opts = mode === "download" ? { download: row.original_filename ?? true } : undefined;
     const { data, error } = await supabase.storage
       .from("document-uploads")
-      .createSignedUrl(row.storage_path, 60, { download: row.original_filename ?? undefined });
+      .createSignedUrl(row.storage_path, 300, opts);
     if (error || !data?.signedUrl) {
-      toast.error("Could not generate download link", { description: error?.message });
+      toast.error("Could not generate link", { description: error?.message });
       return;
     }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
@@ -161,10 +162,15 @@ export function DocumentUploadsList() {
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    <Button size="sm" variant="outline" className="rounded-full gap-1.5" onClick={() => download(r)}>
-                      <Download className="h-4 w-4" />Download
-                    </Button>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="inline-flex gap-1.5">
+                      <Button size="sm" variant="outline" className="rounded-full gap-1.5" onClick={() => openSigned(r, "view")}>
+                        <Eye className="h-4 w-4" />View
+                      </Button>
+                      <Button size="sm" variant="ghost" className="rounded-full gap-1.5" onClick={() => openSigned(r, "download")}>
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
