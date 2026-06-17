@@ -40,14 +40,40 @@ function DocumentPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FakeResult | null>(null);
 
-  function handleFile(f: File | null) {
+  const { data: resources = [] } = useQuery({
+    queryKey: ["resources", "doc-helper"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resources")
+        .select("id,name,description")
+        .eq("active", true)
+        .limit(4);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  async function handleFile(f: File | null) {
     if (!f) return;
     if (!consent) { toast.error("Please check the consent box first."); return; }
     setFile(f);
     setLoading(true);
-    // Placeholder for AI analysis. Real implementation will upload to Supabase
-    // Storage and call a server function that runs the model.
-    setTimeout(() => {
+    try {
+      const ext = f.name.split(".").pop() ?? "bin";
+      const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("document-uploads")
+        .upload(path, f, { contentType: f.type, upsert: false });
+      if (upErr) throw upErr;
+      const { error: insErr } = await supabase.from("document_uploads").insert({
+        storage_path: path,
+        original_filename: f.name,
+        mime_type: f.type,
+        size_bytes: f.size,
+      });
+      if (insErr) throw insErr;
+      toast.success("Document received. Staff will review it.");
+      // Placeholder AI explanation — real model integration will replace this.
       setResult({
         fileName: f.name,
         kind: "This looks like a utility bill.",
@@ -57,8 +83,12 @@ function DocumentPage() {
         nextSteps: ["Find the amount due and the due date.", "If you cannot pay the full amount, call the company and ask about payment plans or hardship help.", "Bring the bill to The PLACE during Document Help Hour for help in person."],
         contact: "The PLACE — Document Help Hour (Wednesday afternoons), or call 2-1-1 in Texas for assistance programs.",
       });
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   }
 
   function deleteAll() {
