@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { scheduleCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -70,6 +71,20 @@ function SchedulePage() {
     () => scheduleItems.filter((s) => category === "All" || s.category === category),
     [scheduleItems, category],
   );
+
+  const allTexts = useMemo(() => {
+    const out: string[] = [];
+    for (const s of scheduleItems) {
+      if (s.title) out.push(s.title);
+      if (s.category) out.push(s.category);
+      if (s.description) out.push(s.description);
+      if (s.location) out.push(s.location);
+      if (s.language) out.push(s.language);
+    }
+    for (const c of scheduleCategories) out.push(c);
+    return out;
+  }, [scheduleItems]);
+  const tx = useTranslatedTexts(allTexts);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
