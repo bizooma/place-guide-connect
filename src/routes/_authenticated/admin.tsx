@@ -4,10 +4,11 @@ import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as L
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { triageCategories, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
+import { triageCategories } from "@/data/adminSeed";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
 import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
+import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
 import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -103,11 +104,7 @@ function AdminPage() {
           <DocumentUploadsList />
         </TabsContent>
         <TabsContent value="languages" className="mt-6">
-          <CrudTable
-            title="Languages"
-            rows={SUPPORTED_LANGUAGES_LIST.map((l) => [l.code, l.name, l.nativeName, l.active ? "Active" : "Inactive"])}
-            head={["Code", "Name", "Native name", "Status"]}
-          />
+          <LanguagesEditor />
         </TabsContent>
         <TabsContent value="settings" className="mt-6">
           <EmptyState title="Settings" desc="App settings will appear here." />
