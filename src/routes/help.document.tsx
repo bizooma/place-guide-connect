@@ -125,7 +125,7 @@ function DocumentPage() {
               </SelectTrigger>
               <SelectContent>
                 {LANGUAGES.map((l) => (
-                  <SelectItem key={l} value={l} className="text-base">{l}</SelectItem>
+                  <SelectItem key={l.value} value={l.value} className="text-base">{l.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
