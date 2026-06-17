@@ -9,16 +9,17 @@ export interface Language {
   code: LanguageCode;
   name: string;
   nativeName: string;
+  flag: string;
   active: boolean;
 }
 
 export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: "en", name: "English", nativeName: "English", active: true },
-  { code: "es", name: "Spanish", nativeName: "Español", active: false },
-  { code: "lang2", name: "Language 2", nativeName: "Language 2", active: false },
-  { code: "lang3", name: "Language 3", nativeName: "Language 3", active: false },
-  { code: "lang4", name: "Language 4", nativeName: "Language 4", active: false },
-  { code: "lang5", name: "Language 5", nativeName: "Language 5", active: false },
+  { code: "en", name: "English", nativeName: "English", flag: "🇺🇸", active: true },
+  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", active: false },
+  { code: "lang2", name: "Language 2", nativeName: "Language 2", flag: "🏳️", active: false },
+  { code: "lang3", name: "Language 3", nativeName: "Language 3", flag: "🏳️", active: false },
+  { code: "lang4", name: "Language 4", nativeName: "Language 4", flag: "🏳️", active: false },
+  { code: "lang5", name: "Language 5", nativeName: "Language 5", flag: "🏳️", active: false },
 ];
 
 type Dict = Record<string, string>;
