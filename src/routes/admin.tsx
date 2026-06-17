@@ -89,7 +89,7 @@ function AdminPage() {
           />
         </TabsContent>
         <TabsContent value="requests" className="mt-6">
-          <EmptyState title="Support requests" desc="User-submitted summaries and document uploads appear here once Supabase is connected." />
+          <EmptyState title="Document uploads" desc="Anonymous document uploads are stored in the Supabase 'document-uploads' bucket and the 'document_uploads' table. Review them from your Supabase dashboard." />
         </TabsContent>
         <TabsContent value="languages" className="mt-6">
           <CrudTable
