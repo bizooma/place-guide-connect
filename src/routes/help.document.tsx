@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Upload, Camera, FileText, Calendar, Phone, MapPin, ListChecks, Sparkles, Trash2, ArrowLeft } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Disclaimer } from "@/components/Disclaimer";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useI18n } from "@/lib/i18n";
-import { resources } from "@/data/mock";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/help/document")({
