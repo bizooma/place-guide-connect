@@ -47,7 +47,10 @@ type ScheduleItem = {
   language: string;
   registration_required: boolean;
   active: boolean;
+  translations?: Record<string, Record<string, string>> | null;
 };
+
+const REQUIRED_LANGS = ["es", "fa", "ps", "so", "ar"];
 
 const CATEGORIES = [
   "English Language Classes",
