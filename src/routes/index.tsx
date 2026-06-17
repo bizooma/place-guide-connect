@@ -83,19 +83,28 @@ function HomePage() {
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {active.map((cat) => {
-            const Icon = (Icons as any)[cat.icon] ?? Icons.HelpCircle;
+            const img = CARD_IMAGES[cat.slug];
             const isDoc = cat.slug === "document";
             return (
               <Link
                 key={cat.id}
                 to={isDoc ? "/help/document" : "/help"}
                 search={isDoc ? undefined : { category: cat.slug }}
-                className="surface-card group flex w-full items-start gap-4 p-5 text-left transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5"
+                className="surface-card group flex w-full items-start gap-4 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5"
               >
-                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary-deep transition group-hover:bg-primary group-hover:text-primary-foreground">
-                  <Icon className="h-6 w-6" aria-hidden />
-                </span>
-                <span className="flex-1">
+                {img && (
+                  <span className="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-secondary">
+                    <img
+                      src={img}
+                      alt=""
+                      width={512}
+                      height={512}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  </span>
+                )}
+                <span className="flex-1 py-1">
                   <span className="block font-display text-lg font-semibold text-primary-deep">{t(`triage.${cat.slug}.title`, cat.title)}</span>
                   <span className="mt-1 block text-sm text-muted-foreground">{t(`triage.${cat.slug}.desc`, cat.description)}</span>
                 </span>
