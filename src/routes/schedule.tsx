@@ -129,7 +129,7 @@ const CATEGORY_DOT: Record<string, string> = {
   "Job Help": "bg-muted-foreground",
 };
 
-function CalendarView({ items }: { items: ScheduleRow[] }) {
+function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallback?: string) => string }) {
   const initial = useMemo(() => {
     const now = new Date();
     if (items.some((i) => {
