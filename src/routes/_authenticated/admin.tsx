@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { triageCategories, scheduleItems, resources, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
+import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
