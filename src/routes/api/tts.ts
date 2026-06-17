@@ -94,7 +94,7 @@ export const Route = createFileRoute("/api/tts")({
         for (let i = 0; i < binary.length; i++) pcm[i] = binary.charCodeAt(i);
         const wav = pcmToWav(pcm, sampleRate);
 
-        return new Response(wav, {
+        return new Response(wav.buffer as ArrayBuffer, {
           status: 200,
           headers: {
             "Content-Type": "audio/wav",
