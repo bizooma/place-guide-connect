@@ -8,6 +8,7 @@ import { triageCategories, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
 import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
+import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -24,6 +25,7 @@ function AdminPage() {
   const navigate = useNavigate();
   const { user } = Route.useRouteContext();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const pendingCount = usePendingUploadsCount();
 
   useEffect(() => {
     supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }).then(({ data }) => {
@@ -72,7 +74,14 @@ function AdminPage() {
           <TabsTrigger value="triage" className="gap-1.5 rounded-full"><FileText className="h-4 w-4" />Help choices</TabsTrigger>
           <TabsTrigger value="schedule" className="gap-1.5 rounded-full"><CalendarDays className="h-4 w-4" />Schedule</TabsTrigger>
           <TabsTrigger value="resources" className="gap-1.5 rounded-full"><BookOpen className="h-4 w-4" />Resources</TabsTrigger>
-          <TabsTrigger value="requests" className="gap-1.5 rounded-full"><Users className="h-4 w-4" />Requests</TabsTrigger>
+          <TabsTrigger value="requests" className="gap-1.5 rounded-full">
+            <Users className="h-4 w-4" />Requests
+            {pendingCount > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-[11px] font-semibold leading-none">
+                {pendingCount > 99 ? "99+" : pendingCount}
+              </span>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="languages" className="gap-1.5 rounded-full"><LangIcon className="h-4 w-4" />Languages</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 rounded-full"><Settings className="h-4 w-4" />Settings</TabsTrigger>
         </TabsList>
