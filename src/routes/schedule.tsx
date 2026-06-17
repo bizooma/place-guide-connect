@@ -284,7 +284,7 @@ function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: Ca
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
-          <p className="col-span-full text-muted-foreground">Nothing scheduled here yet. Try a different view or category.</p>
+          <p className="col-span-full text-muted-foreground">{t("schedule.nothingHere")}</p>
         )}
         {filtered.map((s) => (
           <article key={s.id} className="surface-card flex flex-col p-5">
@@ -298,8 +298,8 @@ function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: Ca
               <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{s.language}</span></div>
             </dl>
             <div className="mt-auto pt-4">
-              {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">Registration required</p>}
-              <Button className="w-full rounded-full bg-primary hover:bg-primary-deep" onClick={() => toast.success("We'll save your interest — a staff member will follow up.")}>
+              {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">{t("schedule.regRequired")}</p>}
+              <Button className="w-full rounded-full bg-primary hover:bg-primary-deep" onClick={() => toast.success(t("schedule.interestSaved"))}>
                 {t("schedule.interested")}
               </Button>
             </div>
