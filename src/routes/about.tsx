@@ -51,7 +51,11 @@ function AboutPage() {
           </p>
         </div>
         <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">We Find In Love</h3>
+          <h3 className="font-display text-xl font-semibold text-primary-deep">
+            <a href="https://wefindinlove.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
+              We Find In Love
+            </a>
+          </h3>
           <p className="mt-1 text-base leading-relaxed text-foreground/85">
             An organization that empowers through art, service, and community. They focus on creating collaborative, creative learning environments that foster independence and help refugee neighbors in the Texas Panhandle (and abroad) live out their dreams.
           </p>
