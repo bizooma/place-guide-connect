@@ -9,6 +9,7 @@ import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
 import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
 import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
+import { SettingsEditor } from "@/components/admin/SettingsEditor";
 import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -107,7 +108,7 @@ function AdminPage() {
           <LanguagesEditor />
         </TabsContent>
         <TabsContent value="settings" className="mt-6">
-          <EmptyState title="Settings" desc="App settings will appear here." />
+          <SettingsEditor />
         </TabsContent>
       </Tabs>
     </div>

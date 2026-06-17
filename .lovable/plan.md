@@ -1,22 +1,29 @@
 ## Goal
-Show admins an unread badge on the Requests tab whenever new documents are uploaded, updating live.
+Make the admin Settings tab functional. Start with a single editable field — **Support email** — designed so more settings drop in later without schema churn.
 
-## Changes
+## Database
+New migration creating a key/value settings table (flexible for future fields):
 
-### 1. Enable realtime on `document_uploads`
-Migration:
-- `ALTER TABLE public.document_uploads REPLICA IDENTITY FULL;`
-- `ALTER PUBLICATION supabase_realtime ADD TABLE public.document_uploads;`
+- `public.app_settings`
+  - `key text PRIMARY KEY`
+  - `value jsonb NOT NULL`
+  - `updated_at timestamptz NOT NULL DEFAULT now()`
+  - `updated_by uuid` (nullable)
+- Grants: `SELECT` to `anon, authenticated`; `ALL` to `service_role`; `INSERT/UPDATE/DELETE` to `authenticated`.
+- RLS enabled. Policies:
+  - SELECT: public read (so the support email can be shown on the site).
+  - INSERT/UPDATE/DELETE: `has_role(auth.uid(), 'admin')`.
+- `updated_at` trigger using existing `public.set_updated_at()`.
+- Seed row: `('support_email', '""'::jsonb)`.
 
-### 2. Badge on Requests tab — `src/routes/_authenticated/admin.tsx`
-- Query count of `document_uploads` where `status = 'pending'`.
-- Render a small red count badge on the "Requests" `TabsTrigger`.
-- `useEffect` subscribes to `postgres_changes` on `document_uploads` (INSERT + UPDATE) and refetches the count; cleanup with `supabase.removeChannel`.
+## Frontend
+- New `src/components/admin/SettingsEditor.tsx`:
+  - Loads `app_settings` row where `key='support_email'`.
+  - Single labeled input (type=email) + Save button.
+  - Upserts on save with `updated_by = auth.uid()`, toasts success/error.
+  - Layout leaves room for additional setting cards later (one section per setting).
+- `src/routes/_authenticated/admin.tsx`: replace the empty `EmptyState` in the Settings tab with `<SettingsEditor />`.
 
-### 3. Live refresh in the list — `src/components/admin/DocumentUploadsList.tsx`
-- Same realtime subscription re-runs the existing `load()` so the table updates without a manual refresh.
-
-## Files
-- new migration (realtime publication)
-- edit `src/routes/_authenticated/admin.tsx`
-- edit `src/components/admin/DocumentUploadsList.tsx`
+## Out of scope
+- No surfacing of the support email on public pages yet (can wire into footer/contact later).
+- No additional setting fields yet — structure supports them when requested.
