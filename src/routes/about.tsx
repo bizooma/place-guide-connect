@@ -31,7 +31,11 @@ function AboutPage() {
 
       <div className="mt-6 space-y-6">
         <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">Refugee Language Project</h3>
+          <h3 className="font-display text-xl font-semibold text-primary-deep">
+            <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="hover:underline">
+              Refugee Language Project
+            </a>
+          </h3>
           <p className="mt-1 text-base leading-relaxed text-foreground/85">
             Dedicated to helping individuals from refugee communities flourish. By removing language barriers, honoring diverse cultural heritages, and fostering community leaders, they help our neighbors confidently interact with the world around them.
           </p>
