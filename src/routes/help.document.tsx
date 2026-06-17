@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Upload, Camera, FileText, Calendar, Phone, MapPin, ListChecks, Sparkles, Trash2, ArrowLeft } from "lucide-react";
+import { Upload, Camera, FileText, Calendar, Phone, MapPin, ListChecks, Sparkles, Trash2, ArrowLeft, Languages } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Disclaimer } from "@/components/Disclaimer";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { analyzeDocument, type DocumentAnalysis } from "@/lib/document-ai.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/help/document")({
@@ -23,22 +26,33 @@ export const Route = createFileRoute("/help/document")({
   component: DocumentPage,
 });
 
-interface FakeResult {
+// Languages the user can ask the AI to explain the document in.
+// These are sent to Gemini as the target language for both summary and TTS.
+const LANGUAGES = [
+  "English",
+  "Spanish",
+  "Vietnamese",
+  "Simplified Chinese",
+  "Arabic",
+  "French",
+  "Haitian Creole",
+  "Russian",
+  "Tagalog",
+  "Korean",
+] as const;
+
+interface Result extends DocumentAnalysis {
   fileName: string;
-  kind: string;
-  summary: string;
-  important: string[];
-  dates: string[];
-  nextSteps: string[];
-  contact: string;
 }
 
 function DocumentPage() {
   const { t } = useI18n();
   const [consent, setConsent] = useState(false);
+  const [language, setLanguage] = useState<string>("English");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<FakeResult | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
+  const runAnalysis = useServerFn(analyzeDocument);
 
   const { data: resources = [] } = useQuery({
     queryKey: ["resources", "doc-helper"],
@@ -72,20 +86,15 @@ function DocumentPage() {
         size_bytes: f.size,
       });
       if (insErr) throw insErr;
-      toast.success("Document received. Staff will review it.");
-      // Placeholder AI explanation — real model integration will replace this.
-      setResult({
-        fileName: f.name,
-        kind: "This looks like a utility bill.",
-        summary: "This is a monthly bill from an electric or gas company. It shows how much energy you used and what you owe. There is a due date — if you pay after that date, there is usually a late fee.",
-        important: ["Amount due: appears near the top right.", "Account number: keep this private.", "A customer service phone number is usually at the top or bottom."],
-        dates: ["Due date — pay by this date to avoid a late fee.", "Statement date — the date the bill was created."],
-        nextSteps: ["Find the amount due and the due date.", "If you cannot pay the full amount, call the company and ask about payment plans or hardship help.", "Bring the bill to The PLACE during Document Help Hour for help in person."],
-        contact: "The PLACE — Document Help Hour (Wednesday afternoons), or call 2-1-1 in Texas for assistance programs.",
+
+      const analysis = await runAnalysis({
+        data: { storagePath: path, mimeType: f.type || "application/octet-stream", language },
       });
+      setResult({ fileName: f.name, ...analysis });
     } catch (err) {
       console.error(err);
-      toast.error("Upload failed. Please try again.");
+      const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -109,6 +118,23 @@ function DocumentPage() {
         <div className="mt-8 surface-card p-6 md:p-8">
           <Disclaimer tone="warn" className="mb-6">{t("disclaimer.upload")}</Disclaimer>
 
+          <div className="mb-5">
+            <Label htmlFor="lang" className="flex items-center gap-2 text-base font-medium">
+              <Languages className="h-4 w-4 text-primary" />
+              Read this document to me in…
+            </Label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger id="lang" className="mt-2 h-12 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map((l) => (
+                  <SelectItem key={l} value={l} className="text-base">{l}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex items-start gap-3">
             <Checkbox id="consent" checked={consent} onCheckedChange={(v) => setConsent(Boolean(v))} className="mt-1" />
             <Label htmlFor="consent" className="text-base leading-relaxed cursor-pointer">{t("document.consent")}</Label>
@@ -119,19 +145,19 @@ function DocumentPage() {
               <Upload className="h-8 w-8 text-primary" />
               <span className="font-medium text-primary-deep">{t("document.upload")}</span>
               <span className="text-xs text-muted-foreground">PDF, JPG, PNG, HEIC</span>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,image/*" className="hidden" disabled={!consent} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,image/*" className="hidden" disabled={!consent || loading} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
             </label>
             <label className={"surface-card flex cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed p-8 text-center transition " + (consent ? "border-accent/30 hover:border-accent hover:bg-accent/5" : "opacity-60 cursor-not-allowed")}>
               <Camera className="h-8 w-8 text-accent" />
               <span className="font-medium text-primary-deep">{t("document.takePhoto")}</span>
               <span className="text-xs text-muted-foreground">Use your camera</span>
-              <input type="file" accept="image/*" capture="environment" className="hidden" disabled={!consent} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
+              <input type="file" accept="image/*" capture="environment" className="hidden" disabled={!consent || loading} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
             </label>
           </div>
 
           {loading && (
             <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles className="h-4 w-4 animate-pulse text-accent" /> Reading your document…
+              <Sparkles className="h-4 w-4 animate-pulse text-accent" /> Reading your document in {language}…
             </p>
           )}
         </div>
@@ -145,40 +171,60 @@ function DocumentPage() {
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">{result.fileName}</p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-primary-deep">{result.kind}</h2>
               </div>
-              <ReadAloudButton text={`${result.kind}. ${result.summary}`} />
+              <ReadAloudButton
+                language={language}
+                text={[
+                  result.kind,
+                  result.summary,
+                  result.important.length ? "Important: " + result.important.join(". ") : "",
+                  result.dates.length ? "Dates: " + result.dates.join(". ") : "",
+                  result.nextSteps.length ? "Next steps: " + result.nextSteps.join(". ") : "",
+                  result.contact,
+                ].filter(Boolean).join(". ")}
+              />
             </div>
           </div>
 
-          <ResultCard icon={FileText} title="Plain English summary">
+          <ResultCard icon={FileText} title="Plain language summary">
             <p>{result.summary}</p>
           </ResultCard>
 
-          <ResultCard icon={ListChecks} title="Important information">
-            <ul className="space-y-2">{result.important.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />{s}</li>)}</ul>
-          </ResultCard>
+          {result.important.length > 0 && (
+            <ResultCard icon={ListChecks} title="Important information">
+              <ul className="space-y-2">{result.important.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />{s}</li>)}</ul>
+            </ResultCard>
+          )}
 
-          <ResultCard icon={Calendar} title="Dates or deadlines">
-            <ul className="space-y-2">{result.dates.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />{s}</li>)}</ul>
-          </ResultCard>
+          {result.dates.length > 0 && (
+            <ResultCard icon={Calendar} title="Dates or deadlines">
+              <ul className="space-y-2">{result.dates.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />{s}</li>)}</ul>
+            </ResultCard>
+          )}
 
-          <ResultCard icon={Sparkles} title="What you may need to do next">
-            <ol className="list-decimal space-y-2 pl-5">{result.nextSteps.map((s, i) => <li key={i}>{s}</li>)}</ol>
-          </ResultCard>
+          {result.nextSteps.length > 0 && (
+            <ResultCard icon={Sparkles} title="What you may need to do next">
+              <ol className="list-decimal space-y-2 pl-5">{result.nextSteps.map((s, i) => <li key={i}>{s}</li>)}</ol>
+            </ResultCard>
+          )}
 
-          <ResultCard icon={MapPin} title="Helpful resources">
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {resources.slice(0, 4).map((r) => (
-                <li key={r.id} className="rounded-xl border border-border p-3">
-                  <p className="font-medium text-primary-deep">{r.name}</p>
-                  <p className="text-sm text-muted-foreground">{r.description}</p>
-                </li>
-              ))}
-            </ul>
-          </ResultCard>
+          {resources.length > 0 && (
+            <ResultCard icon={MapPin} title="Helpful resources">
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {resources.slice(0, 4).map((r) => (
+                  <li key={r.id} className="rounded-xl border border-border p-3">
+                    <p className="font-medium text-primary-deep">{r.name}</p>
+                    <p className="text-sm text-muted-foreground">{r.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </ResultCard>
+          )}
 
-          <ResultCard icon={Phone} title="Who to contact">
-            <p>{result.contact}</p>
-          </ResultCard>
+          {result.contact && (
+            <ResultCard icon={Phone} title="Who to contact">
+              <p>{result.contact}</p>
+            </ResultCard>
+          )}
 
           <Disclaimer>{t("disclaimer.ai")}</Disclaimer>
 
