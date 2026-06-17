@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, FileText, Briefcase, Receipt, CalendarDays, HeartHandshake } from "lucide-react";
+import { ArrowRight, HeartHandshake } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { useI18n } from "@/lib/i18n";
+import { triageCategories } from "@/data/mock";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
