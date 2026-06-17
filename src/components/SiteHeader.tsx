@@ -1,9 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, Languages, Home, HeartHandshake, CalendarDays, BookOpen, Info } from "lucide-react";
+import { Menu, X, Home, HeartHandshake, CalendarDays, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
 import logoAsset from "@/assets/theplace-logowhite.webp.asset.json";
 
@@ -54,7 +53,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <LanguageSelector />
+          {/* Language selector moved to homepage */}
         </div>
 
         <Button
@@ -89,10 +88,6 @@ export function SiteHeader() {
                 </Link>
               );
             })}
-            <div className="mt-2 flex items-center gap-2 px-2">
-              <Languages className="h-4 w-4 text-white/70" aria-hidden />
-              <LanguageSelector />
-            </div>
           </nav>
         </div>
       )}
