@@ -120,15 +120,15 @@ function SchedulePage() {
             onClick={() => setCategory(c)}
             className={"rounded-full border px-3.5 py-1.5 text-sm transition " + (category === c ? "border-primary bg-primary text-primary-foreground" : "border-border bg-warm hover:border-primary/40")}
           >
-            {c}
+            {c === "All" ? t("schedule.all") : tx(c)}
           </button>
         ))}
       </div>
 
       {mode === "calendar" ? (
-        <CalendarView items={filteredItems} t={t} />
+        <CalendarView items={filteredItems} t={t} tx={tx} />
       ) : (
-        <CardsView items={filteredItems} view={cardsView} setView={setCardsView} t={t} />
+        <CardsView items={filteredItems} view={cardsView} setView={setCardsView} t={t} tx={tx} />
       )}
 
       <Disclaimer className="mt-10">{t("schedule.disclaimer")}</Disclaimer>
