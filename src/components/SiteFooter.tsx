@@ -27,6 +27,7 @@ export function SiteFooter() {
         <div>
           <p className="text-xs uppercase tracking-wider text-primary-foreground/60">Trust</p>
           <ul className="mt-3 space-y-2 text-sm">
+            <li><Link to="/admin" className="hover:underline">Admin</Link></li>
             <li><Link to="/privacy" className="hover:underline">Privacy</Link></li>
             <li><Link to="/terms" className="hover:underline">Terms & Responsible Use</Link></li>
           </ul>

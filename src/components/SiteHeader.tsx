@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, Languages, Home, HeartHandshake, CalendarDays, BookOpen, Info, Shield } from "lucide-react";
+import { Menu, X, Languages, Home, HeartHandshake, CalendarDays, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -13,7 +13,6 @@ const nav = [
   { to: "/schedule", labelKey: "nav.schedule", icon: CalendarDays },
   { to: "/resources", labelKey: "nav.resources", icon: BookOpen },
   { to: "/about", labelKey: "nav.about", icon: Info },
-  { to: "/admin", labelKey: "nav.admin", icon: Shield },
 ] as const;
 
 export function SiteHeader() {
