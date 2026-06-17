@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, X, Home, HeartHandshake, CalendarDays, BookOpen, Info } from "lucide-react";
+import { Menu, X, Home, CalendarDays, BookOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
@@ -8,7 +8,6 @@ import logoAsset from "@/assets/theplace-logowhite.webp.asset.json";
 
 const nav = [
   { to: "/", labelKey: "nav.home", icon: Home },
-  { to: "/help", labelKey: "nav.help", icon: HeartHandshake },
   { to: "/schedule", labelKey: "nav.schedule", icon: CalendarDays },
   { to: "/resources", labelKey: "nav.resources", icon: BookOpen },
   { to: "/about", labelKey: "nav.about", icon: Info },
