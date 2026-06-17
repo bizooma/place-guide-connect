@@ -75,20 +75,35 @@ export const analyzeDocument = createServerFn({ method: "POST" })
       },
     };
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      },
-    );
+    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
+    let res: Response | null = null;
+    let lastStatus = 0;
+    let lastBody = "";
+    outer: for (const model of models) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const r = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          },
+        );
+        if (r.ok) { res = r; break outer; }
+        lastStatus = r.status;
+        lastBody = await r.text().catch(() => "");
+        console.error(`[analyzeDocument] ${model} attempt ${attempt + 1} -> ${r.status}`, lastBody.slice(0, 200));
+        // Only retry on transient errors
+        if (r.status !== 503 && r.status !== 429 && r.status !== 500) break;
+        await new Promise((s) => setTimeout(s, 600 * (attempt + 1)));
+      }
+    }
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("[analyzeDocument] Gemini error", res.status, text);
-      if (res.status === 429) throw new Error("AI is busy right now. Please try again in a moment.");
-      if (res.status === 403) throw new Error("AI is not authorized. Please check the API key.");
+    if (!res) {
+      if (lastStatus === 503) throw new Error("AI is overloaded right now. Please try again in a minute.");
+      if (lastStatus === 429) throw new Error("AI is busy right now. Please try again in a moment.");
+      if (lastStatus === 403) throw new Error("AI is not authorized. Please check the API key.");
+      console.error("[analyzeDocument] all attempts failed", lastStatus, lastBody);
       throw new Error("AI could not read this document. Please try a clearer photo or a different file.");
     }
 
