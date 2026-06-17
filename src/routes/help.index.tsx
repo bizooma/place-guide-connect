@@ -12,7 +12,7 @@ import { useI18n } from "@/lib/i18n";
 import { triageCategories, triageFlows, resources } from "@/data/mock";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/help")({
+export const Route = createFileRoute("/help/")({
   head: () => ({
     meta: [
       { title: "How Can We Help You? — The PLACE Online" },
