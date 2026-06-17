@@ -41,7 +41,11 @@ function AboutPage() {
           </p>
         </div>
         <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">Square Mile</h3>
+          <h3 className="font-display text-xl font-semibold text-primary-deep">
+            <a href="https://www.square-mile.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
+              Square Mile
+            </a>
+          </h3>
           <p className="mt-1 text-base leading-relaxed text-foreground/85">
             Focused on holistic and innovative neighborhood revitalization. Using an empowerment-based model of community engagement, Square Mile builds networks of entrepreneurs, small businesses, and residents to bring renewal and restoration to under-resourced areas.
           </p>
