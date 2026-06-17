@@ -4,8 +4,9 @@ import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as L
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { triageCategories, scheduleItems, resources, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
+import { triageCategories, SUPPORTED_LANGUAGES_LIST } from "@/data/adminSeed";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
+import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
