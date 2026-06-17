@@ -34,7 +34,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-primary-foreground/60">© {new Date().getFullYear()} The PLACE Online</p>
+        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-primary-foreground/60">© {new Date().getFullYear()}</p>
       </div>
     </footer>
   );
