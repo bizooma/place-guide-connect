@@ -50,6 +50,17 @@ export function DocumentUploadsList() {
 
   useEffect(() => {
     load();
+    const channel = supabase
+      .channel("document_uploads_list")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "document_uploads" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const categories = useMemo(() => {
