@@ -14,7 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      document_uploads: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          help_category: string | null
+          id: string
+          language: string | null
+          mime_type: string | null
+          original_filename: string | null
+          reviewed_at: string | null
+          size_bytes: number | null
+          status: string
+          storage_path: string
+          updated_at: string
+          user_note: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          help_category?: string | null
+          id?: string
+          language?: string | null
+          mime_type?: string | null
+          original_filename?: string | null
+          reviewed_at?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path: string
+          updated_at?: string
+          user_note?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          help_category?: string | null
+          id?: string
+          language?: string | null
+          mime_type?: string | null
+          original_filename?: string | null
+          reviewed_at?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string
+          updated_at?: string
+          user_note?: string | null
+        }
+        Relationships: []
+      }
+      languages: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+          name: string
+          native_name: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          native_name?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          native_name?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          active: boolean
+          address: string | null
+          category: string
+          cost: string
+          created_at: string
+          description: string
+          eligibility: string | null
+          hours: string | null
+          id: string
+          languages: string[]
+          name: string
+          phone: string | null
+          sort_order: number
+          tags: string[]
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          category: string
+          cost?: string
+          created_at?: string
+          description: string
+          eligibility?: string | null
+          hours?: string | null
+          id?: string
+          languages?: string[]
+          name: string
+          phone?: string | null
+          sort_order?: number
+          tags?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          category?: string
+          cost?: string
+          created_at?: string
+          description?: string
+          eligibility?: string | null
+          hours?: string | null
+          id?: string
+          languages?: string[]
+          name?: string
+          phone?: string | null
+          sort_order?: number
+          tags?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      schedule_items: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          date: string
+          day: string
+          description: string
+          end_time: string
+          id: string
+          language: string
+          location: string
+          registration_required: boolean
+          start_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          date: string
+          day: string
+          description?: string
+          end_time: string
+          id?: string
+          language?: string
+          location: string
+          registration_required?: boolean
+          start_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          date?: string
+          day?: string
+          description?: string
+          end_time?: string
+          id?: string
+          language?: string
+          location?: string
+          registration_required?: boolean
+          start_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
