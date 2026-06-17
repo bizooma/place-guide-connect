@@ -30,7 +30,7 @@ export const Route = createFileRoute("/help/")({
 function HelpPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const search = useSearch({ from: "/help" });
+  const search = useSearch({ from: "/help/" });
   const [selected, setSelected] = useState<string | null>(search.category ?? null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
