@@ -82,6 +82,27 @@ export function ScheduleEditor() {
   const [creating, setCreating] = useState<Omit<ScheduleItem, "id"> | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const translateFn = useServerFn(translateRow);
+
+  async function handleTranslate(id: string) {
+    setTranslatingId(id);
+    try {
+      await translateFn({ data: { table: "schedule_items", id } });
+      toast.success("Translations generated");
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Translation failed");
+    } finally {
+      setTranslatingId(null);
+    }
+  }
+
+  function translationStatus(it: ScheduleItem) {
+    const tr = it.translations ?? {};
+    const present = REQUIRED_LANGS.filter((l) => tr[l] && Object.keys(tr[l]).length > 0).length;
+    return { present, total: REQUIRED_LANGS.length, complete: present === REQUIRED_LANGS.length };
+  }
 
   async function load() {
     const { data, error } = await supabase
