@@ -83,11 +83,7 @@ function AdminPage() {
           />
         </TabsContent>
         <TabsContent value="schedule" className="mt-6">
-          <CrudTable
-            title="Schedule items"
-            rows={scheduleItems.map((s) => [s.title, s.category, `${s.day} ${s.startTime}`, s.location])}
-            head={["Title", "Category", "When", "Location"]}
-          />
+          <ScheduleEditor />
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
           <CrudTable
