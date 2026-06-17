@@ -9,10 +9,10 @@ import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The PLACE Online — Help is closer than you think." },
+      { title: "The PLACE Online — Everyone deserves a PLACE." },
       { name: "description", content: "Online support inspired by The PLACE in Amarillo. Understand documents, find resources, view classes, connect with help." },
       { property: "og:title", content: "The PLACE Online" },
-      { property: "og:description", content: "Help is closer than you think." },
+      { property: "og:description", content: "Everyone deserves a PLACE." },
       { property: "og:image", content: "/icon-512.png" },
     ],
   }),
