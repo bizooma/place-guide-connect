@@ -32,7 +32,7 @@ function AboutPage() {
       <div className="mt-6 space-y-6">
         <div>
           <h3 className="font-display text-xl font-semibold text-primary-deep">
-            <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
               Refugee Language Project
             </a>
           </h3>
