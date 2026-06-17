@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Clock, MapPin, Languages as LanguagesIcon, CalendarDays } from "lucide-react";
+import { Clock, MapPin, Languages as LanguagesIcon, CalendarDays, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
@@ -35,12 +35,25 @@ interface ScheduleRow {
   registration_required: boolean;
 }
 
+type Mode = "calendar" | "cards";
+type CardsView = "today" | "week" | "all";
+
+function parseLocalDate(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function toISO(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function SchedulePage() {
   const { t } = useI18n();
   const [category, setCategory] = useState("All");
-  const [view, setView] = useState<"today" | "week" | "all">("week");
+  const [mode, setMode] = useState<Mode>("calendar");
+  const [cardsView, setCardsView] = useState<CardsView>("week");
 
-  const { data: scheduleItems = [], isLoading } = useQuery({
+  const { data: scheduleItems = [] } = useQuery({
     queryKey: ["schedule_items"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,16 +66,10 @@ function SchedulePage() {
     },
   });
 
-  const items = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    const weekEnd = new Date(Date.now() + 6 * 86400000).toISOString().slice(0, 10);
-    return scheduleItems.filter((s) => {
-      if (category !== "All" && s.category !== category) return false;
-      if (view === "today" && s.date !== today) return false;
-      if (view === "week" && (s.date < today || s.date > weekEnd)) return false;
-      return true;
-    });
-  }, [category, view, scheduleItems]);
+  const filteredItems = useMemo(
+    () => scheduleItems.filter((s) => category === "All" || s.category === category),
+    [scheduleItems, category],
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
@@ -73,18 +80,21 @@ function SchedulePage() {
         </div>
         <div className="inline-flex rounded-full border border-border bg-warm p-1">
           {[
-            { id: "today", label: t("schedule.today") },
-            { id: "week", label: t("schedule.week") },
-            { id: "all", label: t("schedule.all") },
-          ].map((v) => (
-            <button
-              key={v.id}
-              onClick={() => setView(v.id as any)}
-              className={"rounded-full px-4 py-2 text-sm font-medium transition " + (view === v.id ? "bg-primary text-primary-foreground" : "text-primary-deep/80 hover:bg-secondary")}
-            >
-              {v.label}
-            </button>
-          ))}
+            { id: "calendar" as const, label: "Calendar", icon: CalendarRange },
+            { id: "cards" as const, label: "Cards", icon: LayoutGrid },
+          ].map((v) => {
+            const Icon = v.icon;
+            return (
+              <button
+                key={v.id}
+                onClick={() => setMode(v.id)}
+                className={"inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition " + (mode === v.id ? "bg-primary text-primary-foreground" : "text-primary-deep/80 hover:bg-secondary")}
+              >
+                <Icon className="h-4 w-4" />
+                {v.label}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -100,11 +110,183 @@ function SchedulePage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.length === 0 && (
+      {mode === "calendar" ? (
+        <CalendarView items={filteredItems} />
+      ) : (
+        <CardsView items={filteredItems} view={cardsView} setView={setCardsView} t={t} />
+      )}
+
+      <Disclaimer className="mt-10">Schedule changes happen. If something is important to you, call The PLACE to confirm.</Disclaimer>
+    </div>
+  );
+}
+
+const CATEGORY_DOT: Record<string, string> = {
+  "English Language Classes": "bg-primary",
+  "Life Skills Classes": "bg-accent",
+  "Community Events": "bg-primary-deep",
+  "Document Help": "bg-secondary-foreground",
+  "Job Help": "bg-muted-foreground",
+};
+
+function CalendarView({ items }: { items: ScheduleRow[] }) {
+  const initial = useMemo(() => {
+    const now = new Date();
+    if (items.some((i) => {
+      const d = parseLocalDate(i.date);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    })) return new Date(now.getFullYear(), now.getMonth(), 1);
+    const future = items.map((i) => parseLocalDate(i.date)).filter((d) => d >= new Date(now.getFullYear(), now.getMonth(), 1)).sort((a, b) => a.getTime() - b.getTime())[0];
+    const target = future ?? (items[0] ? parseLocalDate(items[0].date) : now);
+    return new Date(target.getFullYear(), target.getMonth(), 1);
+  }, [items]);
+
+  const [cursor, setCursor] = useState<Date>(initial);
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const byDate = useMemo(() => {
+    const map = new Map<string, ScheduleRow[]>();
+    for (const it of items) {
+      const list = map.get(it.date) ?? [];
+      list.push(it);
+      map.set(it.date, list);
+    }
+    for (const list of map.values()) list.sort((a, b) => a.start_time.localeCompare(b.start_time));
+    return map;
+  }, [items]);
+
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayISO = toISO(new Date());
+
+  const cells: (Date | null)[] = [];
+  for (let i = 0; i < firstWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const monthLabel = cursor.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  const selectedItems = selected ? byDate.get(selected) ?? [] : [];
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-2xl font-semibold text-primary-deep">{monthLabel}</h2>
+        <div className="inline-flex gap-1">
+          <Button variant="outline" size="icon" onClick={() => setCursor(new Date(year, month - 1, 1))} aria-label="Previous month">
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setCursor(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}>
+            Today
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="Next month">
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-warm">
+        <div className="grid grid-cols-7 border-b border-border bg-secondary/40 text-xs font-semibold uppercase tracking-wider text-primary-deep/70">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div key={d} className="px-2 py-2 text-center">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {cells.map((cell, idx) => {
+            if (!cell) return <div key={idx} className="min-h-24 border-b border-r border-border/60 bg-background/30 md:min-h-28" />;
+            const iso = toISO(cell);
+            const dayItems = byDate.get(iso) ?? [];
+            const isToday = iso === todayISO;
+            const isSelected = iso === selected;
+            return (
+              <button
+                key={idx}
+                onClick={() => setSelected(iso)}
+                className={"min-h-24 border-b border-r border-border/60 p-1.5 text-left transition md:min-h-28 " + (isSelected ? "bg-primary/10" : "hover:bg-secondary/50")}
+              >
+                <div className={"mb-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold " + (isToday ? "bg-primary text-primary-foreground" : "text-primary-deep")}>
+                  {cell.getDate()}
+                </div>
+                <div className="space-y-0.5">
+                  {dayItems.slice(0, 3).map((it) => (
+                    <div key={it.id} className="flex items-center gap-1 truncate text-[11px] text-primary-deep/85">
+                      <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + (CATEGORY_DOT[it.category] ?? "bg-primary")} />
+                      <span className="truncate">{it.title}</span>
+                    </div>
+                  ))}
+                  {dayItems.length > 3 && (
+                    <div className="text-[10px] font-medium text-muted-foreground">+{dayItems.length - 3} more</div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {selected && (
+        <div className="mt-6">
+          <h3 className="font-display text-xl font-semibold text-primary-deep">
+            {parseLocalDate(selected).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+          </h3>
+          {selectedItems.length === 0 ? (
+            <p className="mt-2 text-muted-foreground">Nothing scheduled on this day.</p>
+          ) : (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {selectedItems.map((s) => (
+                <article key={s.id} className="surface-card p-4">
+                  <span className="text-xs font-medium uppercase tracking-wider text-accent">{s.category}</span>
+                  <h4 className="mt-1 font-display text-lg font-semibold text-primary-deep">{s.title}</h4>
+                  <p className="mt-1 text-sm text-muted-foreground">{s.description}</p>
+                  <dl className="mt-3 space-y-1 text-sm">
+                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
+                    <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{s.location}</span></div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: CardsView; setView: (v: CardsView) => void; t: (k: string) => string }) {
+  const filtered = useMemo(() => {
+    const today = toISO(new Date());
+    const weekEnd = toISO(new Date(Date.now() + 6 * 86400000));
+    return items.filter((s) => {
+      if (view === "today" && s.date !== today) return false;
+      if (view === "week" && (s.date < today || s.date > weekEnd)) return false;
+      return true;
+    });
+  }, [items, view]);
+
+  return (
+    <div className="mt-6">
+      <div className="inline-flex rounded-full border border-border bg-warm p-1">
+        {[
+          { id: "today" as const, label: t("schedule.today") },
+          { id: "week" as const, label: t("schedule.week") },
+          { id: "all" as const, label: t("schedule.all") },
+        ].map((v) => (
+          <button
+            key={v.id}
+            onClick={() => setView(v.id)}
+            className={"rounded-full px-4 py-2 text-sm font-medium transition " + (view === v.id ? "bg-primary text-primary-foreground" : "text-primary-deep/80 hover:bg-secondary")}
+          >
+            {v.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.length === 0 && (
           <p className="col-span-full text-muted-foreground">Nothing scheduled here yet. Try a different view or category.</p>
         )}
-        {items.map((s) => (
+        {filtered.map((s) => (
           <article key={s.id} className="surface-card flex flex-col p-5">
             <span className="text-xs font-medium uppercase tracking-wider text-accent">{s.category}</span>
             <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{s.title}</h3>
@@ -124,8 +306,6 @@ function SchedulePage() {
           </article>
         ))}
       </div>
-
-      <Disclaimer className="mt-10">Schedule changes happen. If something is important to you, call The PLACE to confirm.</Disclaimer>
     </div>
   );
 }
