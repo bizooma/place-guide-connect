@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/lib/i18n";
-import logoAsset from "@/assets/theplace-logo.webp.asset.json";
+import logoAsset from "@/assets/theplace-logowhite.webp.asset.json";
 
 const nav = [
   { to: "/", labelKey: "nav.home", icon: Home },
@@ -30,7 +30,7 @@ export function SiteHeader() {
           <img
             src={logoAsset.url}
             alt="The PLACE Online"
-            className="h-12 w-auto max-w-[200px] rounded-md bg-primary-deep object-contain px-1 py-0.5"
+            className="h-10 w-auto max-w-[220px] object-contain"
           />
         </Link>
 
