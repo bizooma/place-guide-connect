@@ -76,12 +76,12 @@ function SchedulePage() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-semibold text-primary-deep md:text-5xl">{t("schedule.title")}</h1>
-          <p className="mt-2 text-muted-foreground">Walk-in welcome unless noted. Times may change.</p>
+          <p className="mt-2 text-muted-foreground">{t("schedule.subtitle")}</p>
         </div>
         <div className="inline-flex rounded-full border border-border bg-warm p-1">
           {[
-            { id: "calendar" as const, label: "Calendar", icon: CalendarRange },
-            { id: "cards" as const, label: "Cards", icon: LayoutGrid },
+            { id: "calendar" as const, label: t("schedule.calendar"), icon: CalendarRange },
+            { id: "cards" as const, label: t("schedule.cards"), icon: LayoutGrid },
           ].map((v) => {
             const Icon = v.icon;
             return (
@@ -111,12 +111,12 @@ function SchedulePage() {
       </div>
 
       {mode === "calendar" ? (
-        <CalendarView items={filteredItems} />
+        <CalendarView items={filteredItems} t={t} />
       ) : (
         <CardsView items={filteredItems} view={cardsView} setView={setCardsView} t={t} />
       )}
 
-      <Disclaimer className="mt-10">Schedule changes happen. If something is important to you, call The PLACE to confirm.</Disclaimer>
+      <Disclaimer className="mt-10">{t("schedule.disclaimer")}</Disclaimer>
     </div>
   );
 }
@@ -129,7 +129,7 @@ const CATEGORY_DOT: Record<string, string> = {
   "Job Help": "bg-muted-foreground",
 };
 
-function CalendarView({ items }: { items: ScheduleRow[] }) {
+function CalendarView({ items, t }: { items: ScheduleRow[]; t: (k: string, fallback?: string) => string }) {
   const initial = useMemo(() => {
     const now = new Date();
     if (items.some((i) => {
@@ -178,7 +178,7 @@ function CalendarView({ items }: { items: ScheduleRow[] }) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={() => setCursor(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}>
-            Today
+            {t("schedule.todayBtn")}
           </Button>
           <Button variant="outline" size="icon" onClick={() => setCursor(new Date(year, month + 1, 1))} aria-label="Next month">
             <ChevronRight className="h-4 w-4" />
@@ -231,7 +231,7 @@ function CalendarView({ items }: { items: ScheduleRow[] }) {
             {parseLocalDate(selected).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
           </h3>
           {selectedItems.length === 0 ? (
-            <p className="mt-2 text-muted-foreground">Nothing scheduled on this day.</p>
+            <p className="mt-2 text-muted-foreground">{t("schedule.nothingDay")}</p>
           ) : (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {selectedItems.map((s) => (
@@ -284,7 +284,7 @@ function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: Ca
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
-          <p className="col-span-full text-muted-foreground">Nothing scheduled here yet. Try a different view or category.</p>
+          <p className="col-span-full text-muted-foreground">{t("schedule.nothingHere")}</p>
         )}
         {filtered.map((s) => (
           <article key={s.id} className="surface-card flex flex-col p-5">
@@ -298,8 +298,8 @@ function CardsView({ items, view, setView, t }: { items: ScheduleRow[]; view: Ca
               <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{s.language}</span></div>
             </dl>
             <div className="mt-auto pt-4">
-              {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">Registration required</p>}
-              <Button className="w-full rounded-full bg-primary hover:bg-primary-deep" onClick={() => toast.success("We'll save your interest — a staff member will follow up.")}>
+              {s.registration_required && <p className="mb-2 text-xs font-medium text-accent">{t("schedule.regRequired")}</p>}
+              <Button className="w-full rounded-full bg-primary hover:bg-primary-deep" onClick={() => toast.success(t("schedule.interestSaved"))}>
                 {t("schedule.interested")}
               </Button>
             </div>

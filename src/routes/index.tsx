@@ -62,8 +62,8 @@ function HomePage() {
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">What can we help with?</h2>
-            <p className="mt-2 max-w-2xl text-muted-foreground">Tap any card to get started. You don't have to know exactly what you need.</p>
+            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">{t("home.cards.title")}</h2>
+            <p className="mt-2 max-w-2xl text-muted-foreground">{t("home.cards.subtitle")}</p>
           </div>
           <LanguageSelector />
         </div>
@@ -82,8 +82,8 @@ function HomePage() {
                   <Icon className="h-6 w-6" aria-hidden />
                 </span>
                 <span className="flex-1">
-                  <span className="block font-display text-lg font-semibold text-primary-deep">{cat.title}</span>
-                  <span className="mt-1 block text-sm text-muted-foreground">{cat.description}</span>
+                  <span className="block font-display text-lg font-semibold text-primary-deep">{t(`triage.${cat.slug}.title`, cat.title)}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{t(`triage.${cat.slug}.desc`, cat.description)}</span>
                 </span>
                 <ArrowRight className="mt-2 h-5 w-5 text-accent transition group-hover:translate-x-1" />
               </Link>

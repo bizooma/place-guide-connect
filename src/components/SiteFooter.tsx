@@ -16,7 +16,7 @@ export function SiteFooter() {
           <p className="mt-3 text-sm text-primary-foreground/80">{t("app.inspiredBy")}</p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wider text-primary-foreground/60">Explore</p>
+          <p className="text-xs uppercase tracking-wider text-primary-foreground/60">{t("footer.explore")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             <li><Link to="/help" className="hover:underline">{t("nav.help")}</Link></li>
             <li><Link to="/schedule" className="hover:underline">{t("nav.schedule")}</Link></li>
@@ -25,11 +25,11 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wider text-primary-foreground/60">Trust</p>
+          <p className="text-xs uppercase tracking-wider text-primary-foreground/60">{t("footer.trust")}</p>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><Link to="/admin" className="hover:underline">Admin</Link></li>
-            <li><Link to="/privacy" className="hover:underline">Privacy</Link></li>
-            <li><Link to="/terms" className="hover:underline">Terms & Responsible Use</Link></li>
+            <li><Link to="/admin" className="hover:underline">{t("footer.admin")}</Link></li>
+            <li><Link to="/privacy" className="hover:underline">{t("footer.privacy")}</Link></li>
+            <li><Link to="/terms" className="hover:underline">{t("footer.terms")}</Link></li>
           </ul>
           <p className="mt-4 text-xs text-primary-foreground/60">{t("disclaimer.compassion")}</p>
         </div>
