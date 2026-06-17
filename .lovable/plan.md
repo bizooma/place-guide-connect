@@ -1,36 +1,22 @@
-# Pre-translated admin content
+## Goal
+Show admins an unread badge on the Requests tab whenever new documents are uploaded, updating live.
 
-## Why
-Today, translations of resources/schedule items happen in each visitor's browser and are cached only in their own `localStorage`. When an admin adds or edits an item, the new text is re-translated separately for every visitor on first view. We'll move translations server-side so admins can generate them once and all visitors get the same instant result.
+## Changes
 
-## What changes
+### 1. Enable realtime on `document_uploads`
+Migration:
+- `ALTER TABLE public.document_uploads REPLICA IDENTITY FULL;`
+- `ALTER PUBLICATION supabase_realtime ADD TABLE public.document_uploads;`
 
-### Database (migration)
-Add a `translations jsonb` column (default `{}`) to:
-- `public.resources`
-- `public.schedule_items`
+### 2. Badge on Requests tab — `src/routes/_authenticated/admin.tsx`
+- Query count of `document_uploads` where `status = 'pending'`.
+- Render a small red count badge on the "Requests" `TabsTrigger`.
+- `useEffect` subscribes to `postgres_changes` on `document_uploads` (INSERT + UPDATE) and refetches the count; cleanup with `supabase.removeChannel`.
 
-Shape: `{ es: { name: "...", description: "...", ... }, ar: {...}, fa: {...}, ps: {...}, so: {...} }`. Only the translatable string fields are stored per language. No new tables, no policy changes.
+### 3. Live refresh in the list — `src/components/admin/DocumentUploadsList.tsx`
+- Same realtime subscription re-runs the existing `load()` so the table updates without a manual refresh.
 
-### Server function
-New `translateRow` in `src/lib/translate.functions.ts` (admin-only, gated via `requireSupabaseAuth` + `has_role('admin')`):
-- Input: `{ table: 'resources' | 'schedule_items', id: string }`
-- Reads the row, calls Gemini (existing `translateBatch` helper) for each of the 5 target languages, writes the merged result back into `translations` using `supabaseAdmin`.
-- Returns `{ ok: true, languages: [...] }`.
-
-### Admin UI
-In `src/routes/_authenticated/admin.tsx`:
-- Replace the static `CrudTable` rows for Resources and Schedule with live data from Supabase.
-- Each row gets a "Translate" button (Languages icon). Click → calls `translateRow`, shows spinner, toast on success/failure.
-- Row shows a small badge: "Translated" (green) if `translations` covers all 5 langs, "Needs translation" (amber) otherwise — so admins know what to regenerate after an edit.
-- Optional bulk "Translate all missing" button at the top of each tab.
-
-### Public pages
-`src/routes/resources.tsx` and `src/routes/schedule.tsx`:
-- When the active language is not English and the row has a stored `translations[lang]`, use those fields directly.
-- Fall back to the existing client-side `tx()` AI translation only when the DB value is missing (keeps things working for un-translated rows).
-
-## Out of scope
-- No changes to UI-string locale JSON files.
-- No auto-translate-on-save (admin clicks the button explicitly, as requested).
-- Triage categories and languages tabs are unchanged (short, already covered by locale files).
+## Files
+- new migration (realtime publication)
+- edit `src/routes/_authenticated/admin.tsx`
+- edit `src/components/admin/DocumentUploadsList.tsx`
