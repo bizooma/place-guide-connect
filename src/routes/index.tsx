@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { useI18n } from "@/lib/i18n";
-import hero from "@/assets/hero-community.jpg";
+import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
