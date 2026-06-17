@@ -1,9 +1,14 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import en from "@/locales/en.json";
+import es from "@/locales/es.json";
+import fa from "@/locales/fa.json";
+import ps from "@/locales/ps.json";
+import so from "@/locales/so.json";
+import ar from "@/locales/ar.json";
 
-// Supported languages. Only English is active for the MVP.
+// Supported languages
 // `code` matches a Languages table in Supabase later.
-export type LanguageCode = "en" | "es" | "lang2" | "lang3" | "lang4" | "lang5";
+export type LanguageCode = "en" | "es" | "fa" | "ps" | "so" | "ar";
 
 export interface Language {
   code: LanguageCode;
@@ -15,15 +20,22 @@ export interface Language {
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸", active: true },
-  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", active: false },
-  { code: "lang2", name: "Language 2", nativeName: "Language 2", flag: "🏳️", active: false },
-  { code: "lang3", name: "Language 3", nativeName: "Language 3", flag: "🏳️", active: false },
-  { code: "lang4", name: "Language 4", nativeName: "Language 4", flag: "🏳️", active: false },
-  { code: "lang5", name: "Language 5", nativeName: "Language 5", flag: "🏳️", active: false },
+  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸", active: true },
+  { code: "fa", name: "Dari", nativeName: "دری", flag: "🇦🇫", active: true },
+  { code: "ps", name: "Pashto", nativeName: "پښتو", flag: "🇦🇫", active: true },
+  { code: "so", name: "Somali", nativeName: "Soomaali", flag: "🇸🇴", active: true },
+  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦", active: true },
 ];
 
 type Dict = Record<string, string>;
-const dictionaries: Partial<Record<LanguageCode, Dict>> = { en: en as Dict };
+const dictionaries: Partial<Record<LanguageCode, Dict>> = {
+  en: en as Dict,
+  es: es as Dict,
+  fa: fa as Dict,
+  ps: ps as Dict,
+  so: so as Dict,
+  ar: ar as Dict,
+};
 
 interface I18nContextValue {
   language: LanguageCode;
