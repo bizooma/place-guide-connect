@@ -87,11 +87,7 @@ function AdminPage() {
           <ScheduleEditor />
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
-          <CrudTable
-            title="Resources"
-            rows={resources.map((r) => [r.name, r.category, r.phone ?? "—", r.languages.join(", ")])}
-            head={["Name", "Category", "Phone", "Languages"]}
-          />
+          <ResourcesTranslateList />
         </TabsContent>
         <TabsContent value="requests" className="mt-6">
           <EmptyState title="Document uploads" desc="Anonymous document uploads are stored in the Supabase 'document-uploads' bucket and the 'document_uploads' table. Review them from your Supabase dashboard." />
