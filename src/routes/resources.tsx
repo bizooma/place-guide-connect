@@ -87,7 +87,7 @@ function ResourcesPage() {
         </div>
         <select value={cat} onChange={(e) => setCat(e.target.value)} className="h-12 rounded-full border border-input bg-background px-4 text-sm">
           <option value="All">{t("resources.allCategories")}</option>
-          {resourceCategories.map((c) => <option key={c}>{c}</option>)}
+          {resourceCategories.map((c) => <option key={c} value={c}>{tx(c)}</option>)}
         </select>
         <select value={lang} onChange={(e) => setLang(e.target.value)} className="h-12 rounded-full border border-input bg-background px-4 text-sm">
           <option value="All">{t("resources.allLanguages")}</option>
@@ -100,14 +100,14 @@ function ResourcesPage() {
         {!isLoading && filtered.length === 0 && <p className="col-span-full text-muted-foreground">{t("resources.none")}</p>}
         {filtered.map((r) => (
           <article key={r.id} className="surface-card flex flex-col p-5">
-            <span className="text-xs font-medium uppercase tracking-wider text-accent">{r.category}</span>
-            <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{r.name}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.description}</p>
+            <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(r.category)}</span>
+            <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{tx(r.name)}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tx(r.description)}</p>
             <ul className="mt-4 space-y-1.5 text-sm">
-              {r.hours && <li className="text-muted-foreground">{r.hours}</li>}
+              {r.hours && <li className="text-muted-foreground">{tx(r.hours)}</li>}
               {r.address && <li className="text-muted-foreground">{r.address}</li>}
               <li className="text-muted-foreground">{t("resources.languages")}: {(r.languages ?? []).join(", ")}</li>
-              <li className="text-muted-foreground">{t("resources.cost")}: {r.cost}{r.eligibility ? ` · ${r.eligibility}` : ""}</li>
+              <li className="text-muted-foreground">{t("resources.cost")}: {r.cost}{r.eligibility ? ` · ${tx(r.eligibility)}` : ""}</li>
             </ul>
             <div className="mt-auto pt-4 flex flex-wrap gap-2">
               {r.phone && <Button asChild size="sm" className="rounded-full bg-primary hover:bg-primary-deep gap-1.5"><a href={`tel:${r.phone}`}><Phone className="h-3.5 w-3.5" />{t("resources.call")}</a></Button>}
