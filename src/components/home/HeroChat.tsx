@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { Sparkles, MessageCircle } from "lucide-react";
 import {
   Conversation,
@@ -27,11 +26,6 @@ export function HeroChat() {
   const { messages, status, send } = useChatbot();
   const isLoading = status === "submitted";
   const submitStatus = status === "submitted" ? "submitted" : undefined;
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  useEffect(() => {
-    if (!isLoading) textareaRef.current?.focus();
-  }, [isLoading]);
 
   function handleSubmit(message: PromptInputMessage) {
     void send(message.text);
@@ -106,7 +100,6 @@ export function HeroChat() {
       <div className="border-t border-border bg-white p-3">
         <PromptInput onSubmit={handleSubmit}>
           <PromptInputTextarea
-            ref={textareaRef}
             placeholder="Ask a question…"
             disabled={isLoading}
           />
