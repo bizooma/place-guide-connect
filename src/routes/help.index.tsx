@@ -9,6 +9,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { triageCategories, triageFlows, resources } from "@/data/mock";
 import { toast } from "sonner";
 
@@ -37,6 +38,22 @@ function HelpPage() {
 
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
   const flow = selected ? triageFlows[selected] : null;
+  const currentCategory = selected ? triageCategories.find((c) => c.slug === selected) : null;
+
+  const translatableTexts: string[] = [
+    ...active.flatMap((c) => [c.title, c.description]),
+    ...(flow ? [flow.intro] : []),
+    ...(flow ? flow.questions.flatMap((q) => [q.label, ...(q.options ?? [])]) : []),
+    ...(currentCategory ? [currentCategory.title] : []),
+    "Start over",
+    "Back",
+    "Here's what we heard",
+    "What you can do next",
+    "Helpful resources",
+    "See my summary",
+    ...resources.flatMap((r) => [r.name, r.description]),
+  ];
+  const tx = useTranslatedTexts(translatableTexts);
 
   function reset() {
     setSelected(null); setAnswers({}); setSubmitted(false);
@@ -65,8 +82,8 @@ function HelpPage() {
                   <Icon className="h-6 w-6" aria-hidden />
                 </span>
                 <span className="flex-1">
-                  <span className="block font-display text-lg font-semibold text-primary-deep">{cat.title}</span>
-                  <span className="mt-1 block text-sm text-muted-foreground">{cat.description}</span>
+                  <span className="block font-display text-lg font-semibold text-primary-deep">{tx(cat.title)}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{tx(cat.description)}</span>
                 </span>
                 <ArrowRight className="mt-2 h-5 w-5 text-accent transition group-hover:translate-x-1" />
               </button>
@@ -88,17 +105,17 @@ function HelpPage() {
     const matched = resources.filter((r) => r.tags.some((tag) => result.relatedTags.includes(tag))).slice(0, 3);
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 md:py-16">
-        <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> Start over</Button>
+        <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Start over")}</Button>
 
         <div className="surface-card p-6 md:p-8">
           <div className="flex items-center gap-3">
             <CheckCircle2 className="h-6 w-6 text-primary" />
-            <h1 className="font-display text-2xl font-semibold text-primary-deep">Here's what we heard</h1>
+            <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx("Here's what we heard")}</h1>
             <div className="ml-auto"><ReadAloudButton text={result.summary + ". Next steps: " + result.nextSteps.join(". ")} /></div>
           </div>
           <p className="mt-4 text-lg leading-relaxed">{result.summary}</p>
 
-          <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">What you can do next</h2>
+          <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">{tx("What you can do next")}</h2>
           <ul className="mt-2 space-y-2">
             {result.nextSteps.map((s, i) => (
               <li key={i} className="flex gap-2 text-base"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />{s}</li>
@@ -107,12 +124,12 @@ function HelpPage() {
 
           {matched.length > 0 && (
             <>
-              <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">Helpful resources</h2>
+              <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">{tx("Helpful resources")}</h2>
               <ul className="mt-3 grid gap-3 sm:grid-cols-2">
                 {matched.map((r) => (
                   <li key={r.id} className="rounded-xl border border-border bg-warm/50 p-4">
-                    <p className="font-medium text-primary-deep">{r.name}</p>
-                    <p className="text-sm text-muted-foreground">{r.description}</p>
+                    <p className="font-medium text-primary-deep">{tx(r.name)}</p>
+                    <p className="text-sm text-muted-foreground">{tx(r.description)}</p>
                     {r.phone && <a href={`tel:${r.phone}`} className="mt-2 inline-block text-sm font-medium text-accent">{r.phone}</a>}
                   </li>
                 ))}
@@ -133,11 +150,11 @@ function HelpPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 md:py-16">
-      <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
+      <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Back")}</Button>
 
       <div className="surface-card p-6 md:p-8">
-        <h1 className="font-display text-2xl font-semibold text-primary-deep">{triageCategories.find((c) => c.slug === selected)?.title}</h1>
-        <p className="mt-2 text-muted-foreground">{flow.intro}</p>
+        <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx(currentCategory?.title ?? "")}</h1>
+        <p className="mt-2 text-muted-foreground">{tx(flow.intro)}</p>
 
         <form
           className="mt-6 space-y-6"
@@ -145,7 +162,7 @@ function HelpPage() {
         >
           {flow.questions.map((q) => (
             <div key={q.id} className="space-y-2">
-              <Label htmlFor={q.id} className="text-base font-medium">{q.label}</Label>
+              <Label htmlFor={q.id} className="text-base font-medium">{tx(q.label)}</Label>
               {q.type === "text" ? (
                 <div className="flex gap-2">
                   <Input
@@ -167,7 +184,7 @@ function HelpPage() {
                         onClick={() => setAnswers({ ...answers, [q.id]: opt })}
                         className={"rounded-2xl border px-4 py-3 text-left text-base transition " + (active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-warm/40 hover:border-primary/40")}
                       >
-                        {opt}
+                        {tx(opt)}
                       </button>
                     );
                   })}
@@ -177,7 +194,7 @@ function HelpPage() {
           ))}
 
           <Button type="submit" size="lg" className="w-full rounded-full bg-primary hover:bg-primary-deep h-12 text-base">
-            See my summary <ArrowRight className="ml-2 h-5 w-5" />
+            {tx("See my summary")} <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </form>
       </div>
