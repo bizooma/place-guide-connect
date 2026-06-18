@@ -214,7 +214,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
       const rows: Array<{ document_id: string; chunk_index: number; content: string; embedding: string; token_estimate: number }> = [];
       for (let i = 0; i < chunks.length; i += BATCH) {
         const batch = chunks.slice(i, i + BATCH);
-        const vectors = await embedTexts(lovableKey, batch);
+        const vectors = await embedTexts(geminiKey, batch);
         batch.forEach((c, j) => {
           rows.push({
             document_id: docRow.id,
