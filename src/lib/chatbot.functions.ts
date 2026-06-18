@@ -253,9 +253,11 @@ export const askChatbot = createServerFn({ method: "POST" })
       .object({
         conversationId: z.string().uuid().nullable().optional(),
         question: z.string().min(1).max(2000),
+        language: z.string().min(2).max(50).optional(),
       })
       .parse(input),
   )
+
   .handler(async ({ data }) => {
     const lovableKey = process.env.LOVABLE_API_KEY;
     if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
@@ -319,8 +321,9 @@ export const askChatbot = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "You are a friendly assistant for The PLACE, a community help center. Answer the visitor's question using ONLY the provided context. Be warm, concise (1-4 short paragraphs), and plain-spoken. If the context does not contain the answer, reply: \"I don't have that in my notes yet — try the Get help button or ask something else.\" Do not invent details. Do not cite source numbers in your reply.",
+                `You are a friendly assistant for The PLACE, a community help center. Answer the visitor's question using ONLY the provided context. Be warm, concise (1-4 short paragraphs), and plain-spoken. If the context does not contain the answer, reply: \"I don't have that in my notes yet — try the Get help button or ask something else.\" Do not invent details. Do not cite source numbers in your reply. Always write your reply in ${data.language ?? "English"}, even if the context is in another language.`,
             },
+
             {
               role: "user",
               content: `Context:\n${contextText}\n\nQuestion: ${data.question}`,
