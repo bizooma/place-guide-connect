@@ -135,8 +135,8 @@ function DonatePage() {
         <div className="surface-card overflow-hidden p-2">
           <div className="relative w-full overflow-hidden rounded-lg" style={{ aspectRatio: "16 / 9" }}>
             <iframe
-              src="https://app.heygen.com/embeds/195417e5257446d8a636bb4b480ff50d"
-              title="The Place"
+              src="https://app.heygen.com/embeds/19f2b8d81e7f4b6b9f381457a335b23c"
+              title="The Place Final"
               frameBorder={0}
               allow="encrypted-media; fullscreen;"
               allowFullScreen
