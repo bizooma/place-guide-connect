@@ -74,11 +74,11 @@ function AdminPage() {
       </header>
 
       <Tabs defaultValue="triage" className="mt-8">
-        <TabsList className="flex flex-wrap h-auto bg-warm border border-border rounded-full p-1">
-          <TabsTrigger value="triage" className="gap-1.5 rounded-full"><FileText className="h-4 w-4" />Help choices</TabsTrigger>
-          <TabsTrigger value="schedule" className="gap-1.5 rounded-full"><CalendarDays className="h-4 w-4" />Schedule</TabsTrigger>
-          <TabsTrigger value="resources" className="gap-1.5 rounded-full"><BookOpen className="h-4 w-4" />Resources</TabsTrigger>
-          <TabsTrigger value="requests" className="gap-1.5 rounded-full">
+        <TabsList className="flex flex-wrap h-auto bg-primary-deep border border-primary-deep/30 rounded-full p-1">
+          <TabsTrigger value="triage" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><FileText className="h-4 w-4" />Help choices</TabsTrigger>
+          <TabsTrigger value="schedule" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><CalendarDays className="h-4 w-4" />Schedule</TabsTrigger>
+          <TabsTrigger value="resources" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><BookOpen className="h-4 w-4" />Resources</TabsTrigger>
+          <TabsTrigger value="requests" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep">
             <Users className="h-4 w-4" />Requests
             {pendingCount > 0 && (
               <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-red-600 text-white text-[11px] font-semibold leading-none">
@@ -86,10 +86,10 @@ function AdminPage() {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="training" className="gap-1.5 rounded-full"><Brain className="h-4 w-4" />Chatbot training</TabsTrigger>
-          <TabsTrigger value="volunteers" className="gap-1.5 rounded-full"><HeartHandshake className="h-4 w-4" />Volunteers</TabsTrigger>
-          <TabsTrigger value="languages" className="gap-1.5 rounded-full"><LangIcon className="h-4 w-4" />Languages</TabsTrigger>
-          <TabsTrigger value="settings" className="gap-1.5 rounded-full"><Settings className="h-4 w-4" />Settings</TabsTrigger>
+          <TabsTrigger value="training" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><Brain className="h-4 w-4" />Chatbot training</TabsTrigger>
+          <TabsTrigger value="volunteers" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><HeartHandshake className="h-4 w-4" />Volunteers</TabsTrigger>
+          <TabsTrigger value="languages" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><LangIcon className="h-4 w-4" />Languages</TabsTrigger>
+          <TabsTrigger value="settings" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><Settings className="h-4 w-4" />Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="triage" className="mt-6">
