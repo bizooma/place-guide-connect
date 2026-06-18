@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain } from "lucide-react";
+import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain, HeartHandshake } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
 import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
 import { SettingsEditor } from "@/components/admin/SettingsEditor";
 import { TrainingDocsEditor } from "@/components/admin/TrainingDocsEditor";
+import { VolunteerSignupsList } from "@/components/admin/VolunteerSignupsList";
 import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
 export const Route = createFileRoute("/_authenticated/admin")({
