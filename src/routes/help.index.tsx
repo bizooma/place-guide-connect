@@ -150,11 +150,11 @@ function HelpPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 md:py-16">
-      <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button>
+      <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Back")}</Button>
 
       <div className="surface-card p-6 md:p-8">
-        <h1 className="font-display text-2xl font-semibold text-primary-deep">{triageCategories.find((c) => c.slug === selected)?.title}</h1>
-        <p className="mt-2 text-muted-foreground">{flow.intro}</p>
+        <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx(currentCategory?.title ?? "")}</h1>
+        <p className="mt-2 text-muted-foreground">{tx(flow.intro)}</p>
 
         <form
           className="mt-6 space-y-6"
@@ -162,7 +162,7 @@ function HelpPage() {
         >
           {flow.questions.map((q) => (
             <div key={q.id} className="space-y-2">
-              <Label htmlFor={q.id} className="text-base font-medium">{q.label}</Label>
+              <Label htmlFor={q.id} className="text-base font-medium">{tx(q.label)}</Label>
               {q.type === "text" ? (
                 <div className="flex gap-2">
                   <Input
@@ -184,7 +184,7 @@ function HelpPage() {
                         onClick={() => setAnswers({ ...answers, [q.id]: opt })}
                         className={"rounded-2xl border px-4 py-3 text-left text-base transition " + (active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-warm/40 hover:border-primary/40")}
                       >
-                        {opt}
+                        {tx(opt)}
                       </button>
                     );
                   })}
@@ -194,7 +194,7 @@ function HelpPage() {
           ))}
 
           <Button type="submit" size="lg" className="w-full rounded-full bg-primary hover:bg-primary-deep h-12 text-base">
-            See my summary <ArrowRight className="ml-2 h-5 w-5" />
+            {tx("See my summary")} <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </form>
       </div>
