@@ -1,6 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+function createPublicClient() {
+  return createClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+  );
+}
 
 const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1";
 const EMBED_MODEL = "openai/text-embedding-3-small"; // 1536 dims (HNSW-friendly)
@@ -250,13 +260,13 @@ export const askChatbot = createServerFn({ method: "POST" })
     const lovableKey = process.env.LOVABLE_API_KEY;
     if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = createPublicClient();
 
     // Ensure conversation exists
     let conversationId = data.conversationId ?? null;
     if (!conversationId) {
       const label = data.question.slice(0, 80);
-      const { data: convo, error: convErr } = await supabaseAdmin
+      const { data: convo, error: convErr } = await supabase
         .from("chatbot_conversations")
         .insert({ visitor_label: label })
         .select("id")
@@ -266,7 +276,7 @@ export const askChatbot = createServerFn({ method: "POST" })
     }
 
     // Store user message
-    await supabaseAdmin.from("chatbot_messages").insert({
+    await supabase.from("chatbot_messages").insert({
       conversation_id: conversationId,
       role: "user",
       content: data.question,
@@ -274,7 +284,7 @@ export const askChatbot = createServerFn({ method: "POST" })
 
     // Embed question + retrieve
     const [qVector] = await embedTexts(lovableKey, [data.question]);
-    const { data: matches, error: matchErr } = await supabaseAdmin.rpc("match_chatbot_chunks", {
+    const { data: matches, error: matchErr } = await supabase.rpc("match_chatbot_chunks", {
       query_embedding: JSON.stringify(qVector) as unknown as string,
       match_count: 5,
     });
@@ -289,18 +299,10 @@ export const askChatbot = createServerFn({ method: "POST" })
       answer =
         "I don't have that in my notes yet. You can use the **Get help** button above, or try asking something else.";
     } else {
-      // Fetch titles for sources
-      const docIds = Array.from(new Set(relevant.map((r: { document_id: string }) => r.document_id)));
-      const { data: docs } = await supabaseAdmin
-        .from("chatbot_documents")
-        .select("id, title")
-        .in("id", docIds);
-      const titleMap = new Map((docs ?? []).map((d) => [d.id, d.title]));
-
       const contextText = relevant
         .map(
-          (r: { document_id: string; content: string }, idx: number) =>
-            `[${idx + 1}] (${titleMap.get(r.document_id) ?? "doc"})\n${r.content}`,
+          (r: { document_title: string | null; content: string }, idx: number) =>
+            `[${idx + 1}] (${r.document_title ?? "doc"})\n${r.content}`,
         )
         .join("\n\n---\n\n");
 
@@ -336,21 +338,21 @@ export const askChatbot = createServerFn({ method: "POST" })
       const chatJson = (await chatRes.json()) as { choices?: Array<{ message?: { content?: string } }> };
       answer = chatJson.choices?.[0]?.message?.content?.trim() || "I don't have an answer for that yet.";
 
-      sources = relevant.map((r: { document_id: string; content: string }) => ({
+      sources = relevant.map((r: { document_id: string; document_title: string | null; content: string }) => ({
         document_id: r.document_id,
-        title: titleMap.get(r.document_id) ?? "Document",
+        title: r.document_title ?? "Document",
         snippet: r.content.slice(0, 200),
       }));
     }
 
     // Save assistant message + bump conversation
-    await supabaseAdmin.from("chatbot_messages").insert({
+    await supabase.from("chatbot_messages").insert({
       conversation_id: conversationId,
       role: "assistant",
       content: answer,
       sources,
     });
-    await supabaseAdmin
+    await supabase
       .from("chatbot_conversations")
       .update({ last_message_at: new Date().toISOString() })
       .eq("id", conversationId);
