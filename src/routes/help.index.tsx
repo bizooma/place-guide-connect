@@ -82,8 +82,8 @@ function HelpPage() {
                   <Icon className="h-6 w-6" aria-hidden />
                 </span>
                 <span className="flex-1">
-                  <span className="block font-display text-lg font-semibold text-primary-deep">{cat.title}</span>
-                  <span className="mt-1 block text-sm text-muted-foreground">{cat.description}</span>
+                  <span className="block font-display text-lg font-semibold text-primary-deep">{tx(cat.title)}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{tx(cat.description)}</span>
                 </span>
                 <ArrowRight className="mt-2 h-5 w-5 text-accent transition group-hover:translate-x-1" />
               </button>
