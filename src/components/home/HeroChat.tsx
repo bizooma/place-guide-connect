@@ -111,9 +111,10 @@ export function HeroChat() {
       <div className="border-t border-border bg-white p-3">
         <PromptInput onSubmit={handleSubmit}>
           <PromptInputTextarea
-            placeholder="Ask a question…"
+            placeholder={tx("Ask a question…")}
             disabled={isLoading}
           />
+
           <PromptInputFooter className="justify-end">
             <PromptInputSubmit status={submitStatus} disabled={isLoading} />
           </PromptInputFooter>
