@@ -33,6 +33,7 @@ export function DocumentUploadsList() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [showArchived, setShowArchived] = useState(false);
 
   async function load() {
     setLoading(true);
