@@ -50,30 +50,3 @@ export function MobileBottomNav() {
     </nav>
   );
 }
-          return (
-            <li key={item.to}>
-              <Link
-                to={item.to}
-                className={cn(
-                  "flex h-full min-h-14 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium transition-colors",
-                  active ? "text-primary-foreground" : "text-white/70 hover:text-white",
-                )}
-                aria-current={active ? "page" : undefined}
-              >
-                <span
-                  className={cn(
-                    "flex h-9 w-12 items-center justify-center rounded-full transition-colors",
-                    active ? "bg-primary text-primary-foreground" : "bg-transparent",
-                  )}
-                >
-                  <Icon className="h-5 w-5" aria-hidden />
-                </span>
-                <span className="truncate max-w-full leading-tight">{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
-  );
-}
