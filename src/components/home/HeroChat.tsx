@@ -32,7 +32,7 @@ export function HeroChat() {
   const { messages, status, send } = useChatbot();
   const isLoading = status === "submitted";
   const submitStatus = status === "submitted" ? "submitted" : undefined;
-  const tx = useTranslatedTexts([TITLE, SUBTITLE, GREETING, ...STARTERS]);
+  const tx = useTranslatedTexts([TITLE, SUBTITLE, GREETING, "Ask a question…", ...STARTERS]);
 
   function handleSubmit(message: PromptInputMessage) {
     void send(message.text);
