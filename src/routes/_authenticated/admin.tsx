@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { triageCategories } from "@/data/adminSeed";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
-import { ResourcesTranslateList } from "@/components/admin/ResourcesTranslateList";
+import { ResourcesEditor } from "@/components/admin/ResourcesEditor";
 import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
 import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
 import { SettingsEditor } from "@/components/admin/SettingsEditor";
@@ -103,7 +103,7 @@ function AdminPage() {
           <ScheduleEditor />
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
-          <ResourcesTranslateList />
+          <ResourcesEditor />
         </TabsContent>
         <TabsContent value="requests" className="mt-6">
           <DocumentUploadsList />
