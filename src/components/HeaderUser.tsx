@@ -48,7 +48,7 @@ export function HeaderUser() {
       aria-label="Your profile"
       className="rounded-full ring-1 ring-white/20 hover:ring-white/60 transition"
     >
-      <Avatar className="h-9 w-9">
+      <Avatar className="h-11 w-11">
         {avatarUrl ? <AvatarImage src={avatarUrl} alt="Your avatar" /> : null}
         <AvatarFallback className="bg-white/10 text-white text-sm font-semibold">
           {initial}
