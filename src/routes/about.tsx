@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
 import rlpLogo from "@/assets/rlp-logo.png.asset.json";
+import squareMileLogo from "@/assets/square-mile-logo.webp.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -39,7 +40,7 @@ function AboutPage() {
           </div>
         </div>
         <div className="flex items-start gap-4">
-          <div className="h-16 w-24 shrink-0 bg-muted/30 rounded" />
+          <img src={squareMileLogo.url} alt="Square Mile logo" className="h-16 w-auto shrink-0 object-contain" />
           <div>
             <h3 className="font-display text-xl font-semibold text-primary-deep">
               <a href="https://www.square-mile.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
