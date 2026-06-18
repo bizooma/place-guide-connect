@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, Building2, Users, HelpCircle, CalendarDays, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { VolunteerSignupDialog } from "@/components/VolunteerSignupDialog";
 
 export const Route = createFileRoute("/donate")({
   head: () => ({
