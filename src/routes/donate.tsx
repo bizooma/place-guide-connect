@@ -1,8 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart, Building2, Users, HelpCircle, CalendarDays, ArrowRight } from "lucide-react";
+import { CalendarDays, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VolunteerSignupDialog } from "@/components/VolunteerSignupDialog";
 import { DonateGallery } from "@/components/DonateGallery";
+import financialImg from "@/assets/donate-financial.jpg";
+import corporateImg from "@/assets/donate-corporate.jpg";
+import volunteerImg from "@/assets/donate-volunteer.jpg";
+import otherImg from "@/assets/donate-other.jpg";
+
+function CardImage({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      width={64}
+      height={64}
+      className="h-14 w-14 shrink-0 rounded-full object-cover ring-1 ring-primary/15"
+    />
+  );
+}
 
 export const Route = createFileRoute("/donate")({
   head: () => ({
@@ -44,10 +61,8 @@ function DonatePage() {
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Financial Giving */}
         <section className="surface-card p-6 md:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Heart className="h-5 w-5 text-primary" aria-hidden />
-            </div>
+          <div className="flex items-center gap-4">
+            <CardImage src={financialImg} alt="Hands placing coins into a donation jar" />
             <h2 className="font-display text-2xl font-semibold text-primary-deep">Financial Giving</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
@@ -96,10 +111,8 @@ function DonatePage() {
 
         {/* Corporate Sponsorship */}
         <section className="surface-card p-6 md:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Building2 className="h-5 w-5 text-primary" aria-hidden />
-            </div>
+          <div className="flex items-center gap-4">
+            <CardImage src={corporateImg} alt="Two professionals shaking hands in a community center" />
             <h2 className="font-display text-2xl font-semibold text-primary-deep">Corporate Sponsorship</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
@@ -157,10 +170,8 @@ function DonatePage() {
 
         {/* Volunteer */}
         <section className="surface-card p-6 md:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <Users className="h-5 w-5 text-primary" aria-hidden />
-            </div>
+          <div className="flex items-center gap-4">
+            <CardImage src={volunteerImg} alt="Diverse volunteers smiling together" />
             <h2 className="font-display text-2xl font-semibold text-primary-deep">Volunteer</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
@@ -208,10 +219,8 @@ function DonatePage() {
 
       {/* Other Ways to Help */}
       <section className="mt-8 surface-card p-6 md:p-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-            <HelpCircle className="h-5 w-5 text-primary" aria-hidden />
-          </div>
+        <div className="flex items-center gap-4">
+          <CardImage src={otherImg} alt="Cardboard donation boxes filled with clothes and books" />
           <h2 className="font-display text-2xl font-semibold text-primary-deep">Other Ways to Help</h2>
         </div>
         <p className="mt-3 text-lg leading-relaxed text-foreground/85">
