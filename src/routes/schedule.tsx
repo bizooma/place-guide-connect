@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Clock, MapPin, Languages as LanguagesIcon, CalendarDays, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
@@ -265,15 +266,20 @@ function CalendarView({ items, t, tx }: { items: ScheduleRow[]; t: (k: string, f
         </div>
       </div>
 
-      {selected && (
-        <div className="mt-6">
-          <h3 className="font-display text-xl font-semibold text-primary-deep">
-            {parseLocalDate(selected).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-          </h3>
+      <Dialog open={!!selected} onOpenChange={(open) => { if (!open) setSelected(null); }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl font-semibold text-primary-deep">
+              {selected ? parseLocalDate(selected).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }) : ""}
+            </DialogTitle>
+            <DialogDescription asChild>
+              <span />
+            </DialogDescription>
+          </DialogHeader>
           {selectedItems.length === 0 ? (
-            <p className="mt-2 text-muted-foreground">{t("schedule.nothingDay")}</p>
+            <p className="text-muted-foreground">{t("schedule.nothingDay")}</p>
           ) : (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               {selectedItems.map((s) => (
                 <article key={s.id} className="surface-card p-4">
                   <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
@@ -287,8 +293,8 @@ function CalendarView({ items, t, tx }: { items: ScheduleRow[]; t: (k: string, f
               ))}
             </div>
           )}
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
