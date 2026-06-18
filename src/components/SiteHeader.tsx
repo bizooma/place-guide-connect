@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import logoAsset from "@/assets/theplace-logowhite.webp.asset.json";
+import { HeaderUser } from "@/components/HeaderUser";
 
 const nav = [
   { to: "/", labelKey: "nav.home", icon: Home },
