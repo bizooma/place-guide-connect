@@ -158,19 +158,16 @@ function DonatePage() {
           </li>
         </ul>
         <div className="mt-6">
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-full border-primary text-primary hover:bg-primary/5"
-          >
-            <a
-              href="https://refugeelanguage.org/volunteer"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Become a Volunteer <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
+          <VolunteerSignupDialog
+            trigger={
+              <Button
+                variant="outline"
+                className="rounded-full border-primary text-primary hover:bg-primary/5"
+              >
+                Become a Volunteer <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            }
+          />
         </div>
       </section>
 
