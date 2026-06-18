@@ -46,11 +46,11 @@ export function HeaderUser() {
     <Link
       to="/profile"
       aria-label="Your profile"
-      className="rounded-full ring-1 ring-white/20 hover:ring-white/60 transition"
+      className="rounded-full ring-2 ring-white/20 hover:ring-white/60 transition"
     >
-      <Avatar className="h-11 w-11">
+      <Avatar className="h-10 w-10">
         {avatarUrl ? <AvatarImage src={avatarUrl} alt="Your avatar" /> : null}
-        <AvatarFallback className="bg-white/10 text-white text-sm font-semibold">
+        <AvatarFallback className="bg-white/10 text-white text-base font-semibold">
           {initial}
         </AvatarFallback>
       </Avatar>
