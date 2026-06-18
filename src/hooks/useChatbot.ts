@@ -1,17 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { askChatbot } from "@/lib/chatbot.functions";
+import { useI18n, SUPPORTED_LANGUAGES } from "@/lib/i18n";
 
 export interface ChatbotMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
+  language?: string;
 }
 
 const STORAGE_KEY = "place-chatbot-convo";
 
 export function useChatbot() {
   const ask = useServerFn(askChatbot);
+  const { language } = useI18n();
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
   const [status, setStatus] = useState<"idle" | "submitted" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -36,8 +39,9 @@ export function useChatbot() {
       setMessages((m) => [...m, { id: userId, role: "user", content: trimmed }]);
       setStatus("submitted");
       try {
+        const langName = SUPPORTED_LANGUAGES.find((l) => l.code === language)?.name ?? "English";
         const res = await ask({
-          data: { question: trimmed, conversationId: conversationIdRef.current },
+          data: { question: trimmed, conversationId: conversationIdRef.current, language: langName },
         });
         conversationIdRef.current = res.conversationId;
         try {
@@ -45,7 +49,7 @@ export function useChatbot() {
         } catch {
           // ignore
         }
-        setMessages((m) => [...m, { id: crypto.randomUUID(), role: "assistant", content: res.answer }]);
+        setMessages((m) => [...m, { id: crypto.randomUUID(), role: "assistant", content: res.answer, language: langName }]);
         setStatus("idle");
       } catch (err) {
         const message = err instanceof Error ? err.message : "Something went wrong.";
@@ -57,7 +61,7 @@ export function useChatbot() {
         setStatus("error");
       }
     },
-    [ask, status],
+    [ask, status, language],
   );
 
   const reset = useCallback(() => {
