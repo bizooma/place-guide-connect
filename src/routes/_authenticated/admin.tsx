@@ -87,6 +87,7 @@ function AdminPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="training" className="gap-1.5 rounded-full"><Brain className="h-4 w-4" />Chatbot training</TabsTrigger>
+          <TabsTrigger value="volunteers" className="gap-1.5 rounded-full"><HeartHandshake className="h-4 w-4" />Volunteers</TabsTrigger>
           <TabsTrigger value="languages" className="gap-1.5 rounded-full"><LangIcon className="h-4 w-4" />Languages</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 rounded-full"><Settings className="h-4 w-4" />Settings</TabsTrigger>
         </TabsList>
