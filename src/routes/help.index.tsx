@@ -105,17 +105,17 @@ function HelpPage() {
     const matched = resources.filter((r) => r.tags.some((tag) => result.relatedTags.includes(tag))).slice(0, 3);
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 md:py-16">
-        <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> Start over</Button>
+        <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Start over")}</Button>
 
         <div className="surface-card p-6 md:p-8">
           <div className="flex items-center gap-3">
             <CheckCircle2 className="h-6 w-6 text-primary" />
-            <h1 className="font-display text-2xl font-semibold text-primary-deep">Here's what we heard</h1>
+            <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx("Here's what we heard")}</h1>
             <div className="ml-auto"><ReadAloudButton text={result.summary + ". Next steps: " + result.nextSteps.join(". ")} /></div>
           </div>
           <p className="mt-4 text-lg leading-relaxed">{result.summary}</p>
 
-          <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">What you can do next</h2>
+          <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">{tx("What you can do next")}</h2>
           <ul className="mt-2 space-y-2">
             {result.nextSteps.map((s, i) => (
               <li key={i} className="flex gap-2 text-base"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden />{s}</li>
