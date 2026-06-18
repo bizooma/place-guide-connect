@@ -1,34 +1,31 @@
-## Replace small loading text with animated progress indicator in Document Helper
+Redesign the /donate page into a multi-column layout to accommodate a new embedded HeyGen video while shortening vertical scroll.
 
-### Context
-In `src/routes/help.document.tsx`, the current loading state while the AI reads and translates a document is a small text line at the bottom of the card:
-```tsx
-<p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-  <Sparkles className="h-4 w-4 animate-pulse text-accent" /> Reading your document in {language}…
-</p>
-```
-This is barely visible and gives poor user feedback during a multi-step process (file upload → storage → AI analysis).
+## Layout changes
 
-### Goal
-Replace this with a prominent, animated visual progress indicator that makes it unmistakably clear the system is working.
+1. **Widen page container** from `max-w-3xl` to `max-w-5xl` so two-column rows have comfortable horizontal breathing room on desktop.
 
-### Changes
-1. **Create a reusable `DocumentLoadingState` component** in the same file (or inline) that renders:
-   - A full-width **indeterminate animated progress bar** using the brand primary green color (`bg-primary`) with a continuous shimmer/slide animation (CSS `@keyframes` with a sliding lighter stripe)
-   - Larger, centered status text showing the current stage
-   - A subtle pulsing or fade animation on the text to reinforce activity
-   - Keep the language reference in the message
+2. **Row 1 — Two cards side by side**
+   - Financial Giving (left)
+   - Corporate Sponsorship (right)
+   - Use a responsive 2-column grid (`grid-cols-1 md:grid-cols-2`) with `gap-6`.
 
-2. **Style choices**
-   - Progress bar: `h-3`, `rounded-full`, `bg-primary/20` track, `bg-primary` fill with an animated gradient overlay that slides continuously
-   - Use Tailwind arbitrary values or add a single CSS keyframe animation in `src/styles.css` for the indeterminate shimmer effect
-   - Text: `text-base` or `text-lg`, `text-primary-deep`, centered, with `animate-pulse` or a gentler fade
-   - Wrap in a `surface-card` sub-section or just a padded div within the existing card
+3. **Row 2 — Video + card side by side**
+   - HeyGen embed `<iframe>` in the left column (responsive `aspect-video` container, full width of its column).
+   - Volunteer card in the right column.
+   - Same responsive 2-column grid pattern.
 
-3. **Build validation**
-   - Run `lovable-exec build` to ensure no type or syntax errors
-   - Verify the animation runs smoothly in the preview
+4. **Row 3 — Full-width card**
+   - Other Ways to Help spans the full width as a single card below the video row.
 
-### Files to modify
-- `src/routes/help.document.tsx` — replace the `{loading && …}` block
-- `src/styles.css` — optionally add a single `@keyframes indeterminate-progress` utility if Tailwind's built-in animations aren't sufficient for the shimmer stripe effect
+## Video embed details
+- Source: `https://app.heygen.com/embeds/195417e5257446d8a636bb4b480ff50d`
+- Title: "The Place"
+- Wrapped in a responsive container (`aspect-video`) so it scales with the column width.
+- Allow attributes: `encrypted-media; fullscreen`
+
+## Mobile behavior
+- Below `md` breakpoint, every row collapses to a single column (cards and video stack vertically) so readability is preserved on phones.
+
+## Files to modify
+- `src/routes/donate.tsx` — restructure the card layout, add HeyGen iframe embed, adjust container width.
+- No new components needed; all work is within the existing route file.
