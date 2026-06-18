@@ -1,14 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, CalendarDays, BookOpen, Heart, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n";
 
 const items = [
-  { to: "/", labelKey: "nav.home", icon: Home },
-  { to: "/schedule", labelKey: "nav.schedule", icon: CalendarDays },
-  { to: "/help", labelKey: "nav.help", icon: HelpCircle },
-  { to: "/resources", labelKey: "nav.resources", icon: BookOpen },
-  { to: "/donate", labelKey: "nav.donate", icon: Heart },
+  { to: "/", label: "Home", icon: Home },
+  { to: "/schedule", label: "Schedule", icon: CalendarDays },
+  { to: "/help", label: "Help", icon: HelpCircle },
+  { to: "/resources", label: "Resources", icon: BookOpen },
+  { to: "/donate", label: "Donate", icon: Heart },
 ] as const;
 
 export function MobileBottomNav() {
