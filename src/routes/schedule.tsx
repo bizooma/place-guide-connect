@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Clock, MapPin, Languages as LanguagesIcon, CalendarDays, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
