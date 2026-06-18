@@ -128,16 +128,15 @@ export const deleteChatbotDocument = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: doc } = await supabaseAdmin
+    const { data: doc } = await context.supabase
       .from("chatbot_documents")
       .select("storage_path")
       .eq("id", data.documentId)
       .maybeSingle();
     if (doc?.storage_path) {
-      await supabaseAdmin.storage.from("document-uploads").remove([doc.storage_path]);
+      await context.supabase.storage.from("document-uploads").remove([doc.storage_path]);
     }
-    const { error } = await supabaseAdmin.from("chatbot_documents").delete().eq("id", data.documentId);
+    const { error } = await context.supabase.from("chatbot_documents").delete().eq("id", data.documentId);
     if (error) throw error;
     return { ok: true };
   });
@@ -166,10 +165,10 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
     if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
     if (data.byteSize > MAX_BYTES) throw new Error("File is too large (max 10 MB).");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const db = context.supabase;
 
     // Create the document row in processing state
-    const { data: docRow, error: insErr } = await supabaseAdmin
+    const { data: docRow, error: insErr } = await db
       .from("chatbot_documents")
       .insert({
         title: data.title,
@@ -186,7 +185,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
 
     try {
       // Download file
-      const { data: file, error: dlErr } = await supabaseAdmin.storage
+      const { data: file, error: dlErr } = await db.storage
         .from("document-uploads")
         .download(data.storagePath);
       if (dlErr || !file) throw new Error("Could not download uploaded file.");
@@ -227,10 +226,10 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
         });
       }
 
-      const { error: chunkErr } = await supabaseAdmin.from("chatbot_chunks").insert(rows);
+      const { error: chunkErr } = await db.from("chatbot_chunks").insert(rows);
       if (chunkErr) throw chunkErr;
 
-      await supabaseAdmin
+      await db
         .from("chatbot_documents")
         .update({ status: "ready", chunk_count: rows.length, error_message: null })
         .eq("id", docRow.id);
@@ -238,7 +237,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
       return { ok: true, documentId: docRow.id, chunkCount: rows.length };
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ingestion failed.";
-      await supabaseAdmin
+      await db
         .from("chatbot_documents")
         .update({ status: "error", error_message: message })
         .eq("id", docRow.id);
