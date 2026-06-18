@@ -124,12 +124,12 @@ function HelpPage() {
 
           {matched.length > 0 && (
             <>
-              <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">Helpful resources</h2>
+              <h2 className="mt-7 font-display text-lg font-semibold text-primary-deep">{tx("Helpful resources")}</h2>
               <ul className="mt-3 grid gap-3 sm:grid-cols-2">
                 {matched.map((r) => (
                   <li key={r.id} className="rounded-xl border border-border bg-warm/50 p-4">
-                    <p className="font-medium text-primary-deep">{r.name}</p>
-                    <p className="text-sm text-muted-foreground">{r.description}</p>
+                    <p className="font-medium text-primary-deep">{tx(r.name)}</p>
+                    <p className="text-sm text-muted-foreground">{tx(r.description)}</p>
                     {r.phone && <a href={`tel:${r.phone}`} className="mt-2 inline-block text-sm font-medium text-accent">{r.phone}</a>}
                   </li>
                 ))}
