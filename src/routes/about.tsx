@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
+import rlpLogo from "@/assets/rlp-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
