@@ -117,6 +117,18 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
+          <section className="w-full">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3260.1191209596177!2d-101.8719168!3d35.2035017!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87014f1424cae707%3A0x79b397e9e5bc8a02!2sthe%20PLACE!5e0!3m2!1sen!2sus!4v1781802453037!5m2!1sen!2sus"
+              width="100%"
+              height="450"
+              className="block border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="The PLACE location"
+            />
+          </section>
           <SiteFooter />
           <MobileBottomNav />
         </div>
