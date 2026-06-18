@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
+import rlpLogo from "@/assets/rlp-logo.png.asset.json";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -26,29 +27,38 @@ function AboutPage() {
       <p className="mt-3 text-lg leading-relaxed text-foreground/85">{t("about.collab.p")}</p>
 
       <div className="mt-6 space-y-6">
-        <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">
-            <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
-              Refugee Language Project
-            </a>
-          </h3>
-          <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.rlp.desc")}</p>
+        <div className="flex items-start gap-4">
+          <img src={rlpLogo.url} alt="Refugee Language Project logo" className="h-16 w-auto shrink-0 object-contain" />
+          <div>
+            <h3 className="font-display text-xl font-semibold text-primary-deep">
+              <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
+                Refugee Language Project
+              </a>
+            </h3>
+            <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.rlp.desc")}</p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">
-            <a href="https://www.square-mile.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
-              Square Mile
-            </a>
-          </h3>
-          <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.sm.desc")}</p>
+        <div className="flex items-start gap-4">
+          <div className="h-16 w-24 shrink-0 bg-muted/30 rounded" />
+          <div>
+            <h3 className="font-display text-xl font-semibold text-primary-deep">
+              <a href="https://www.square-mile.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
+                Square Mile
+              </a>
+            </h3>
+            <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.sm.desc")}</p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-display text-xl font-semibold text-primary-deep">
-            <a href="https://wefindinlove.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
-              We Find In Love
-            </a>
-          </h3>
-          <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.wfil.desc")}</p>
+        <div className="flex items-start gap-4">
+          <div className="h-16 w-24 shrink-0 bg-muted/30 rounded" />
+          <div>
+            <h3 className="font-display text-xl font-semibold text-primary-deep">
+              <a href="https://wefindinlove.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
+                We Find In Love
+              </a>
+            </h3>
+            <p className="mt-1 text-base leading-relaxed text-foreground/85">{t("about.wfil.desc")}</p>
+          </div>
         </div>
       </div>
 
