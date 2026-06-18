@@ -417,6 +417,42 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteer_signups: {
+        Row: {
+          admin_notes: string | null
+          availability: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          reviewed_at: string | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          availability: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          reviewed_at?: string | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          availability?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          reviewed_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
