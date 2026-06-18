@@ -30,7 +30,9 @@ function AboutPage() {
 
       <div className="mt-6 space-y-6">
         <div className="flex items-start gap-4">
-          <img src={rlpLogo.url} alt="Refugee Language Project logo" className="h-16 w-auto shrink-0 object-contain" />
+          <div className="w-32 shrink-0 flex items-center justify-center">
+            <img src={rlpLogo.url} alt="Refugee Language Project logo" className="h-16 w-auto object-contain" />
+          </div>
           <div>
             <h3 className="font-display text-xl font-semibold text-primary-deep">
               <a href="https://refugeelanguage.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
@@ -41,7 +43,9 @@ function AboutPage() {
           </div>
         </div>
         <div className="flex items-start gap-4">
-          <img src={squareMileLogo.url} alt="Square Mile logo" className="h-16 w-auto shrink-0 object-contain" />
+          <div className="w-32 shrink-0 flex items-center justify-center">
+            <img src={squareMileLogo.url} alt="Square Mile logo" className="h-16 w-auto object-contain" />
+          </div>
           <div>
             <h3 className="font-display text-xl font-semibold text-primary-deep">
               <a href="https://www.square-mile.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
@@ -52,7 +56,9 @@ function AboutPage() {
           </div>
         </div>
         <div className="flex items-start gap-4">
-          <img src={wfilLogo.url} alt="We Find In Love logo" className="h-20 w-auto shrink-0 object-contain" />
+          <div className="w-32 shrink-0 flex items-center justify-center">
+            <img src={wfilLogo.url} alt="We Find In Love logo" className="h-20 w-auto object-contain" />
+          </div>
           <div>
             <h3 className="font-display text-xl font-semibold text-primary-deep">
               <a href="https://wefindinlove.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
