@@ -22,6 +22,7 @@ export function SiteFooter() {
             <li><Link to="/schedule" className="hover:underline">{t("nav.schedule")}</Link></li>
             <li><Link to="/resources" className="hover:underline">{t("nav.resources")}</Link></li>
             <li><Link to="/about" className="hover:underline">{t("nav.about")}</Link></li>
+            <li><Link to="/donate" className="hover:underline">{t("nav.donate")}</Link></li>
           </ul>
         </div>
         <div>
