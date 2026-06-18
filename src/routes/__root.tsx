@@ -104,12 +104,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <div className="flex min-h-dvh flex-col">
+        <div className="flex min-h-dvh flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
           <SiteHeader />
           <main className="flex-1">
             <Outlet />
           </main>
           <SiteFooter />
+          <MobileBottomNav />
         </div>
         <Toaster richColors position="top-center" />
       </I18nProvider>
