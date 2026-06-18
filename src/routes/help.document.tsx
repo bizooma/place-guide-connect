@@ -39,6 +39,8 @@ const LANGUAGES = [
 
 interface Result extends DocumentAnalysis {
   fileName: string;
+  storagePath: string;
+  uploadId: string;
 }
 
 function DocumentPage() {
@@ -47,6 +49,7 @@ function DocumentPage() {
   const [language, setLanguage] = useState<string>("English");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const runAnalysis = useServerFn(analyzeDocument);
 
@@ -75,18 +78,22 @@ function DocumentPage() {
         .from("document-uploads")
         .upload(path, f, { contentType: f.type, upsert: false });
       if (upErr) throw upErr;
-      const { error: insErr } = await supabase.from("document_uploads").insert({
-        storage_path: path,
-        original_filename: f.name,
-        mime_type: f.type,
-        size_bytes: f.size,
-      });
+      const { data: insRow, error: insErr } = await supabase
+        .from("document_uploads")
+        .insert({
+          storage_path: path,
+          original_filename: f.name,
+          mime_type: f.type,
+          size_bytes: f.size,
+        })
+        .select("id")
+        .single();
       if (insErr) throw insErr;
 
       const analysis = await runAnalysis({
         data: { storagePath: path, mimeType: f.type || "application/octet-stream", language },
       });
-      setResult({ fileName: f.name, ...analysis });
+      setResult({ fileName: f.name, storagePath: path, uploadId: insRow.id, ...analysis });
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
@@ -96,9 +103,29 @@ function DocumentPage() {
     }
   }
 
-  function deleteAll() {
-    setFile(null); setResult(null);
-    toast.success("Document and result deleted.");
+  async function deleteAll() {
+    if (!result) { setFile(null); return; }
+    setDeleting(true);
+    try {
+      const { error: storageErr } = await supabase.storage
+        .from("document-uploads")
+        .remove([result.storagePath]);
+      if (storageErr) throw storageErr;
+      const { error: dbErr } = await supabase
+        .from("document_uploads")
+        .delete()
+        .eq("id", result.uploadId);
+      if (dbErr) throw dbErr;
+      setFile(null);
+      setResult(null);
+      toast.success("Document and result deleted.");
+    } catch (err) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Could not delete document.";
+      toast.error(msg);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
