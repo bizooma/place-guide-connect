@@ -12,9 +12,9 @@ function createPublicClient() {
   );
 }
 
-const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1";
-const EMBED_MODEL = "openai/text-embedding-3-small"; // 1536 dims (HNSW-friendly)
-const CHAT_MODEL = "google/gemini-3-flash-preview";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
+const EMBED_MODEL = "text-embedding-004"; // 768 dims
+const CHAT_MODEL = "gemini-2.5-flash";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const CHUNK_SIZE = 1200;
@@ -44,23 +44,25 @@ function chunkText(text: string): string[] {
 }
 
 async function embedTexts(apiKey: string, inputs: string[]): Promise<number[][]> {
-  const res = await fetch(`${LOVABLE_AI_URL}/embeddings`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+  const res = await fetch(
+    `${GEMINI_URL}/models/${EMBED_MODEL}:batchEmbedContents?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requests: inputs.map((text) => ({
+          model: `models/${EMBED_MODEL}`,
+          content: { parts: [{ text }] },
+        })),
+      }),
     },
-    body: JSON.stringify({ model: EMBED_MODEL, input: inputs }),
-  });
+  );
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Embedding failed (${res.status}): ${body.slice(0, 200)}`);
   }
-  const json = (await res.json()) as { data: Array<{ embedding: number[]; index: number }> };
-  const out: number[][] = new Array(inputs.length);
-  for (const row of json.data) out[row.index] = row.embedding;
-  return out;
+  const json = (await res.json()) as { embeddings: Array<{ values: number[] }> };
+  return json.embeddings.map((e) => e.values);
 }
 
 async function extractTextWithGemini(
