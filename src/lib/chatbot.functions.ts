@@ -13,7 +13,7 @@ function createPublicClient() {
 }
 
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
-const EMBED_MODEL = "text-embedding-004"; // 768 dims
+const EMBED_MODEL = "gemini-embedding-001"; // configured to 768 dims via outputDimensionality
 const CHAT_MODEL = "gemini-2.5-flash";
 
 const MAX_BYTES = 10 * 1024 * 1024;
