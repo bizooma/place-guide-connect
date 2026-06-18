@@ -53,20 +53,19 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-2">
-          {/* Language selector moved to homepage */}
+        <div className="flex items-center gap-2">
+          <HeaderUser />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden h-11 w-11 text-white hover:bg-white/10"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
         </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden h-11 w-11 text-white hover:bg-white/10"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
       </div>
 
       {open && (
