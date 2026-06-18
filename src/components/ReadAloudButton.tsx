@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 /**
- * Fetches PCM audio from /api/tts (Gemini TTS, JSON response) and plays it
- * via Web Audio. Falls back to browser SpeechSynthesis on error.
+ * Fetches mp3 audio from /api/tts (Lovable AI Gateway, base64 JSON) and plays
+ * it via an <audio> element. Falls back to browser SpeechSynthesis on error.
  */
 export function ReadAloudButton({
   text,
@@ -18,8 +18,8 @@ export function ReadAloudButton({
 }) {
   const [state, setState] = useState<"idle" | "loading" | "playing">("idle");
   const abortRef = useRef<AbortController | null>(null);
-  const ctxRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const urlRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => cleanup();
@@ -29,10 +29,15 @@ export function ReadAloudButton({
   function cleanup() {
     abortRef.current?.abort();
     abortRef.current = null;
-    try { sourceRef.current?.stop(); } catch { /* noop */ }
-    sourceRef.current = null;
-    ctxRef.current?.close().catch(() => {});
-    ctxRef.current = null;
+    if (audioRef.current) {
+      try { audioRef.current.pause(); } catch { /* noop */ }
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+      urlRef.current = null;
+    }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
@@ -57,6 +62,11 @@ export function ReadAloudButton({
     const controller = new AbortController();
     abortRef.current = controller;
 
+    // Create the audio element synchronously inside the user gesture so iOS
+    // Safari permits playback after the upcoming await.
+    const audio = new Audio();
+    audioRef.current = audio;
+
     try {
       const res = await fetch("/api/tts", {
         method: "POST",
@@ -65,36 +75,25 @@ export function ReadAloudButton({
         signal: controller.signal,
       });
       if (!res.ok) throw new Error(`TTS ${res.status}`);
-      const { audioBase64, sampleRate } = (await res.json()) as {
+      const { audioBase64, mimeType } = (await res.json()) as {
         audioBase64: string;
-        sampleRate: number;
+        mimeType?: string;
       };
 
       const binary = atob(audioBase64);
       const bytes = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      const usable = bytes.length - (bytes.length % 2);
-      const samples = new Int16Array(bytes.buffer, 0, usable / 2);
-      const floats = Float32Array.from(samples, (s) => s / 32768);
-
-      const rate = sampleRate || 24000;
-      const ctx = new AudioContext({ sampleRate: rate });
-      ctxRef.current = ctx;
-      if (ctx.state === "suspended") await ctx.resume().catch(() => {});
-
-      const buffer = ctx.createBuffer(1, floats.length, rate);
-      buffer.copyToChannel(floats, 0);
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(ctx.destination);
-      sourceRef.current = source;
-      source.onended = () => {
+      const blob = new Blob([bytes], { type: mimeType || "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      urlRef.current = url;
+      audio.src = url;
+      audio.onended = () => {
         if (abortRef.current === controller) {
           cleanup();
           setState("idle");
         }
       };
-      source.start();
+      await audio.play();
       setState("playing");
     } catch (err) {
       if ((err as Error)?.name === "AbortError") return;
