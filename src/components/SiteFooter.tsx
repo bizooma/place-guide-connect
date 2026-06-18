@@ -36,7 +36,15 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-primary-foreground/60">© 2026 The PLACE - A Community Center In Cooperation With The Refugee Language Project, Square Mile, And We Find In Love | All Rights Reserved</p>
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 sm:flex-row">
+          <p className="text-xs text-primary-foreground/60">© 2026 The PLACE - A Community Center In Cooperation With The Refugee Language Project, Square Mile, And We Find In Love | All Rights Reserved</p>
+          <p className="text-xs text-primary-foreground/60">
+            Website by{" "}
+            <a href="https://bizooma.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-foreground">
+              Bizooma, LLC
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
