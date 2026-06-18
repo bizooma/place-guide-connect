@@ -9,6 +9,7 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { triageCategories, triageFlows, resources } from "@/data/mock";
 import { toast } from "sonner";
 
