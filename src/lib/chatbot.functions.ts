@@ -161,9 +161,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const lovableKey = process.env.LOVABLE_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
     if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
     if (data.byteSize > MAX_BYTES) throw new Error("File is too large (max 10 MB).");
 
