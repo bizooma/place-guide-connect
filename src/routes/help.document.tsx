@@ -152,9 +152,16 @@ function DocumentPage() {
           </div>
 
           {loading && (
-            <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles className="h-4 w-4 animate-pulse text-accent" /> Reading your document in {language}…
-            </p>
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex items-center justify-center gap-2 text-base font-medium text-primary-deep">
+                <Sparkles className="h-5 w-5 animate-pulse text-primary" />
+                <span className="animate-pulse">Reading your document in {language}…</span>
+              </div>
+              <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-primary/15">
+                <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-primary/60 via-primary to-primary/60 animate-indeterminate-progress" />
+              </div>
+              <p className="mt-3 text-center text-xs text-muted-foreground">This usually takes 10–30 seconds. Please don't close this page.</p>
+            </div>
           )}
         </div>
       )}
