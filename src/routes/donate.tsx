@@ -117,7 +117,7 @@ function DonatePage() {
             className="rounded-full border-primary text-primary hover:bg-primary/5"
           >
             <a
-              href="mailto:hello@refugeelanguage.org"
+              href="mailto:sara@wefindinlove.org"
               target="_blank"
               rel="noopener noreferrer"
             >
