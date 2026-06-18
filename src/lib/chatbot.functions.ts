@@ -128,16 +128,15 @@ export const deleteChatbotDocument = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: doc } = await supabaseAdmin
+    const { data: doc } = await context.supabase
       .from("chatbot_documents")
       .select("storage_path")
       .eq("id", data.documentId)
       .maybeSingle();
     if (doc?.storage_path) {
-      await supabaseAdmin.storage.from("document-uploads").remove([doc.storage_path]);
+      await context.supabase.storage.from("document-uploads").remove([doc.storage_path]);
     }
-    const { error } = await supabaseAdmin.from("chatbot_documents").delete().eq("id", data.documentId);
+    const { error } = await context.supabase.from("chatbot_documents").delete().eq("id", data.documentId);
     if (error) throw error;
     return { ok: true };
   });
