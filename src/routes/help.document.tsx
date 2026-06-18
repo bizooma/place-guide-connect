@@ -259,7 +259,7 @@ function DocumentPage() {
           <Disclaimer>{t("disclaimer.ai")}</Disclaimer>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button variant="outline" className="rounded-full gap-2" onClick={deleteAll}><Trash2 className="h-4 w-4" /> {t("document.delete")}</Button>
+            <Button variant="outline" className="rounded-full gap-2" onClick={deleteAll} disabled={deleting}><Trash2 className="h-4 w-4" /> {deleting ? "Deleting…" : t("document.delete")}</Button>
             <Button asChild className="rounded-full bg-primary hover:bg-primary-deep"><Link to="/resources">{t("cta.contact")}</Link></Button>
           </div>
         </div>
