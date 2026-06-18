@@ -38,6 +38,22 @@ function HelpPage() {
 
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
   const flow = selected ? triageFlows[selected] : null;
+  const currentCategory = selected ? triageCategories.find((c) => c.slug === selected) : null;
+
+  const translatableTexts: string[] = [
+    ...active.flatMap((c) => [c.title, c.description]),
+    ...(flow ? [flow.intro] : []),
+    ...(flow ? flow.questions.flatMap((q) => [q.label, ...(q.options ?? [])]) : []),
+    ...(currentCategory ? [currentCategory.title] : []),
+    "Start over",
+    "Back",
+    "Here's what we heard",
+    "What you can do next",
+    "Helpful resources",
+    "See my summary",
+    ...resources.flatMap((r) => [r.name, r.description]),
+  ];
+  const tx = useTranslatedTexts(translatableTexts);
 
   function reset() {
     setSelected(null); setAnswers({}); setSubmitted(false);
