@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
-import logoAsset from "@/assets/theplace-logo.webp.asset.json";
+import logoAsset from "@/assets/theplace-logo-full.webp.asset.json";
 
 export function SiteFooter() {
   const { t } = useI18n();
