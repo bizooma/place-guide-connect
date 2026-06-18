@@ -9,7 +9,7 @@ import p8 from "@/assets/donate-gallery/place8.jpg.asset.json";
 import p9 from "@/assets/donate-gallery/place9.jpg.asset.json";
 import p10 from "@/assets/donate-gallery/place10.jpg.asset.json";
 
-const images = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10];
+const images: { url: string }[] = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10] as { url: string }[];
 
 export function DonateGallery() {
   const loop = [...images, ...images];
