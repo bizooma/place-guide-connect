@@ -12,9 +12,9 @@ function createPublicClient() {
   );
 }
 
-const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1";
-const EMBED_MODEL = "openai/text-embedding-3-small"; // 1536 dims (HNSW-friendly)
-const CHAT_MODEL = "google/gemini-3-flash-preview";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta";
+const EMBED_MODEL = "text-embedding-004"; // 768 dims
+const CHAT_MODEL = "gemini-2.5-flash";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const CHUNK_SIZE = 1200;
@@ -44,23 +44,25 @@ function chunkText(text: string): string[] {
 }
 
 async function embedTexts(apiKey: string, inputs: string[]): Promise<number[][]> {
-  const res = await fetch(`${LOVABLE_AI_URL}/embeddings`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+  const res = await fetch(
+    `${GEMINI_URL}/models/${EMBED_MODEL}:batchEmbedContents?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requests: inputs.map((text) => ({
+          model: `models/${EMBED_MODEL}`,
+          content: { parts: [{ text }] },
+        })),
+      }),
     },
-    body: JSON.stringify({ model: EMBED_MODEL, input: inputs }),
-  });
+  );
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     throw new Error(`Embedding failed (${res.status}): ${body.slice(0, 200)}`);
   }
-  const json = (await res.json()) as { data: Array<{ embedding: number[]; index: number }> };
-  const out: number[][] = new Array(inputs.length);
-  for (const row of json.data) out[row.index] = row.embedding;
-  return out;
+  const json = (await res.json()) as { embeddings: Array<{ values: number[] }> };
+  return json.embeddings.map((e) => e.values);
 }
 
 async function extractTextWithGemini(
@@ -159,9 +161,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const lovableKey = process.env.LOVABLE_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
     if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
     if (data.byteSize > MAX_BYTES) throw new Error("File is too large (max 10 MB).");
 
@@ -214,7 +214,7 @@ export const ingestChatbotDocument = createServerFn({ method: "POST" })
       const rows: Array<{ document_id: string; chunk_index: number; content: string; embedding: string; token_estimate: number }> = [];
       for (let i = 0; i < chunks.length; i += BATCH) {
         const batch = chunks.slice(i, i + BATCH);
-        const vectors = await embedTexts(lovableKey, batch);
+        const vectors = await embedTexts(geminiKey, batch);
         batch.forEach((c, j) => {
           rows.push({
             document_id: docRow.id,
@@ -259,8 +259,8 @@ export const askChatbot = createServerFn({ method: "POST" })
   )
 
   .handler(async ({ data }) => {
-    const lovableKey = process.env.LOVABLE_API_KEY;
-    if (!lovableKey) throw new Error("LOVABLE_API_KEY is not configured");
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!geminiKey) throw new Error("GEMINI_API_KEY is not configured");
 
     const supabase = createPublicClient();
 
@@ -285,7 +285,7 @@ export const askChatbot = createServerFn({ method: "POST" })
     });
 
     // Embed question + retrieve
-    const [qVector] = await embedTexts(lovableKey, [data.question]);
+    const [qVector] = await embedTexts(geminiKey, [data.question]);
     const { data: matches, error: matchErr } = await supabase.rpc("match_chatbot_chunks", {
       query_embedding: JSON.stringify(qVector) as unknown as string,
       match_count: 5,
@@ -308,38 +308,36 @@ export const askChatbot = createServerFn({ method: "POST" })
         )
         .join("\n\n---\n\n");
 
-      const chatRes = await fetch(`${LOVABLE_AI_URL}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Lovable-API-Key": lovableKey,
-          "X-Lovable-AIG-SDK": "vercel-ai-sdk",
-        },
-        body: JSON.stringify({
-          model: CHAT_MODEL,
-          messages: [
-            {
-              role: "system",
-              content:
-                `You are a friendly assistant for The PLACE, a community help center. Answer the visitor's question using ONLY the provided context. Be warm, concise (1-4 short paragraphs), and plain-spoken. If the context does not contain the answer, reply: \"I don't have that in my notes yet — try the Get help button or ask something else.\" Do not invent details. Do not cite source numbers in your reply. Always write your reply in ${data.language ?? "English"}, even if the context is in another language.`,
-            },
+      const systemPrompt = `You are a friendly assistant for The PLACE, a community help center. Answer the visitor's question using ONLY the provided context. Be warm, concise (1-4 short paragraphs), and plain-spoken. If the context does not contain the answer, reply: "I don't have that in my notes yet — try the Get help button or ask something else." Do not invent details. Do not cite source numbers in your reply. Always write your reply in ${data.language ?? "English"}, even if the context is in another language.`;
 
-            {
-              role: "user",
-              content: `Context:\n${contextText}\n\nQuestion: ${data.question}`,
-            },
-          ],
-          temperature: 0.3,
-        }),
-      });
+      const chatRes = await fetch(
+        `${GEMINI_URL}/models/${CHAT_MODEL}:generateContent?key=${geminiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: `Context:\n${contextText}\n\nQuestion: ${data.question}` }],
+              },
+            ],
+            generationConfig: { temperature: 0.3 },
+          }),
+        },
+      );
       if (!chatRes.ok) {
         const body = await chatRes.text().catch(() => "");
         if (chatRes.status === 429) throw new Error("The assistant is busy right now. Please try again in a moment.");
-        if (chatRes.status === 402) throw new Error("The assistant is temporarily unavailable.");
         throw new Error(`Chat failed (${chatRes.status}): ${body.slice(0, 200)}`);
       }
-      const chatJson = (await chatRes.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      answer = chatJson.choices?.[0]?.message?.content?.trim() || "I don't have an answer for that yet.";
+      const chatJson = (await chatRes.json()) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      };
+      answer =
+        chatJson.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("").trim() ||
+        "I don't have an answer for that yet.";
 
       sources = relevant.map((r: { document_id: string; document_title: string | null; content: string }) => ({
         document_id: r.document_id,
