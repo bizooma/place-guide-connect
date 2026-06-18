@@ -75,7 +75,7 @@ function DonatePage() {
             className="rounded-full bg-primary text-primary-foreground hover:opacity-90"
           >
             <a
-              href="https://refugeelanguage.org/give"
+              href="https://www.paypal.com/donate/?hosted_button_id=8A4MLHZ987BZJ"
               target="_blank"
               rel="noopener noreferrer"
             >
