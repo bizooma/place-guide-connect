@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Disclaimer } from "@/components/Disclaimer";
 import { useI18n } from "@/lib/i18n";
 import rlpLogo from "@/assets/rlp-logo.png.asset.json";
-import squareMileLogo from "@/assets/square-mile-logo.webp.asset.json";
+import squareMileLogo from "@/assets/square-mile-logo.png.asset.json";
 import wfilLogo from "@/assets/wfil-logo.webp.asset.json";
 
 export const Route = createFileRoute("/about")({
