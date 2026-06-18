@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Download, RefreshCw, FileText, Eye } from "lucide-react";
+import { Download, RefreshCw, FileText, Eye, Archive, ArchiveRestore } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,6 +33,7 @@ export function DocumentUploadsList() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [showArchived, setShowArchived] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -71,11 +72,17 @@ export function DocumentUploadsList() {
 
   const filtered = useMemo(() => {
     return (rows ?? []).filter((r) => {
-      if (statusFilter !== "all" && (r.status ?? "pending") !== statusFilter) return false;
+      const status = r.status ?? "pending";
+      if (showArchived) {
+        if (status !== "archived") return false;
+      } else {
+        if (status === "archived") return false;
+      }
+      if (statusFilter !== "all" && status !== statusFilter) return false;
       if (categoryFilter !== "all" && r.help_category !== categoryFilter) return false;
       return true;
     });
-  }, [rows, statusFilter, categoryFilter]);
+  }, [rows, statusFilter, categoryFilter, showArchived]);
 
   async function openSigned(row: DocRow, mode: "view" | "download") {
     const opts = mode === "download" ? { download: row.original_filename ?? true } : undefined;
@@ -123,6 +130,9 @@ export function DocumentUploadsList() {
               {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Button variant={showArchived ? "default" : "outline"} size="sm" className="rounded-full gap-1.5" onClick={() => setShowArchived((v) => !v)}>
+            {showArchived ? <><ArchiveRestore className="h-4 w-4" />Back to active</> : <><Archive className="h-4 w-4" />View archived</>}
+          </Button>
           <Button variant="outline" size="sm" className="rounded-full gap-1.5" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />Refresh
           </Button>
