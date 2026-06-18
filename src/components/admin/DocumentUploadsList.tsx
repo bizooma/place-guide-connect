@@ -130,6 +130,9 @@ export function DocumentUploadsList() {
               {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Button variant={showArchived ? "default" : "outline"} size="sm" className="rounded-full gap-1.5" onClick={() => setShowArchived((v) => !v)}>
+            {showArchived ? <><ArchiveRestore className="h-4 w-4" />Back to active</> : <><Archive className="h-4 w-4" />View archived</>}
+          </Button>
           <Button variant="outline" size="sm" className="rounded-full gap-1.5" onClick={load} disabled={loading}>
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />Refresh
           </Button>
