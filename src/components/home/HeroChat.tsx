@@ -15,7 +15,12 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { useChatbot } from "@/hooks/useChatbot";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 
+const TITLE = "Ask The PLACE";
+const SUBTITLE = "Answers based on our community info";
+const GREETING =
+  "Hi — I can answer questions about The PLACE: classes, hours, services, and how to get help. What can I help you with?";
 const STARTERS = [
   "What classes are offered?",
   "What hours are you open?",
@@ -27,6 +32,7 @@ export function HeroChat() {
   const { messages, status, send } = useChatbot();
   const isLoading = status === "submitted";
   const submitStatus = status === "submitted" ? "submitted" : undefined;
+  const tx = useTranslatedTexts([TITLE, SUBTITLE, GREETING, ...STARTERS]);
 
   function handleSubmit(message: PromptInputMessage) {
     void send(message.text);
@@ -44,10 +50,10 @@ export function HeroChat() {
         </div>
         <div className="min-w-0">
           <div className="truncate font-display text-sm font-semibold text-primary-deep">
-            Ask The PLACE
+            {tx(TITLE)}
           </div>
           <div className="text-[11px] text-muted-foreground">
-            Answers based on our community info
+            {tx(SUBTITLE)}
           </div>
         </div>
       </header>
@@ -59,7 +65,7 @@ export function HeroChat() {
               <div className="flex items-start gap-3">
                 <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                 <p className="text-sm text-foreground">
-                  Hi — I can answer questions about The PLACE: classes, hours, services, and how to get help. What can I help you with?
+                  {tx(GREETING)}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
@@ -70,12 +76,13 @@ export function HeroChat() {
                     onClick={() => handleStarter(s)}
                     className="rounded-full border border-border bg-warm px-3 py-1.5 text-xs text-primary-deep transition hover:bg-warm/70 hover:shadow-sm"
                   >
-                    {s}
+                    {tx(s)}
                   </button>
                 ))}
               </div>
             </div>
           )}
+
           {messages.map((m) => (
             <Message key={m.id} from={m.role}>
               <MessageContent>
