@@ -91,7 +91,7 @@ function HomePage() {
                 key={cat.id}
                 to={isDoc ? "/help/document" : "/help"}
                 search={isDoc ? undefined : { category: cat.slug }}
-                className="surface-card group flex w-full items-start gap-4 p-4 text-left transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5 bg-white/40 backdrop-blur-xl border border-white/50 hover:bg-white/60"
+                className="group flex w-full items-start gap-4 rounded-2xl border border-white/50 bg-white/40 p-4 text-left shadow-card backdrop-blur-xl backdrop-saturate-150 transition hover:-translate-y-0.5 hover:bg-white/60 hover:shadow-lift focus-visible:-translate-y-0.5"
               >
                 {img && (
                   <span className="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-secondary">
