@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain } from "lucide-react";
+import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain, HeartHandshake } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
 import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
 import { SettingsEditor } from "@/components/admin/SettingsEditor";
 import { TrainingDocsEditor } from "@/components/admin/TrainingDocsEditor";
+import { VolunteerSignupsList } from "@/components/admin/VolunteerSignupsList";
 import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -86,6 +87,7 @@ function AdminPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="training" className="gap-1.5 rounded-full"><Brain className="h-4 w-4" />Chatbot training</TabsTrigger>
+          <TabsTrigger value="volunteers" className="gap-1.5 rounded-full"><HeartHandshake className="h-4 w-4" />Volunteers</TabsTrigger>
           <TabsTrigger value="languages" className="gap-1.5 rounded-full"><LangIcon className="h-4 w-4" />Languages</TabsTrigger>
           <TabsTrigger value="settings" className="gap-1.5 rounded-full"><Settings className="h-4 w-4" />Settings</TabsTrigger>
         </TabsList>
@@ -108,6 +110,9 @@ function AdminPage() {
         </TabsContent>
         <TabsContent value="training" className="mt-6">
           <TrainingDocsEditor />
+        </TabsContent>
+        <TabsContent value="volunteers" className="mt-6">
+          <VolunteerSignupsList />
         </TabsContent>
         <TabsContent value="languages" className="mt-6">
           <LanguagesEditor />
