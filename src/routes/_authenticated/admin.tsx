@@ -111,6 +111,9 @@ function AdminPage() {
         <TabsContent value="training" className="mt-6">
           <TrainingDocsEditor />
         </TabsContent>
+        <TabsContent value="volunteers" className="mt-6">
+          <VolunteerSignupsList />
+        </TabsContent>
         <TabsContent value="languages" className="mt-6">
           <LanguagesEditor />
         </TabsContent>
