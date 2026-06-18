@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, Building2, Users, HelpCircle, CalendarDays, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VolunteerSignupDialog } from "@/components/VolunteerSignupDialog";
+import { DonateGallery } from "@/components/DonateGallery";
 
 export const Route = createFileRoute("/donate")({
   head: () => ({
@@ -33,6 +34,11 @@ function DonatePage() {
         By partnering with us, you are directly investing in the language acquisition, artistic
         expression, cultural integration, and economic growth of our new neighbors.
       </p>
+
+      {/* Auto-scrolling photo gallery */}
+      <div className="mt-10">
+        <DonateGallery />
+      </div>
 
       {/* Financial Giving */}
       <section className="mt-12 surface-card p-6 md:p-8">
