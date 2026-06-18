@@ -11,7 +11,7 @@ export function SiteFooter() {
           <img
             src={logoAsset.url}
             alt="The PLACE Online"
-            className="h-10 w-auto object-contain"
+            className="h-24 w-auto object-contain"
           />
           <p className="mt-3 text-sm text-primary-foreground/80">{t("app.inspiredBy")}</p>
         </div>
