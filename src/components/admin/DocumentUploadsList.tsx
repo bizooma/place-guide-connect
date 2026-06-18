@@ -72,11 +72,17 @@ export function DocumentUploadsList() {
 
   const filtered = useMemo(() => {
     return (rows ?? []).filter((r) => {
-      if (statusFilter !== "all" && (r.status ?? "pending") !== statusFilter) return false;
+      const status = r.status ?? "pending";
+      if (showArchived) {
+        if (status !== "archived") return false;
+      } else {
+        if (status === "archived") return false;
+      }
+      if (statusFilter !== "all" && status !== statusFilter) return false;
       if (categoryFilter !== "all" && r.help_category !== categoryFilter) return false;
       return true;
     });
-  }, [rows, statusFilter, categoryFilter]);
+  }, [rows, statusFilter, categoryFilter, showArchived]);
 
   async function openSigned(row: DocRow, mode: "view" | "download") {
     const opts = mode === "download" ? { download: row.original_filename ?? true } : undefined;
