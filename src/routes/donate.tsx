@@ -132,7 +132,7 @@ function DonatePage() {
 
       {/* Row 2: Video + Volunteer */}
       <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="surface-card overflow-hidden p-2">
+        <div className="surface-card overflow-hidden p-2 flex flex-col">
           <div className="relative w-full overflow-hidden rounded-lg" style={{ aspectRatio: "16 / 9" }}>
             <iframe
               src="https://app.heygen.com/embeds/19f2b8d81e7f4b6b9f381457a335b23c"
@@ -142,6 +142,16 @@ function DonatePage() {
               allowFullScreen
               className="absolute inset-0 h-full w-full"
             />
+          </div>
+          <div className="mt-4 px-3 pb-3">
+            <h3 className="font-display text-lg font-semibold text-primary-deep">The PLACE</h3>
+            <p className="mt-1 text-sm text-foreground/80">3107 Plains Blvd Space 500,<br />Amarillo, TX 79102</p>
+            <p className="mt-2 text-sm text-foreground/80">
+              Phone: <a href="tel:+18065535155" className="text-primary underline hover:no-underline">(806) 553-5155</a>
+            </p>
+            <p className="mt-1 text-sm text-foreground/80">
+              Email: <a href="mailto:sara@wefindinlove.org" className="text-primary underline hover:no-underline">sara@wefindinlove.org</a>
+            </p>
           </div>
         </div>
 
