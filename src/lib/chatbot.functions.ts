@@ -53,6 +53,7 @@ async function embedTexts(apiKey: string, inputs: string[]): Promise<number[][]>
         requests: inputs.map((text) => ({
           model: `models/${EMBED_MODEL}`,
           content: { parts: [{ text }] },
+          outputDimensionality: 768,
         })),
       }),
     },
