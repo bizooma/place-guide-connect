@@ -14,6 +14,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { useChatbot } from "@/hooks/useChatbot";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 const STARTERS = [
   "What classes are offered?",
@@ -79,7 +80,10 @@ export function HeroChat() {
             <Message key={m.id} from={m.role}>
               <MessageContent>
                 {m.role === "assistant" ? (
-                  <MessageResponse>{m.content}</MessageResponse>
+                  <div className="space-y-2">
+                    <MessageResponse>{m.content}</MessageResponse>
+                    <ReadAloudButton text={m.content} language={m.language} label="Listen" />
+                  </div>
                 ) : (
                   <div className="whitespace-pre-wrap">{m.content}</div>
                 )}
