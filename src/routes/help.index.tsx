@@ -10,7 +10,8 @@ import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
-import { triageCategories, triageFlows, resources } from "@/data/mock";
+import { triageFlows, resources } from "@/data/mock";
+import { useTriageCategories } from "@/hooks/useTriageCategories";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/help/")({
@@ -36,6 +37,7 @@ function HelpPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
+  const triageCategories = useTriageCategories();
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
   const flow = selected ? triageFlows[selected] : null;
   const currentCategory = selected ? triageCategories.find((c) => c.slug === selected) : null;

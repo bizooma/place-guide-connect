@@ -4,7 +4,7 @@ import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as L
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { triageCategories } from "@/data/adminSeed";
+import { TriageCategoriesEditor } from "@/components/admin/TriageCategoriesEditor";
 import { ScheduleEditor } from "@/components/admin/ScheduleEditor";
 import { ResourcesEditor } from "@/components/admin/ResourcesEditor";
 import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
@@ -93,11 +93,7 @@ function AdminPage() {
         </TabsList>
 
         <TabsContent value="triage" className="mt-6">
-          <CrudTable
-            title="Help choices (triage categories)"
-            rows={triageCategories.map((c) => [c.order, c.title, c.description, c.active ? "Active" : "Hidden"])}
-            head={["Order", "Title", "Description", "Status"]}
-          />
+          <TriageCategoriesEditor />
         </TabsContent>
         <TabsContent value="schedule" className="mt-6">
           <ScheduleEditor />

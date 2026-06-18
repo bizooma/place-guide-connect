@@ -6,7 +6,7 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HeroChat } from "@/components/home/HeroChat";
 import { useI18n } from "@/lib/i18n";
-import { triageCategories } from "@/data/mock";
+import { useTriageCategories } from "@/hooks/useTriageCategories";
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 import cardBill from "@/assets/cards/bill.jpg";
 import cardJob from "@/assets/cards/job.jpg";
@@ -39,6 +39,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { t } = useI18n();
+  const triageCategories = useTriageCategories();
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
 
   return (
