@@ -52,7 +52,7 @@ function AboutPage() {
           </div>
         </div>
         <div className="flex items-start gap-4">
-          <img src={wfilLogo.url} alt="We Find In Love logo" className="h-16 w-auto shrink-0 object-contain" />
+          <img src={wfilLogo.url} alt="We Find In Love logo" className="h-20 w-auto shrink-0 object-contain" />
           <div>
             <h3 className="font-display text-xl font-semibold text-primary-deep">
               <a href="https://wefindinlove.org/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:underline">
