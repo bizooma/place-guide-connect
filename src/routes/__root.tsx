@@ -15,6 +15,7 @@ import { registerServiceWorker } from "../lib/registerSW";
 import { I18nProvider } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
