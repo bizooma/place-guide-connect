@@ -108,6 +108,22 @@ export function DocumentUploadsList() {
     setRows((prev) => prev?.map((r) => (r.id === row.id ? { ...r, status } : r)) ?? null);
   }
 
+  async function deleteDoc(row: DocRow) {
+    if (!confirm(`Delete "${row.original_filename ?? row.storage_path}"? This cannot be undone.`)) return;
+    const { error: storageErr } = await supabase.storage.from("document-uploads").remove([row.storage_path]);
+    if (storageErr) {
+      toast.error("Could not delete file", { description: storageErr.message });
+      return;
+    }
+    const { error } = await supabase.from("document_uploads").delete().eq("id", row.id);
+    if (error) {
+      toast.error("Could not delete record", { description: error.message });
+      return;
+    }
+    setRows((prev) => prev?.filter((r) => r.id !== row.id) ?? null);
+    toast.success("Document deleted");
+  }
+
   return (
     <section className="surface-card overflow-hidden">
       <div className="flex items-center justify-between gap-3 p-4 border-b border-border flex-wrap">
