@@ -72,6 +72,19 @@ function DocumentPage() {
     setFile(f);
     setLoading(true);
     try {
+      const nameLower = f.name.toLowerCase();
+      const isHeic = /image\/hei[cf]/i.test(f.type) || nameLower.endsWith(".heic") || nameLower.endsWith(".heif");
+      if (isHeic) {
+        try {
+          const { default: heic2any } = await import("heic2any");
+          const converted = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.9 });
+          const blob = Array.isArray(converted) ? converted[0] : converted;
+          f = new File([blob], f.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+        } catch (convErr) {
+          console.error("HEIC conversion failed", convErr);
+          throw new Error("Could not read this iPhone photo. Please save it as JPEG and try again.");
+        }
+      }
       const ext = f.name.split(".").pop() ?? "bin";
       const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
