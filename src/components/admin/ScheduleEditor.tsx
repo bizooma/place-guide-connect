@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
+type Recurrence = "none" | "weekly" | "biweekly" | "monthly";
+
 type ScheduleItem = {
   id: string;
   title: string;
@@ -47,6 +49,9 @@ type ScheduleItem = {
   language: string;
   registration_required: boolean;
   active: boolean;
+  recurrence: Recurrence;
+  recurrence_end_date: string | null;
+  series_id: string | null;
   translations?: Record<string, Record<string, string>> | null;
 };
 
@@ -62,6 +67,13 @@ const CATEGORIES = [
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
+  { value: "none", label: "Does not repeat" },
+  { value: "weekly", label: "Weekly" },
+  { value: "biweekly", label: "Every 2 weeks" },
+  { value: "monthly", label: "Monthly" },
+];
+
 const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   title: "",
   category: CATEGORIES[0],
@@ -74,7 +86,39 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   language: "English",
   registration_required: false,
   active: true,
+  recurrence: "none",
+  recurrence_end_date: null,
+  series_id: null,
 });
+
+function addDays(iso: string, n: number): string {
+  const d = new Date(iso + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+function addMonths(iso: string, n: number): string {
+  const d = new Date(iso + "T00:00:00");
+  d.setMonth(d.getMonth() + n);
+  return d.toISOString().slice(0, 10);
+}
+function dayName(iso: string): string {
+  const idx = new Date(iso + "T00:00:00").getDay(); // 0=Sun
+  return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][idx];
+}
+function generateOccurrenceDates(start: string, end: string, rec: Recurrence): string[] {
+  if (rec === "none") return [start];
+  const dates: string[] = [];
+  let cur = start;
+  let i = 0;
+  while (cur <= end && i < 520) {
+    dates.push(cur);
+    if (rec === "weekly") cur = addDays(cur, 7);
+    else if (rec === "biweekly") cur = addDays(cur, 14);
+    else if (rec === "monthly") cur = addMonths(cur, 1);
+    i++;
+  }
+  return dates;
+}
 
 const PAGE_SIZE = 10;
 
