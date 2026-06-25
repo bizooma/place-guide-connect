@@ -76,6 +76,8 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   active: true,
 });
 
+const PAGE_SIZE = 10;
+
 export function ScheduleEditor() {
   const [items, setItems] = useState<ScheduleItem[] | null>(null);
   const [editing, setEditing] = useState<ScheduleItem | null>(null);
@@ -83,6 +85,7 @@ export function ScheduleEditor() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
 
   async function handleTranslate(id: string) {
