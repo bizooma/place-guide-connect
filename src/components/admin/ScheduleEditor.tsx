@@ -266,7 +266,16 @@ export function ScheduleEditor() {
                 const st = translationStatus(it);
                 return (
                   <tr key={it.id} className="border-t border-border">
-                    <td className="px-4 py-2">{it.title}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-2">
+                        <span>{it.title}</span>
+                        {it.series_id && (
+                          <span title="Recurring event" className="inline-flex items-center text-muted-foreground">
+                            <Repeat className="h-3.5 w-3.5" />
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-2">{it.category}</td>
                     <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
                     <td className="px-4 py-2">{it.location}</td>
