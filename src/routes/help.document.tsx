@@ -74,29 +74,34 @@ function DocumentPage() {
     try {
       const nameLower = f.name.toLowerCase();
       const isHeic = /image\/hei[cf]/i.test(f.type) || nameLower.endsWith(".heic") || nameLower.endsWith(".heif");
+      let mimeType = f.type || "application/octet-stream";
       if (isHeic) {
+        mimeType = "image/heic";
         try {
           const { default: heic2any } = await import("heic2any");
           const converted = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.9 });
           const blob = Array.isArray(converted) ? converted[0] : converted;
           f = new File([blob], f.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+          mimeType = "image/jpeg";
         } catch (convErr) {
-          console.error("HEIC conversion failed", convErr);
-          throw new Error("Could not read this iPhone photo. Please save it as JPEG and try again.");
+          console.warn("HEIC client conversion failed, uploading original for server processing", convErr);
+          // Fall through: upload raw HEIC; Gemini supports image/heic natively.
+          f = new File([f], f.name, { type: "image/heic" });
         }
       }
       const ext = f.name.split(".").pop() ?? "bin";
       const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("document-uploads")
-        .upload(path, f, { contentType: f.type, upsert: false });
+        .upload(path, f, { contentType: mimeType, upsert: false });
       if (upErr) throw upErr;
+
       const { data: insRow, error: insErr } = await supabase
         .from("document_uploads")
         .insert({
           storage_path: path,
           original_filename: f.name,
-          mime_type: f.type,
+          mime_type: mimeType,
           size_bytes: f.size,
         })
         .select("id")
@@ -104,13 +109,14 @@ function DocumentPage() {
       if (insErr) throw insErr;
 
       const analysis = await runAnalysis({
-        data: { storagePath: path, mimeType: f.type || "application/octet-stream", language },
+        data: { storagePath: path, mimeType, language },
       });
       setResult({ fileName: f.name, storagePath: path, uploadId: insRow.id, ...analysis });
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
       toast.error(msg);
+
     } finally {
       setLoading(false);
     }
