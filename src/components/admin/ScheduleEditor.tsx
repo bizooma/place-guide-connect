@@ -390,12 +390,16 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
   value: T;
   saving: boolean;
   onClose: () => void;
-  onSave: (v: NonNullable<T>) => void;
+  onSave: (v: NonNullable<T>, scope: "single" | "series") => void;
 }) {
   const [draft, setDraft] = useState<NonNullable<T> | null>(null);
+  const [scope, setScope] = useState<"single" | "series">("single");
 
   useEffect(() => {
-    if (value) setDraft(value as NonNullable<T>);
+    if (value) {
+      setDraft(value as NonNullable<T>);
+      setScope("single");
+    }
   }, [value]);
 
   if (!draft) {
@@ -409,6 +413,10 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
   const update = <K extends keyof NonNullable<T>>(key: K, v: NonNullable<T>[K]) =>
     setDraft({ ...draft, [key]: v });
 
+  const isExisting = "id" in (draft as any);
+  const isPartOfSeries = isExisting && Boolean((draft as ScheduleItem).series_id);
+  const isNew = !isExisting;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
@@ -416,6 +424,31 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-2">
+          {isPartOfSeries && (
+            <div className="rounded-md border border-border bg-warm/50 p-3 text-sm">
+              <p className="font-medium mb-2">This event is part of a recurring series</p>
+              <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="scope"
+                    checked={scope === "single"}
+                    onChange={() => setScope("single")}
+                  />
+                  Edit this event only
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="scope"
+                    checked={scope === "series"}
+                    onChange={() => setScope("series")}
+                  />
+                  Edit entire series (date/time-of-day not changed for past events)
+                </label>
+              </div>
+            </div>
+          )}
           <Field label="Title">
             <Input value={draft.title} onChange={(e) => update("title", e.target.value as never)} />
           </Field>
@@ -459,6 +492,30 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
           <Field label="Description">
             <Textarea rows={3} value={draft.description} onChange={(e) => update("description", e.target.value as never)} />
           </Field>
+          {isNew && (
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Repeats">
+                <Select value={draft.recurrence} onValueChange={(v) => update("recurrence", v as never)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {RECURRENCE_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              {draft.recurrence !== "none" && (
+                <Field label="Repeat until">
+                  <Input
+                    type="date"
+                    value={draft.recurrence_end_date ?? ""}
+                    min={draft.date}
+                    onChange={(e) => update("recurrence_end_date", (e.target.value || null) as never)}
+                  />
+                </Field>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
               <Switch checked={draft.registration_required} onCheckedChange={(v) => update("registration_required", v as never)} />
@@ -472,7 +529,14 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button onClick={() => onSave(draft)} disabled={saving || !draft.title}>
+          <Button
+            onClick={() => onSave(draft, scope)}
+            disabled={
+              saving ||
+              !draft.title ||
+              (isNew && draft.recurrence !== "none" && !draft.recurrence_end_date)
+            }
+          >
             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Save
           </Button>
         </DialogFooter>
