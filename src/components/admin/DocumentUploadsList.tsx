@@ -207,6 +207,9 @@ export function DocumentUploadsList() {
                       <Button size="sm" variant="ghost" className="rounded-full gap-1.5" onClick={() => openSigned(r, "download")}>
                         <Download className="h-4 w-4" />
                       </Button>
+                      <Button size="sm" variant="ghost" className="rounded-full gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => deleteDoc(r)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
