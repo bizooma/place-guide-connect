@@ -339,7 +339,7 @@ export function ScheduleEditor() {
         value={editing}
         saving={saving}
         onClose={() => setEditing(null)}
-        onSave={(v) => handleSave(v as ScheduleItem)}
+        onSave={(v, scope) => handleSave(v as ScheduleItem, scope)}
       />
       <EventDialog
         open={creating !== null}
@@ -354,11 +354,22 @@ export function ScheduleEditor() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this event?</AlertDialogTitle>
-            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>
+              {items?.find((i) => i.id === deleteId)?.series_id
+                ? "This event is part of a recurring series. Choose what to delete."
+                : "This cannot be undone."}
+            </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-wrap gap-2">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId)}>Delete</AlertDialogAction>
+            {items?.find((i) => i.id === deleteId)?.series_id && (
+              <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId, "series")}>
+                Delete entire series
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId, "single")}>
+              {items?.find((i) => i.id === deleteId)?.series_id ? "Delete this event only" : "Delete"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
