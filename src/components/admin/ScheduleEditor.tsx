@@ -76,6 +76,8 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   active: true,
 });
 
+const PAGE_SIZE = 10;
+
 export function ScheduleEditor() {
   const [items, setItems] = useState<ScheduleItem[] | null>(null);
   const [editing, setEditing] = useState<ScheduleItem | null>(null);
@@ -83,6 +85,7 @@ export function ScheduleEditor() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
 
   async function handleTranslate(id: string) {
@@ -164,6 +167,7 @@ export function ScheduleEditor() {
         ) : items.length === 0 ? (
           <div className="p-6 text-sm text-muted-foreground">No events yet.</div>
         ) : (
+          <>
           <table className="w-full text-sm">
             <thead className="bg-warm">
               <tr>
@@ -174,7 +178,7 @@ export function ScheduleEditor() {
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => {
+              {items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((it) => {
                 const st = translationStatus(it);
                 return (
                   <tr key={it.id} className="border-t border-border">
@@ -216,6 +220,23 @@ export function ScheduleEditor() {
               })}
             </tbody>
           </table>
+          {items.length > PAGE_SIZE && (() => {
+            const totalPages = Math.ceil(items.length / PAGE_SIZE);
+            const current = Math.min(page, totalPages);
+            return (
+              <div className="flex items-center justify-between gap-2 p-4 border-t border-border">
+                <p className="text-sm text-muted-foreground">
+                  Showing {(current - 1) * PAGE_SIZE + 1}–{Math.min(current * PAGE_SIZE, items.length)} of {items.length}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" disabled={current === 1} onClick={() => setPage(current - 1)}>Previous</Button>
+                  <span className="text-sm text-muted-foreground">Page {current} of {totalPages}</span>
+                  <Button size="sm" variant="outline" disabled={current === totalPages} onClick={() => setPage(current + 1)}>Next</Button>
+                </div>
+              </div>
+            );
+          })()}
+          </>
         )}
       </div>
 
