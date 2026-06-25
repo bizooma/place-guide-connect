@@ -168,29 +168,69 @@ export function ScheduleEditor() {
     load();
   }, []);
 
-  async function handleSave(draft: ScheduleItem | Omit<ScheduleItem, "id">) {
+  async function handleSave(
+    draft: ScheduleItem | Omit<ScheduleItem, "id">,
+    scope: "single" | "series" = "single",
+  ) {
     setSaving(true);
-    if ("id" in draft) {
-      const { id, ...patch } = draft;
-      const { error } = await supabase.from("schedule_items").update(patch).eq("id", id);
+    try {
+      if ("id" in draft) {
+        // Editing existing
+        if (scope === "series" && draft.series_id) {
+          const { id, date, day, series_id, recurrence, recurrence_end_date, translations, ...patch } = draft;
+          const { error } = await supabase
+            .from("schedule_items")
+            .update(patch)
+            .eq("series_id", series_id);
+          if (error) throw error;
+          toast.success("Series updated");
+        } else {
+          const { id, translations, ...patch } = draft;
+          const { error } = await supabase.from("schedule_items").update(patch).eq("id", id);
+          if (error) throw error;
+          toast.success("Event updated");
+        }
+        setEditing(null);
+      } else {
+        // Creating new
+        if (draft.recurrence !== "none" && draft.recurrence_end_date) {
+          const seriesId = crypto.randomUUID();
+          const dates = generateOccurrenceDates(draft.date, draft.recurrence_end_date, draft.recurrence);
+          const rows = dates.map((d) => ({
+            ...draft,
+            date: d,
+            day: dayName(d),
+            series_id: seriesId,
+          }));
+          const { error } = await supabase.from("schedule_items").insert(rows);
+          if (error) throw error;
+          toast.success(`${rows.length} events created`);
+        } else {
+          const { error } = await supabase.from("schedule_items").insert({ ...draft, series_id: null });
+          if (error) throw error;
+          toast.success("Event created");
+        }
+        setCreating(null);
+      }
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Save failed");
+    } finally {
       setSaving(false);
-      if (error) return toast.error(error.message);
-      toast.success("Event updated");
-      setEditing(null);
-    } else {
-      const { error } = await supabase.from("schedule_items").insert(draft);
-      setSaving(false);
-      if (error) return toast.error(error.message);
-      toast.success("Event created");
-      setCreating(null);
     }
-    load();
   }
 
-  async function handleDelete(id: string) {
-    const { error } = await supabase.from("schedule_items").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Event deleted");
+  async function handleDelete(id: string, scope: "single" | "series" = "single") {
+    const target = items?.find((i) => i.id === id);
+    if (scope === "series" && target?.series_id) {
+      const { error } = await supabase.from("schedule_items").delete().eq("series_id", target.series_id);
+      if (error) return toast.error(error.message);
+      toast.success("Series deleted");
+    } else {
+      const { error } = await supabase.from("schedule_items").delete().eq("id", id);
+      if (error) return toast.error(error.message);
+      toast.success("Event deleted");
+    }
     setDeleteId(null);
     load();
   }
