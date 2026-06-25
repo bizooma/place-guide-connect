@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Download, RefreshCw, FileText, Eye, Archive, ArchiveRestore } from "lucide-react";
+import { Download, RefreshCw, FileText, Eye, Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -108,6 +108,22 @@ export function DocumentUploadsList() {
     setRows((prev) => prev?.map((r) => (r.id === row.id ? { ...r, status } : r)) ?? null);
   }
 
+  async function deleteDoc(row: DocRow) {
+    if (!confirm(`Delete "${row.original_filename ?? row.storage_path}"? This cannot be undone.`)) return;
+    const { error: storageErr } = await supabase.storage.from("document-uploads").remove([row.storage_path]);
+    if (storageErr) {
+      toast.error("Could not delete file", { description: storageErr.message });
+      return;
+    }
+    const { error } = await supabase.from("document_uploads").delete().eq("id", row.id);
+    if (error) {
+      toast.error("Could not delete record", { description: error.message });
+      return;
+    }
+    setRows((prev) => prev?.filter((r) => r.id !== row.id) ?? null);
+    toast.success("Document deleted");
+  }
+
   return (
     <section className="surface-card overflow-hidden">
       <div className="flex items-center justify-between gap-3 p-4 border-b border-border flex-wrap">
@@ -190,6 +206,9 @@ export function DocumentUploadsList() {
                       </Button>
                       <Button size="sm" variant="ghost" className="rounded-full gap-1.5" onClick={() => openSigned(r, "download")}>
                         <Download className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="rounded-full gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => deleteDoc(r)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </td>
