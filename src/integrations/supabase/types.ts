@@ -354,7 +354,10 @@ export type Database = {
           id: string
           language: string
           location: string
+          recurrence: string
+          recurrence_end_date: string | null
           registration_required: boolean
+          series_id: string | null
           start_time: string
           title: string
           translations: Json
@@ -371,7 +374,10 @@ export type Database = {
           id?: string
           language?: string
           location: string
+          recurrence?: string
+          recurrence_end_date?: string | null
           registration_required?: boolean
+          series_id?: string | null
           start_time: string
           title: string
           translations?: Json
@@ -388,7 +394,10 @@ export type Database = {
           id?: string
           language?: string
           location?: string
+          recurrence?: string
+          recurrence_end_date?: string | null
           registration_required?: boolean
+          series_id?: string | null
           start_time?: string
           title?: string
           translations?: Json

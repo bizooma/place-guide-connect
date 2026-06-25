@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check } from "lucide-react";
+import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { translateRow } from "@/lib/translate.functions";
@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
+type Recurrence = "none" | "weekly" | "biweekly" | "monthly";
+
 type ScheduleItem = {
   id: string;
   title: string;
@@ -47,6 +49,9 @@ type ScheduleItem = {
   language: string;
   registration_required: boolean;
   active: boolean;
+  recurrence: Recurrence;
+  recurrence_end_date: string | null;
+  series_id: string | null;
   translations?: Record<string, Record<string, string>> | null;
 };
 
@@ -62,6 +67,13 @@ const CATEGORIES = [
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
+  { value: "none", label: "Does not repeat" },
+  { value: "weekly", label: "Weekly" },
+  { value: "biweekly", label: "Every 2 weeks" },
+  { value: "monthly", label: "Monthly" },
+];
+
 const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   title: "",
   category: CATEGORIES[0],
@@ -74,7 +86,39 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   language: "English",
   registration_required: false,
   active: true,
+  recurrence: "none",
+  recurrence_end_date: null,
+  series_id: null,
 });
+
+function addDays(iso: string, n: number): string {
+  const d = new Date(iso + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+function addMonths(iso: string, n: number): string {
+  const d = new Date(iso + "T00:00:00");
+  d.setMonth(d.getMonth() + n);
+  return d.toISOString().slice(0, 10);
+}
+function dayName(iso: string): string {
+  const idx = new Date(iso + "T00:00:00").getDay(); // 0=Sun
+  return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][idx];
+}
+function generateOccurrenceDates(start: string, end: string, rec: Recurrence): string[] {
+  if (rec === "none") return [start];
+  const dates: string[] = [];
+  let cur = start;
+  let i = 0;
+  while (cur <= end && i < 520) {
+    dates.push(cur);
+    if (rec === "weekly") cur = addDays(cur, 7);
+    else if (rec === "biweekly") cur = addDays(cur, 14);
+    else if (rec === "monthly") cur = addMonths(cur, 1);
+    i++;
+  }
+  return dates;
+}
 
 const PAGE_SIZE = 10;
 
@@ -124,29 +168,69 @@ export function ScheduleEditor() {
     load();
   }, []);
 
-  async function handleSave(draft: ScheduleItem | Omit<ScheduleItem, "id">) {
+  async function handleSave(
+    draft: ScheduleItem | Omit<ScheduleItem, "id">,
+    scope: "single" | "series" = "single",
+  ) {
     setSaving(true);
-    if ("id" in draft) {
-      const { id, ...patch } = draft;
-      const { error } = await supabase.from("schedule_items").update(patch).eq("id", id);
+    try {
+      if ("id" in draft) {
+        // Editing existing
+        if (scope === "series" && draft.series_id) {
+          const { id, date, day, series_id, recurrence, recurrence_end_date, translations, ...patch } = draft;
+          const { error } = await supabase
+            .from("schedule_items")
+            .update(patch)
+            .eq("series_id", series_id);
+          if (error) throw error;
+          toast.success("Series updated");
+        } else {
+          const { id, translations, ...patch } = draft;
+          const { error } = await supabase.from("schedule_items").update(patch).eq("id", id);
+          if (error) throw error;
+          toast.success("Event updated");
+        }
+        setEditing(null);
+      } else {
+        // Creating new
+        if (draft.recurrence !== "none" && draft.recurrence_end_date) {
+          const seriesId = crypto.randomUUID();
+          const dates = generateOccurrenceDates(draft.date, draft.recurrence_end_date, draft.recurrence);
+          const rows = dates.map((d) => ({
+            ...draft,
+            date: d,
+            day: dayName(d),
+            series_id: seriesId,
+          }));
+          const { error } = await supabase.from("schedule_items").insert(rows);
+          if (error) throw error;
+          toast.success(`${rows.length} events created`);
+        } else {
+          const { error } = await supabase.from("schedule_items").insert({ ...draft, series_id: null });
+          if (error) throw error;
+          toast.success("Event created");
+        }
+        setCreating(null);
+      }
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Save failed");
+    } finally {
       setSaving(false);
-      if (error) return toast.error(error.message);
-      toast.success("Event updated");
-      setEditing(null);
-    } else {
-      const { error } = await supabase.from("schedule_items").insert(draft);
-      setSaving(false);
-      if (error) return toast.error(error.message);
-      toast.success("Event created");
-      setCreating(null);
     }
-    load();
   }
 
-  async function handleDelete(id: string) {
-    const { error } = await supabase.from("schedule_items").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Event deleted");
+  async function handleDelete(id: string, scope: "single" | "series" = "single") {
+    const target = items?.find((i) => i.id === id);
+    if (scope === "series" && target?.series_id) {
+      const { error } = await supabase.from("schedule_items").delete().eq("series_id", target.series_id);
+      if (error) return toast.error(error.message);
+      toast.success("Series deleted");
+    } else {
+      const { error } = await supabase.from("schedule_items").delete().eq("id", id);
+      if (error) return toast.error(error.message);
+      toast.success("Event deleted");
+    }
     setDeleteId(null);
     load();
   }
@@ -182,7 +266,16 @@ export function ScheduleEditor() {
                 const st = translationStatus(it);
                 return (
                   <tr key={it.id} className="border-t border-border">
-                    <td className="px-4 py-2">{it.title}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-2">
+                        <span>{it.title}</span>
+                        {it.series_id && (
+                          <span title="Recurring event" className="inline-flex items-center text-muted-foreground">
+                            <Repeat className="h-3.5 w-3.5" />
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-2">{it.category}</td>
                     <td className="px-4 py-2">{it.date} · {it.start_time}–{it.end_time}</td>
                     <td className="px-4 py-2">{it.location}</td>
@@ -246,7 +339,7 @@ export function ScheduleEditor() {
         value={editing}
         saving={saving}
         onClose={() => setEditing(null)}
-        onSave={(v) => handleSave(v as ScheduleItem)}
+        onSave={(v, scope) => { void handleSave(v as ScheduleItem, scope); }}
       />
       <EventDialog
         open={creating !== null}
@@ -254,18 +347,29 @@ export function ScheduleEditor() {
         value={creating}
         saving={saving}
         onClose={() => setCreating(null)}
-        onSave={(v) => handleSave(v)}
+        onSave={(v) => { void handleSave(v); }}
       />
 
       <AlertDialog open={deleteId !== null} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this event?</AlertDialogTitle>
-            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>
+              {items?.find((i) => i.id === deleteId)?.series_id
+                ? "This event is part of a recurring series. Choose what to delete."
+                : "This cannot be undone."}
+            </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-wrap gap-2">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId)}>Delete</AlertDialogAction>
+            {items?.find((i) => i.id === deleteId)?.series_id && (
+              <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId, "series")}>
+                Delete entire series
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction onClick={() => deleteId && handleDelete(deleteId, "single")}>
+              {items?.find((i) => i.id === deleteId)?.series_id ? "Delete this event only" : "Delete"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -286,12 +390,16 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
   value: T;
   saving: boolean;
   onClose: () => void;
-  onSave: (v: NonNullable<T>) => void;
+  onSave: (v: NonNullable<T>, scope: "single" | "series") => void;
 }) {
   const [draft, setDraft] = useState<NonNullable<T> | null>(null);
+  const [scope, setScope] = useState<"single" | "series">("single");
 
   useEffect(() => {
-    if (value) setDraft(value as NonNullable<T>);
+    if (value) {
+      setDraft(value as NonNullable<T>);
+      setScope("single");
+    }
   }, [value]);
 
   if (!draft) {
@@ -305,6 +413,10 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
   const update = <K extends keyof NonNullable<T>>(key: K, v: NonNullable<T>[K]) =>
     setDraft({ ...draft, [key]: v });
 
+  const isExisting = "id" in (draft as any);
+  const isPartOfSeries = isExisting && Boolean((draft as ScheduleItem).series_id);
+  const isNew = !isExisting;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
@@ -312,6 +424,31 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-2">
+          {isPartOfSeries && (
+            <div className="rounded-md border border-border bg-warm/50 p-3 text-sm">
+              <p className="font-medium mb-2">This event is part of a recurring series</p>
+              <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="scope"
+                    checked={scope === "single"}
+                    onChange={() => setScope("single")}
+                  />
+                  Edit this event only
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="scope"
+                    checked={scope === "series"}
+                    onChange={() => setScope("series")}
+                  />
+                  Edit entire series (date/time-of-day not changed for past events)
+                </label>
+              </div>
+            </div>
+          )}
           <Field label="Title">
             <Input value={draft.title} onChange={(e) => update("title", e.target.value as never)} />
           </Field>
@@ -355,6 +492,30 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
           <Field label="Description">
             <Textarea rows={3} value={draft.description} onChange={(e) => update("description", e.target.value as never)} />
           </Field>
+          {isNew && (
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Repeats">
+                <Select value={draft.recurrence} onValueChange={(v) => update("recurrence", v as never)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {RECURRENCE_OPTIONS.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              {draft.recurrence !== "none" && (
+                <Field label="Repeat until">
+                  <Input
+                    type="date"
+                    value={draft.recurrence_end_date ?? ""}
+                    min={draft.date}
+                    onChange={(e) => update("recurrence_end_date", (e.target.value || null) as never)}
+                  />
+                </Field>
+              )}
+            </div>
+          )}
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
               <Switch checked={draft.registration_required} onCheckedChange={(v) => update("registration_required", v as never)} />
@@ -368,7 +529,14 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button onClick={() => onSave(draft)} disabled={saving || !draft.title}>
+          <Button
+            onClick={() => onSave(draft, scope)}
+            disabled={
+              saving ||
+              !draft.title ||
+              (isNew && draft.recurrence !== "none" && !draft.recurrence_end_date)
+            }
+          >
             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Save
           </Button>
         </DialogFooter>
