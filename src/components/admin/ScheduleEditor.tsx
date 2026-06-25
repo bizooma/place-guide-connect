@@ -339,7 +339,7 @@ export function ScheduleEditor() {
         value={editing}
         saving={saving}
         onClose={() => setEditing(null)}
-        onSave={(v, scope) => handleSave(v as ScheduleItem, scope)}
+        onSave={(v, scope) => { void handleSave(v as ScheduleItem, scope); }}
       />
       <EventDialog
         open={creating !== null}
@@ -347,7 +347,7 @@ export function ScheduleEditor() {
         value={creating}
         saving={saving}
         onClose={() => setCreating(null)}
-        onSave={(v) => handleSave(v)}
+        onSave={(v) => { void handleSave(v); }}
       />
 
       <AlertDialog open={deleteId !== null} onOpenChange={(o) => !o && setDeleteId(null)}>
