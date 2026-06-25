@@ -101,7 +101,7 @@ function DocumentPage() {
         .insert({
           storage_path: path,
           original_filename: f.name,
-          mime_type: f.type,
+          mime_type: mimeType,
           size_bytes: f.size,
         })
         .select("id")
@@ -109,13 +109,14 @@ function DocumentPage() {
       if (insErr) throw insErr;
 
       const analysis = await runAnalysis({
-        data: { storagePath: path, mimeType: f.type || "application/octet-stream", language },
+        data: { storagePath: path, mimeType, language },
       });
       setResult({ fileName: f.name, storagePath: path, uploadId: insRow.id, ...analysis });
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
       toast.error(msg);
+
     } finally {
       setLoading(false);
     }
