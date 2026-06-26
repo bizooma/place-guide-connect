@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Phone, Globe, MapPin, Search } from "lucide-react";
+import { Phone, Globe, MapPin, Search, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { resourceCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
+import jacksonLogo from "@/assets/jackson-logo.png.asset.json";
+import jacksonPortrait from "@/assets/jackson-portrait.jpg.asset.json";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
