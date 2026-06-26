@@ -177,7 +177,7 @@ export const triageFlows: Record<string, TriageFlow> = {
     intro: "That's okay — most people start here. A few questions will help.",
     questions: [
       { id: "urgent", label: "Is this urgent today?", type: "choice", options: ["Yes, today", "This week", "Not urgent"] },
-      { id: "area", label: "What part of life is this about?", type: "choice", options: ["Money", "Family", "Work", "Health", "Paperwork", "Something else"] },
+      { id: "area", label: "What part of life is this about?", type: "choice", options: ["Family", "Immigration", "School", "Jobs", "Work", "Health", "Paperwork", "Something else"] },
     ],
     summary: (a) => ({
       summary: `We hear you. ${a.urgent === "Yes, today" ? "Because this is urgent, we recommend calling The PLACE or 2-1-1 right away." : "Here are some places to start."}`,
