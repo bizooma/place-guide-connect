@@ -6,7 +6,13 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HeroChat } from "@/components/home/HeroChat";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { useTriageCategories } from "@/hooks/useTriageCategories";
+
+const ASSISTANT_STRINGS = {
+  title: "Ask the assistant",
+  subtitle: "Get answers based on The PLACE's resources and guides.",
+};
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 import cardBill from "@/assets/cards/bill.jpg";
 import cardJob from "@/assets/cards/job.jpg";
@@ -41,6 +47,7 @@ function HomePage() {
   const { t } = useI18n();
   const triageCategories = useTriageCategories();
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
+  const tx = useTranslatedTexts(Object.values(ASSISTANT_STRINGS));
 
   return (
     <>
@@ -121,8 +128,8 @@ function HomePage() {
       <section className="bg-secondary/40 border-y border-border/60">
         <div className="mx-auto max-w-4xl px-4 py-14 md:py-20">
           <div className="mb-6 text-center">
-            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">Ask the assistant</h2>
-            <p className="mt-2 text-muted-foreground">Get answers based on The PLACE's resources and guides.</p>
+            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">{tx(ASSISTANT_STRINGS.title)}</h2>
+            <p className="mt-2 text-muted-foreground">{tx(ASSISTANT_STRINGS.subtitle)}</p>
           </div>
           <HeroChat />
         </div>
