@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { CalendarDays, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VolunteerSignupDialog } from "@/components/VolunteerSignupDialog";
 import { DonateGallery } from "@/components/DonateGallery";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import financialImg from "@/assets/donate-financial.jpg";
 import corporateImg from "@/assets/donate-corporate.jpg";
 import volunteerImg from "@/assets/donate-volunteer.jpg";
@@ -33,23 +35,56 @@ export const Route = createFileRoute("/donate")({
   component: DonatePage,
 });
 
+const STRINGS = [
+  "Invest in Belonging.",
+  "Support the PLACE.",
+  "At the PLACE, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads — they are looking for community, connection, and a chance to thrive.",
+  "By partnering with us, you are directly investing in the language acquisition, artistic expression, cultural integration, and economic growth of our new neighbors.",
+  "Financial Giving",
+  "Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees. Every dollar builds a stronger, more inclusive Amarillo.",
+  "helps provide essential learning supplies for language classes.",
+  "funds community art and cultural integration workshops.",
+  "helps scale economic growth pathways and workforce mentorship programs.",
+  "Give Now",
+  "Corporate Sponsorship",
+  "Are you a local business or organization looking to make a lasting difference? Partnering with the PLACE is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.",
+  "We offer custom sponsorship tiers to align with your organization's community impact goals.",
+  "Contact Our Team to Learn More",
+  "The PLACE",
+  "Phone:",
+  "Email:",
+  "Volunteer",
+  "Financial support keeps our doors open, but volunteers are the heartbeat of our community center. Whether you want to help practice English, mentor a family, or assist with cultural events, your time and friendship can change a life.",
+  "Language Mentors:",
+  "Help new neighbors build confidence in conversational English.",
+  "Event Assistants:",
+  "Support our cultural and community gatherings.",
+  "Skill Sharing:",
+  "Have a specific professional or artistic skill? Teach a workshop!",
+  "Become a Volunteer",
+  "Other Ways to Help",
+  "Have questions about matching gifts, physical donations, or upcoming events? Check out our",
+  "Calendar",
+  "or get in touch with us directly on our",
+  "Contact Page",
+  "Thank you for helping us ensure everyone has a place.",
+];
+
 function DonatePage() {
+  const tx = useTranslatedTexts(useMemo(() => STRINGS, []));
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 md:py-16">
       {/* Hero */}
       <h1 className="font-display text-4xl font-semibold text-primary-deep md:text-5xl">
-        Invest in Belonging.
+        {tx("Invest in Belonging.")}
         <br />
-        Support the PLACE.
+        {tx("Support the PLACE.")}
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-foreground/85">
-        At the PLACE, we believe that everyone deserves a place to call home. When resettled and new
-        refugees arrive in Amarillo, Texas, they aren&apos;t just looking for a new roof over their
-        heads — they are looking for community, connection, and a chance to thrive.
+        {tx("At the PLACE, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads — they are looking for community, connection, and a chance to thrive.")}
       </p>
       <p className="mt-4 text-lg leading-relaxed text-foreground/85">
-        By partnering with us, you are directly investing in the language acquisition, artistic
-        expression, cultural integration, and economic growth of our new neighbors.
+        {tx("By partnering with us, you are directly investing in the language acquisition, artistic expression, cultural integration, and economic growth of our new neighbors.")}
       </p>
 
       {/* Auto-scrolling photo gallery */}
@@ -63,33 +98,28 @@ function DonatePage() {
         <section className="surface-card p-6 md:p-8">
           <div className="flex items-center gap-4">
             <CardImage src={financialImg} alt="Hands placing coins into a donation jar" />
-            <h2 className="font-display text-2xl font-semibold text-primary-deep">Financial Giving</h2>
+            <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Financial Giving")}</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            Your financial contributions go directly toward sustaining our multicultural community
-            center and expanding vital programs for local refugees. Every dollar builds a stronger,
-            more inclusive Amarillo.
+            {tx("Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees. Every dollar builds a stronger, more inclusive Amarillo.")}
           </p>
           <ul className="mt-5 space-y-3">
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">$25</strong> helps provide essential learning
-                supplies for language classes.
+                <strong className="text-foreground">$25</strong> {tx("helps provide essential learning supplies for language classes.")}
               </span>
             </li>
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">$100</strong> funds community art and cultural
-                integration workshops.
+                <strong className="text-foreground">$100</strong> {tx("funds community art and cultural integration workshops.")}
               </span>
             </li>
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">$500+</strong> helps scale economic growth
-                pathways and workforce mentorship programs.
+                <strong className="text-foreground">$500+</strong> {tx("helps scale economic growth pathways and workforce mentorship programs.")}
               </span>
             </li>
           </ul>
@@ -103,7 +133,7 @@ function DonatePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Give Now <ArrowRight className="ml-2 h-4 w-4" />
+                {tx("Give Now")} <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
           </div>
@@ -113,17 +143,13 @@ function DonatePage() {
         <section className="surface-card p-6 md:p-8">
           <div className="flex items-center gap-4">
             <CardImage src={corporateImg} alt="Two professionals shaking hands in a community center" />
-            <h2 className="font-display text-2xl font-semibold text-primary-deep">Corporate Sponsorship</h2>
+            <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Corporate Sponsorship")}</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            Are you a local business or organization looking to make a lasting difference? Partnering
-            with the PLACE is a powerful way to invest in the economic and cultural future of our
-            city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and
-            build a prosperous, diverse local economy.
+            {tx("Are you a local business or organization looking to make a lasting difference? Partnering with the PLACE is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.")}
           </p>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            We offer custom sponsorship tiers to align with your organization&apos;s community impact
-            goals.
+            {tx("We offer custom sponsorship tiers to align with your organization's community impact goals.")}
           </p>
           <div className="mt-6">
             <Button
@@ -136,7 +162,7 @@ function DonatePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Contact Our Team to Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                {tx("Contact Our Team to Learn More")} <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
           </div>
@@ -157,13 +183,13 @@ function DonatePage() {
             />
           </div>
           <div className="mt-4 px-3 pb-3">
-            <h3 className="font-display text-lg font-semibold text-primary-deep">The PLACE</h3>
+            <h3 className="font-display text-lg font-semibold text-primary-deep">{tx("The PLACE")}</h3>
             <p className="mt-1 text-sm text-foreground/80">3107 Plains Blvd Space 500,<br />Amarillo, TX 79102</p>
             <p className="mt-2 text-sm text-foreground/80">
-              Phone: <a href="tel:+18065535155" className="text-primary underline hover:no-underline">(806) 553-5155</a>
+              {tx("Phone:")} <a href="tel:+18065535155" className="text-primary underline hover:no-underline">(806) 553-5155</a>
             </p>
             <p className="mt-1 text-sm text-foreground/80">
-              Email: <a href="mailto:sara@wefindinlove.org" className="text-primary underline hover:no-underline">sara@wefindinlove.org</a>
+              {tx("Email:")} <a href="mailto:sara@wefindinlove.org" className="text-primary underline hover:no-underline">sara@wefindinlove.org</a>
             </p>
           </div>
         </div>
@@ -172,33 +198,28 @@ function DonatePage() {
         <section className="surface-card p-6 md:p-8">
           <div className="flex items-center gap-4">
             <CardImage src={volunteerImg} alt="Diverse volunteers smiling together" />
-            <h2 className="font-display text-2xl font-semibold text-primary-deep">Volunteer</h2>
+            <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Volunteer")}</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            Financial support keeps our doors open, but volunteers are the heartbeat of our community
-            center. Whether you want to help practice English, mentor a family, or assist with
-            cultural events, your time and friendship can change a life.
+            {tx("Financial support keeps our doors open, but volunteers are the heartbeat of our community center. Whether you want to help practice English, mentor a family, or assist with cultural events, your time and friendship can change a life.")}
           </p>
           <ul className="mt-5 space-y-3">
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">Language Mentors:</strong> Help new neighbors
-                build confidence in conversational English.
+                <strong className="text-foreground">{tx("Language Mentors:")}</strong> {tx("Help new neighbors build confidence in conversational English.")}
               </span>
             </li>
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">Event Assistants:</strong> Support our cultural
-                and community gatherings.
+                <strong className="text-foreground">{tx("Event Assistants:")}</strong> {tx("Support our cultural and community gatherings.")}
               </span>
             </li>
             <li className="flex items-start gap-3 text-base text-foreground/85">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-foreground">Skill Sharing:</strong> Have a specific
-                professional or artistic skill? Teach a workshop!
+                <strong className="text-foreground">{tx("Skill Sharing:")}</strong> {tx("Have a specific professional or artistic skill? Teach a workshop!")}
               </span>
             </li>
           </ul>
@@ -209,7 +230,7 @@ function DonatePage() {
                   variant="outline"
                   className="rounded-full border-primary text-primary hover:bg-primary/5"
                 >
-                  Become a Volunteer <ArrowRight className="ml-2 h-4 w-4" />
+                  {tx("Become a Volunteer")} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               }
             />
@@ -221,20 +242,20 @@ function DonatePage() {
       <section className="mt-8 surface-card p-6 md:p-8">
         <div className="flex items-center gap-4">
           <CardImage src={otherImg} alt="Cardboard donation boxes filled with clothes and books" />
-          <h2 className="font-display text-2xl font-semibold text-primary-deep">Other Ways to Help</h2>
+          <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Other Ways to Help")}</h2>
         </div>
         <p className="mt-3 text-lg leading-relaxed text-foreground/85">
-          Have questions about matching gifts, physical donations, or upcoming events? Check out our{" "}
+          {tx("Have questions about matching gifts, physical donations, or upcoming events? Check out our")}{" "}
           <Link to="/schedule" className="text-primary underline hover:no-underline inline-flex items-center gap-1">
-            Calendar <CalendarDays className="h-4 w-4" />
+            {tx("Calendar")} <CalendarDays className="h-4 w-4" />
           </Link>{" "}
-          or get in touch with us directly on our{" "}
+          {tx("or get in touch with us directly on our")}{" "}
           <Link to="/help" className="text-primary underline hover:no-underline">
-            Contact Page
+            {tx("Contact Page")}
           </Link>.
         </p>
         <p className="mt-4 text-lg font-medium text-primary-deep">
-          Thank you for helping us ensure everyone has a place.
+          {tx("Thank you for helping us ensure everyone has a place.")}
         </p>
       </section>
     </div>
