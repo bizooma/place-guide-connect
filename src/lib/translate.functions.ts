@@ -10,35 +10,38 @@ const InputSchema = z.object({
 async function callGemini(target: string, texts: string[]): Promise<string[]> {
   if (!target || /^en(glish)?$/i.test(target)) return texts;
   if (texts.length === 0) return [];
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
   const body = {
-    model: "google/gemini-2.5-flash-lite",
-    messages: [
-      {
-        role: "system",
-        content: `You are a professional translator. Translate each input string into ${target}. Preserve proper nouns (organization names, place names, people's names) in their original form. Keep tone warm, simple, and natural. Return ONLY a JSON object {"translations": string[]} with the SAME length and order as the input.`,
-      },
-      {
-        role: "user",
-        content: JSON.stringify({ target, texts }),
-      },
+    system_instruction: {
+      parts: [
+        {
+          text: `You are a professional translator. Translate each input string into ${target}. Preserve proper nouns (organization names, place names, people's names) in their original form. Keep tone warm, simple, and natural. Return ONLY a JSON object matching the schema, where "translations" is an array with the SAME length and order as the input.`,
+        },
+      ],
+    },
+    contents: [
+      { role: "user", parts: [{ text: JSON.stringify({ target, texts }) }] },
     ],
-    response_format: { type: "json_object" },
-    temperature: 0.2,
+    generationConfig: {
+      response_mime_type: "application/json",
+      response_schema: {
+        type: "object",
+        properties: { translations: { type: "array", items: { type: "string" } } },
+        required: ["translations"],
+      },
+      temperature: 0.2,
+    },
   };
 
-  const url = "https://ai.gateway.lovable.dev/v1/chat/completions";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   let res: Response | null = null;
   let errText = "";
   for (let attempt = 0; attempt < 4; attempt++) {
     res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     if (res.ok) break;
@@ -51,17 +54,14 @@ async function callGemini(target: string, texts: string[]): Promise<string[]> {
     break;
   }
   if (!res || !res.ok) {
-    if (res?.status === 429) {
-      throw new Error("Translation is busy right now. Please try again in a moment.");
-    }
-    if (res?.status === 402) {
-      throw new Error("Translation credits exhausted. Please add credits in workspace settings.");
+    if (res?.status === 503) {
+      throw new Error("Translation is temporarily unavailable due to high demand. Please try again in a moment.");
     }
     throw new Error(`Translation failed: ${res?.status ?? "network"} ${errText.slice(0, 200)}`);
   }
 
   const json: any = await res.json();
-  const text: string = json?.choices?.[0]?.message?.content ?? "";
+  const text: string = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   try {
     const parsed = JSON.parse(text) as { translations: string[] };
     if (Array.isArray(parsed.translations) && parsed.translations.length === texts.length) {
