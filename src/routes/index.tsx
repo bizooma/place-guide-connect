@@ -6,7 +6,13 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HeroChat } from "@/components/home/HeroChat";
 import { useI18n } from "@/lib/i18n";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { useTriageCategories } from "@/hooks/useTriageCategories";
+
+const ASSISTANT_STRINGS = {
+  title: "Ask the assistant",
+  subtitle: "Get answers based on The PLACE's resources and guides.",
+};
 import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
 import cardBill from "@/assets/cards/bill.jpg";
 import cardJob from "@/assets/cards/job.jpg";
