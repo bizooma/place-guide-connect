@@ -128,8 +128,8 @@ function HomePage() {
       <section className="bg-secondary/40 border-y border-border/60">
         <div className="mx-auto max-w-4xl px-4 py-14 md:py-20">
           <div className="mb-6 text-center">
-            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">Ask the assistant</h2>
-            <p className="mt-2 text-muted-foreground">Get answers based on The PLACE's resources and guides.</p>
+            <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">{tx(ASSISTANT_STRINGS.title)}</h2>
+            <p className="mt-2 text-muted-foreground">{tx(ASSISTANT_STRINGS.subtitle)}</p>
           </div>
           <HeroChat />
         </div>
