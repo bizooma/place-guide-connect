@@ -184,7 +184,7 @@ function ResourcesPage() {
               <div className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-accent" />
                 <div>
-                  <div className="font-medium text-foreground">Amarillo Office</div>
+                  <div className="font-medium text-foreground">{tx("Amarillo Office")}</div>
                   <div>620 South Taylor St., Suite 200</div>
                   <div>Amarillo, TX 79101</div>
                 </div>
