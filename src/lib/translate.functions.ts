@@ -35,14 +35,32 @@ async function callGemini(target: string, texts: string[]): Promise<string[]> {
     },
   };
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
-  );
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Translation failed: ${res.status} ${errText.slice(0, 200)}`);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  let res: Response | null = null;
+  let errText = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) break;
+    errText = await res.text();
+    // Retry on transient overload/rate-limit
+    if (res.status === 503 || res.status === 429 || res.status >= 500) {
+      const delay = 500 * Math.pow(2, attempt) + Math.random() * 250;
+      await new Promise((r) => setTimeout(r, delay));
+      continue;
+    }
+    break;
   }
+  if (!res || !res.ok) {
+    if (res?.status === 503) {
+      throw new Error("Translation is temporarily unavailable due to high demand. Please try again in a moment.");
+    }
+    throw new Error(`Translation failed: ${res?.status ?? "network"} ${errText.slice(0, 200)}`);
+  }
+
   const json: any = await res.json();
   const text: string = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   try {
