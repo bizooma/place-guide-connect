@@ -1,20 +1,16 @@
-# Support iPhone HEIC photos on /help/document
+## Goal
+Revert translation back to direct Gemini API (using the client's `GEMINI_API_KEY`) and record a persistent rule so future changes don't swap to the Lovable AI Gateway.
 
-## Problem
-iPhones save photos as HEIC/HEIF. The upload input accepts `.heic`, but the AI (Gemini) and most browsers can't read HEIC, so analysis throws an error.
+## Changes
 
-## Fix
-Convert HEIC/HEIF files to JPEG in the browser before uploading, then proceed with the existing upload + analyze flow.
+1. **`src/lib/translate.functions.ts`** — restore the direct Gemini call:
+   - Read `process.env.GEMINI_API_KEY` (not `LOVABLE_API_KEY`).
+   - POST to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=...`.
+   - Keep the existing retry/backoff on 429/503/5xx and the JSON `response_schema` shape.
+   - Parse `candidates[0].content.parts[0].text` into `{ translations: string[] }`.
 
-### Steps
-1. Add `heic2any` (small client-side HEIC→JPEG converter) as a dependency.
-2. In `src/routes/help.document.tsx`, inside `handleFile`:
-   - Detect HEIC/HEIF by mime type (`image/heic`, `image/heif`) or file extension (`.heic`, `.heif`).
-   - Dynamically `import("heic2any")` (browser-only, avoids SSR issues) and convert to a JPEG `Blob` at quality ~0.9.
-   - Wrap the result in a new `File` with a `.jpg` name and `image/jpeg` type, then continue with the existing Supabase upload + `analyzeDocument` call.
-   - Show a small "Converting photo…" toast/loading state during conversion.
-   - On conversion failure, show a friendly error ("Could not read this iPhone photo — please try saving it as JPEG").
-3. Update both file inputs' `accept` to also include `image/heif` for completeness; keep camera capture input unchanged.
+2. **`mem://index.md`** — add a Core rule:
+   > Translations and all app-runtime AI calls use the direct provider API (e.g. Gemini via `GEMINI_API_KEY`). Never switch to Lovable AI Gateway — the client supplies their own keys at launch.
 
-### Out of scope
-- No server-side conversion, no changes to `analyzeDocument`, no schema/storage changes.
+## Notes on the 429
+The original error was the direct Gemini free-tier quota. After reverting, that key will still 429 if the project key is on the free tier. The existing exponential-backoff retry stays in place; long-term fix is the client's paid key at launch.
