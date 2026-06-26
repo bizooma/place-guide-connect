@@ -76,6 +76,13 @@ function ResourcesPage() {
       if (r.eligibility && !dbOverrides.has(r.eligibility)) out.push(r.eligibility);
     }
     for (const c of resourceCategories) out.push(c);
+    out.push(
+      "Your U.S. Congressman",
+      "Need help with a federal agency?",
+      "Congressman Ronny Jackson's office can help residents of Texas's 13th District with issues involving federal agencies — including immigration, Social Security, veterans' benefits, IRS, and more.",
+      "Request help from his office",
+      "Amarillo Office",
+    );
     return out;
   }, [resources, dbOverrides]);
   const txAi = useTranslatedTexts(allTexts);
@@ -177,7 +184,7 @@ function ResourcesPage() {
               <div className="flex items-start gap-2 text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-accent" />
                 <div>
-                  <div className="font-medium text-foreground">Amarillo Office</div>
+                  <div className="font-medium text-foreground">{tx("Amarillo Office")}</div>
                   <div>620 South Taylor St., Suite 200</div>
                   <div>Amarillo, TX 79101</div>
                 </div>
