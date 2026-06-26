@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Phone, Globe, MapPin, Search } from "lucide-react";
+import { Phone, Globe, MapPin, Search, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { resourceCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
+import jacksonLogo from "@/assets/jackson-logo.png.asset.json";
+import jacksonPortrait from "@/assets/jackson-portrait.jpg.asset.json";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
@@ -140,6 +142,78 @@ function ResourcesPage() {
           </article>
         ))}
       </div>
+
+      <section className="mt-16 surface-card overflow-hidden">
+        <div className="grid gap-0 md:grid-cols-[auto_1fr]">
+          <div className="bg-warm flex items-center justify-center p-6 md:p-8">
+            <img
+              src={jacksonPortrait.url}
+              alt="Congressman Ronny Jackson"
+              className="h-48 w-48 md:h-56 md:w-56 rounded-full object-cover shadow-md ring-4 ring-background"
+              loading="lazy"
+            />
+          </div>
+          <div className="p-6 md:p-8 flex flex-col gap-4">
+            <img
+              src={jacksonLogo.url}
+              alt="Ronny Jackson, Congressman for Texas 13"
+              className="h-14 w-auto self-start"
+              loading="lazy"
+            />
+            <div>
+              <span className="text-xs font-medium uppercase tracking-wider text-accent">
+                {tx("Your U.S. Congressman")}
+              </span>
+              <h2 className="mt-1 font-display text-2xl font-semibold text-primary-deep md:text-3xl">
+                {tx("Need help with a federal agency?")}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {tx(
+                  "Congressman Ronny Jackson's office can help residents of Texas's 13th District with issues involving federal agencies — including immigration, Social Security, veterans' benefits, IRS, and more."
+                )}
+              </p>
+            </div>
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-start gap-2 text-muted-foreground">
+                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-accent" />
+                <div>
+                  <div className="font-medium text-foreground">Amarillo Office</div>
+                  <div>620 South Taylor St., Suite 200</div>
+                  <div>Amarillo, TX 79101</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Phone className="h-4 w-4 flex-shrink-0 text-accent" />
+                <a href="tel:+18066415600" className="hover:text-primary-deep">(806) 641-5600</a>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button asChild className="rounded-full bg-primary hover:bg-primary-deep gap-1.5">
+                <a href="https://jackson.house.gov/services/help-federal-agency.htm" target="_blank" rel="noreferrer">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  {tx("Request help from his office")}
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full gap-1.5">
+                <a href="tel:+18066415600">
+                  <Phone className="h-3.5 w-3.5" />
+                  {t("resources.call")}
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full gap-1.5">
+                <a
+                  href="https://maps.google.com/?q=620+South+Taylor+St+Suite+200+Amarillo+TX+79101"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  {t("resources.directions")}
+                </a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
