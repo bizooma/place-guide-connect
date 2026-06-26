@@ -47,6 +47,7 @@ function HomePage() {
   const { t } = useI18n();
   const triageCategories = useTriageCategories();
   const active = triageCategories.filter((c) => c.active).sort((a, b) => a.order - b.order);
+  const tx = useTranslatedTexts(Object.values(ASSISTANT_STRINGS));
 
   return (
     <>
