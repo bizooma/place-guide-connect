@@ -276,9 +276,31 @@ export function ScheduleEditor() {
     <section className="surface-card overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="font-semibold text-primary-deep">Schedule items</h2>
-        <Button size="sm" className="rounded-full gap-1.5" onClick={() => setCreating(emptyDraft())}>
-          <Plus className="h-4 w-4" />Add event
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full gap-1.5"
+            disabled={bulkTranslating || !items || items.length === 0}
+            onClick={handleTranslateAll}
+            title="Generate translations for every event missing them"
+          >
+            {bulkTranslating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Translating {bulkProgress.done}/{bulkProgress.total}…
+              </>
+            ) : (
+              <>
+                <LanguagesIcon className="h-4 w-4" />
+                Translate all
+              </>
+            )}
+          </Button>
+          <Button size="sm" className="rounded-full gap-1.5" onClick={() => setCreating(emptyDraft())}>
+            <Plus className="h-4 w-4" />Add event
+          </Button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         {items === null ? (
