@@ -164,8 +164,7 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(roleErr.message);
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error: readErr } = await supabaseAdmin
+    const { data: rows, error: readErr } = await supabase
       .from("schedule_items")
       .select("id, title, category, description, location, language, translations");
     if (readErr) throw new Error(readErr.message);
