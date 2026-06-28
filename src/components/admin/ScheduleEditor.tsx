@@ -84,6 +84,8 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   date: new Date().toISOString().slice(0, 10),
   start_time: "09:00",
   end_time: "10:00",
+  start_time_2: null,
+  end_time_2: null,
   location: "The PLACE",
   description: "",
   language: "English",
