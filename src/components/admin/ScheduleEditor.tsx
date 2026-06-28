@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat, Bold, Italic, List, ListOrdered, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { translateRow } from "@/lib/translate.functions";
+import { translateRow, translateScheduleAll } from "@/lib/translate.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
