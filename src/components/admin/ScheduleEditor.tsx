@@ -140,6 +140,8 @@ export function ScheduleEditor() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [bulkTranslating, setBulkTranslating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
 
@@ -154,6 +156,30 @@ export function ScheduleEditor() {
     } finally {
       setTranslatingId(null);
     }
+  }
+
+  async function handleTranslateAll() {
+    if (!items) return;
+    const targets = items.filter((it) => !translationStatus(it).complete);
+    if (targets.length === 0) {
+      toast.success("All events are already translated");
+      return;
+    }
+    setBulkTranslating(true);
+    setBulkProgress({ done: 0, total: targets.length });
+    let failed = 0;
+    for (let i = 0; i < targets.length; i++) {
+      try {
+        await translateFn({ data: { table: "schedule_items", id: targets[i].id } });
+      } catch {
+        failed++;
+      }
+      setBulkProgress({ done: i + 1, total: targets.length });
+    }
+    setBulkTranslating(false);
+    if (failed === 0) toast.success(`Translated ${targets.length} event${targets.length === 1 ? "" : "s"}`);
+    else toast.error(`Translated ${targets.length - failed}/${targets.length}; ${failed} failed`);
+    load();
   }
 
   function translationStatus(it: ScheduleItem) {
