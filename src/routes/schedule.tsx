@@ -354,10 +354,12 @@ function CardsView({ items, view, setView, t, tx }: { items: ScheduleRow[]; view
           <article key={s.id} className="surface-card flex flex-col p-5">
             <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
             <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{tx(s.title)}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tx(s.description)}</p>
+            <div className="mt-2 text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none">
+              <ReactMarkdown components={mdComponents}>{tx(s.description)}</ReactMarkdown>
+            </div>
             <dl className="mt-4 space-y-1.5 text-sm">
               <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /><span>{s.day} · {s.date}</span></div>
-              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
+              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{formatTimes(s)}</span></div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
               <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{tx(s.language)}</span></div>
             </dl>
