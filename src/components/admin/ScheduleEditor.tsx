@@ -177,6 +177,7 @@ export function ScheduleEditor() {
   const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
+  const translateAllFn = useServerFn(translateScheduleAll);
 
   async function handleTranslate(id: string) {
     setTranslatingId(id);
