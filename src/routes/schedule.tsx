@@ -10,6 +10,20 @@ import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { scheduleCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+
+function formatTimes(s: ScheduleRow): string {
+  const a = `${s.start_time} – ${s.end_time}`;
+  if (s.start_time_2 && s.end_time_2) return `${a}, ${s.start_time_2} – ${s.end_time_2}`;
+  return a;
+}
+
+const mdComponents = {
+  a: (props: any) => <a {...props} target="_blank" rel="noreferrer" className="text-primary underline" />,
+  ul: (props: any) => <ul {...props} className="list-disc pl-5 space-y-0.5" />,
+  ol: (props: any) => <ol {...props} className="list-decimal pl-5 space-y-0.5" />,
+  p: (props: any) => <p {...props} className="mb-1 last:mb-0" />,
+};
 
 export const Route = createFileRoute("/schedule")({
   head: () => ({
