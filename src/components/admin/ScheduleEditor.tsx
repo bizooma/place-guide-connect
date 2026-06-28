@@ -44,6 +44,8 @@ type ScheduleItem = {
   date: string;
   start_time: string;
   end_time: string;
+  start_time_2: string | null;
+  end_time_2: string | null;
   location: string;
   description: string;
   language: string;
