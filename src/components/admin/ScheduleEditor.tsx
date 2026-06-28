@@ -70,6 +70,7 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
   { value: "none", label: "Does not repeat" },
   { value: "weekly", label: "Weekly" },
+  { value: "weekdays", label: "Every weekday (Mon–Fri)" },
   { value: "biweekly", label: "Every 2 weeks" },
   { value: "monthly", label: "Monthly" },
 ];
