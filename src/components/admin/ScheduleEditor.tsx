@@ -150,7 +150,7 @@ function generateOccurrenceDates(start: string, end: string, rec: Recurrence): s
   let i = 0;
   while (cur <= end && i < 520) {
     if (rec === "weekdays") {
-      const dow = new Date(cur + "T00:00:00").getDay();
+      const dow = fromISO(cur).getDay();
       if (dow !== 0 && dow !== 6) dates.push(cur);
       cur = addDays(cur, 1);
     } else {
