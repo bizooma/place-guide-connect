@@ -300,9 +300,11 @@ function CalendarView({ items, t, tx }: { items: ScheduleRow[]; t: (k: string, f
                 <article key={s.id} className="surface-card p-4">
                   <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
                   <h4 className="mt-1 font-display text-lg font-semibold text-primary-deep">{tx(s.title)}</h4>
-                  <p className="mt-1 text-sm text-muted-foreground">{tx(s.description)}</p>
+                  <div className="mt-1 text-sm text-muted-foreground prose prose-sm max-w-none">
+                    <ReactMarkdown components={mdComponents}>{tx(s.description)}</ReactMarkdown>
+                  </div>
                   <dl className="mt-3 space-y-1 text-sm">
-                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
+                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{formatTimes(s)}</span></div>
                     <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
                   </dl>
                 </article>
