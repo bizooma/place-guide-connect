@@ -1,12 +1,21 @@
-Add a "Weekdays (Mon–Fri)" option to the Repeats dropdown in the admin event editor, so a single event can generate occurrences for every Monday through Friday up to the chosen end date.
+## Problem
 
-## Changes
+"Translate all" fails with: **Missing Supabase environment variable(s): SUPABASE_SERVICE_ROLE_KEY**.
 
-`src/components/admin/ScheduleEditor.tsx`
-- Extend `Recurrence` type to include `"weekdays"`.
-- Add `{ value: "weekdays", label: "Every weekday (Mon–Fri)" }` to `RECURRENCE_OPTIONS` (between Weekly and Every 2 weeks).
-- Update `generateOccurrenceDates`: when `rec === "weekdays"`, advance by 1 day and skip Saturday/Sunday (getDay() 0 and 6) when pushing dates.
-- No DB or schema change needed — occurrences are materialized as individual rows linked by `series_id`, same as existing weekly/biweekly/monthly flows. Edit/delete "entire series" already works via `series_id`.
+`translateScheduleAll` in `src/lib/translate.functions.ts` dynamically imports `@/integrations/supabase/client.server`, which throws when `SUPABASE_SERVICE_ROLE_KEY` isn't set in this environment. We don't actually need the service-role client here — the caller is already verified as an admin, and RLS policies on `schedule_items` allow admins to update rows.
 
-## Notes
-- The existing "Day of week" field becomes informational for weekday recurrence (each generated row gets its actual weekday label based on the date), matching how weekly already behaves.
+This is the same fix pattern we used previously for the chatbot training upload error.
+
+## Fix
+
+In `src/lib/translate.functions.ts`:
+
+1. **`translateScheduleAll`** — remove the `supabaseAdmin` dynamic import. Use the user-scoped `context.supabase` (already auth'd, RLS applies as the admin user) for both the initial select and the per-row updates.
+2. **`translateRow`** — same change for consistency, so single-row translate doesn't break for the same reason.
+
+No schema, UI, or RLS changes needed (admins already have update permission on `schedule_items` and `resources`).
+
+## Verification
+
+- Reload admin → Schedule → click "Translate all" → confirm progress completes and rows get translations.
+- Click the per-row translate button on one event → confirm it still works.

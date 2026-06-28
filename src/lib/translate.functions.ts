@@ -115,9 +115,8 @@ export const translateRow = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Forbidden");
 
     const fields = data.table === "resources" ? RESOURCE_FIELDS : SCHEDULE_FIELDS;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: row, error: readErr } = await supabaseAdmin
+    const { data: row, error: readErr } = await supabase
       .from(data.table)
       .select("*")
       .eq("id", data.id)
@@ -144,7 +143,7 @@ export const translateRow = createServerFn({ method: "POST" })
       translations[code] = map;
     }
 
-    const { error: updErr } = await supabaseAdmin
+    const { error: updErr } = await supabase
       .from(data.table)
       .update({ translations })
       .eq("id", data.id);
@@ -165,8 +164,7 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(roleErr.message);
     if (!isAdmin) throw new Error("Forbidden");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error: readErr } = await supabaseAdmin
+    const { data: rows, error: readErr } = await supabase
       .from("schedule_items")
       .select("id, title, category, description, location, language, translations");
     if (readErr) throw new Error(readErr.message);
@@ -208,7 +206,7 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
           translations[code] = map;
         }
         for (const id of group.ids) {
-          const { error: updErr } = await supabaseAdmin
+          const { error: updErr } = await supabase
             .from("schedule_items")
             .update({ translations })
             .eq("id", id);
