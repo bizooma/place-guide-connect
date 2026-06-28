@@ -112,10 +112,16 @@ function generateOccurrenceDates(start: string, end: string, rec: Recurrence): s
   let cur = start;
   let i = 0;
   while (cur <= end && i < 520) {
-    dates.push(cur);
-    if (rec === "weekly") cur = addDays(cur, 7);
-    else if (rec === "biweekly") cur = addDays(cur, 14);
-    else if (rec === "monthly") cur = addMonths(cur, 1);
+    if (rec === "weekdays") {
+      const dow = new Date(cur + "T00:00:00").getDay();
+      if (dow !== 0 && dow !== 6) dates.push(cur);
+      cur = addDays(cur, 1);
+    } else {
+      dates.push(cur);
+      if (rec === "weekly") cur = addDays(cur, 7);
+      else if (rec === "biweekly") cur = addDays(cur, 14);
+      else if (rec === "monthly") cur = addMonths(cur, 1);
+    }
     i++;
   }
   return dates;
