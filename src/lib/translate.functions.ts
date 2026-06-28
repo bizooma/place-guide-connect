@@ -206,7 +206,7 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
           translations[code] = map;
         }
         for (const id of group.ids) {
-          const { error: updErr } = await supabaseAdmin
+          const { error: updErr } = await supabase
             .from("schedule_items")
             .update({ translations })
             .eq("id", id);
