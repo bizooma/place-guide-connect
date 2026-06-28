@@ -228,6 +228,7 @@ export function ScheduleEditor() {
           const original = items?.find((item) => item.id === draft.id);
           const seriesItems = (items ?? []).filter((item) => item.series_id === draft.series_id);
           const { id, date, day, series_id, recurrence, recurrence_end_date, translations, ...patch } = normalizeDraftDay(draft);
+          if (!series_id) throw new Error("Missing recurring series ID");
           const dateDelta = original ? daysBetween(date, original.date) : 0;
 
           if (dateDelta !== 0 && seriesItems.length > 0) {
