@@ -336,7 +336,7 @@ export function ScheduleEditor() {
             {bulkTranslating ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Translating {bulkProgress.done}/{bulkProgress.total}…
+                Translating all events…
               </>
             ) : (
               <>
