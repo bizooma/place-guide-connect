@@ -14,7 +14,7 @@ export function SiteFooter() {
             className="h-24 w-auto object-contain"
           />
           <p className="mt-3 text-sm text-primary-foreground/80">{t("app.inspiredBy")}</p>
-          <p className="mt-2 text-sm whitespace-pre-line text-primary-foreground/80">{t("app.hours", "Hours: Monday–Thursday 9am–5pm,\nFriday 9am–1pm. Closed Saturday and Sunday.")}</p>
+          <p className="mt-2 text-sm whitespace-pre-line text-primary-foreground/80">{t("app.hours", "Hours: Monday–Thursday 9am–5pm,\nFriday 9am–1pm.\nClosed Saturday and Sunday.")}</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-wider text-primary-foreground/60">{t("footer.explore")}</p>
