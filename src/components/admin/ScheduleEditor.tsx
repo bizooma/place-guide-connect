@@ -521,7 +521,20 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
               </Select>
             </Field>
             <Field label="Day of week">
-              <Select value={draft.day} onValueChange={(v) => update("day", v as never)}>
+              <Select value={draft.day} onValueChange={(v) => {
+                const target = DAYS.indexOf(v); // 0=Mon..6=Sun
+                const targetJs = (target + 1) % 7; // JS getDay: 0=Sun..6=Sat
+                const [y, m, d] = (draft.date || "").split("-").map(Number);
+                if (y && m && d) {
+                  const cur = new Date(y, m - 1, d);
+                  const diff = targetJs - cur.getDay();
+                  cur.setDate(cur.getDate() + diff);
+                  const iso = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,"0")}-${String(cur.getDate()).padStart(2,"0")}`;
+                  setDraft({ ...draft, day: v, date: iso } as never);
+                } else {
+                  update("day", v as never);
+                }
+              }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {DAYS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
@@ -531,7 +544,17 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
           </div>
           <div className="grid grid-cols-3 gap-4">
             <Field label="Date">
-              <Input type="date" value={draft.date} onChange={(e) => update("date", e.target.value as never)} />
+              <Input type="date" value={draft.date} onChange={(e) => {
+                const iso = e.target.value;
+                const [y, m, d] = iso.split("-").map(Number);
+                if (y && m && d) {
+                  const js = new Date(y, m - 1, d).getDay();
+                  const dayLabel = DAYS[(js + 6) % 7];
+                  setDraft({ ...draft, date: iso, day: dayLabel } as never);
+                } else {
+                  update("date", iso as never);
+                }
+              }} />
             </Field>
             <Field label="Start">
               <Input type="time" value={draft.start_time} onChange={(e) => update("start_time", e.target.value as never)} />
