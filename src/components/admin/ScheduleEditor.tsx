@@ -492,6 +492,49 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
               <Input type="time" value={draft.end_time} onChange={(e) => update("end_time", e.target.value as never)} />
             </Field>
           </div>
+          <div className="grid grid-cols-3 gap-4 items-end">
+            <Field label="Second time slot (optional)">
+              {draft.start_time_2 || draft.end_time_2 ? (
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground underline self-start"
+                  onClick={() => {
+                    update("start_time_2", null as never);
+                    update("end_time_2", null as never);
+                  }}
+                >
+                  Remove second time
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="text-xs text-primary underline self-start"
+                  onClick={() => {
+                    update("start_time_2", "14:00" as never);
+                    update("end_time_2", "16:00" as never);
+                  }}
+                >
+                  + Add second time
+                </button>
+              )}
+            </Field>
+            <Field label="Start 2">
+              <Input
+                type="time"
+                disabled={!draft.start_time_2 && !draft.end_time_2}
+                value={draft.start_time_2 ?? ""}
+                onChange={(e) => update("start_time_2", (e.target.value || null) as never)}
+              />
+            </Field>
+            <Field label="End 2">
+              <Input
+                type="time"
+                disabled={!draft.start_time_2 && !draft.end_time_2}
+                value={draft.end_time_2 ?? ""}
+                onChange={(e) => update("end_time_2", (e.target.value || null) as never)}
+              />
+            </Field>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Location">
               <Input value={draft.location} onChange={(e) => update("location", e.target.value as never)} />
@@ -501,7 +544,10 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
             </Field>
           </div>
           <Field label="Description">
-            <Textarea rows={3} value={draft.description} onChange={(e) => update("description", e.target.value as never)} />
+            <RichDescriptionEditor
+              value={draft.description}
+              onChange={(v) => update("description", v as never)}
+            />
           </Field>
           {isNew && (
             <div className="grid grid-cols-2 gap-4">
