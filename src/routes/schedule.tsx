@@ -12,9 +12,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
+function to12Hour(time: string): string {
+  const [h, m] = time.split(":").map(Number);
+  if (isNaN(h) || isNaN(m)) return time;
+  const period = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 function formatTimes(s: ScheduleRow): string {
-  const a = `${s.start_time} – ${s.end_time}`;
-  if (s.start_time_2 && s.end_time_2) return `${a}, ${s.start_time_2} – ${s.end_time_2}`;
+  const a = `${to12Hour(s.start_time)} – ${to12Hour(s.end_time)}`;
+  if (s.start_time_2 && s.end_time_2) return `${a}, ${to12Hour(s.start_time_2)} – ${to12Hour(s.end_time_2)}`;
   return a;
 }
 
