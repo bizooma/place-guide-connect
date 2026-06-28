@@ -610,3 +610,78 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+function RichDescriptionEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+
+  function wrap(before: string, after: string = before, placeholder = "text") {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = value.slice(start, end) || placeholder;
+    const next = value.slice(0, start) + before + selected + after + value.slice(end);
+    onChange(next);
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + before.length;
+      ta.setSelectionRange(pos, pos + selected.length);
+    });
+  }
+
+  function prefixLines(prefix: string | ((i: number) => string)) {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = end + (value.slice(end).indexOf("\n") === -1 ? value.length - end : value.slice(end).indexOf("\n"));
+    const block = value.slice(lineStart, lineEnd);
+    const lines = block.split("\n");
+    const newBlock = lines
+      .map((l, i) => (typeof prefix === "string" ? prefix : prefix(i)) + l)
+      .join("\n");
+    const next = value.slice(0, lineStart) + newBlock + value.slice(lineEnd);
+    onChange(next);
+    requestAnimationFrame(() => ta.focus());
+  }
+
+  function insertLink() {
+    const url = window.prompt("Link URL");
+    if (!url) return;
+    wrap("[", `](${url})`, "link text");
+  }
+
+  const btn =
+    "inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition";
+
+  return (
+    <div className="rounded-md border border-input bg-transparent">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border p-1.5">
+        <button type="button" className={btn} title="Bold" onClick={() => wrap("**")}>
+          <Bold className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Italic" onClick={() => wrap("*")}>
+          <Italic className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Bulleted list" onClick={() => prefixLines("- ")}>
+          <List className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>
+          <ListOrdered className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Insert link" onClick={insertLink}>
+          <LinkIcon className="h-4 w-4" />
+        </button>
+        <span className="ml-2 text-[11px] text-muted-foreground">Markdown supported</span>
+      </div>
+      <Textarea
+        ref={ref}
+        rows={5}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="border-0 focus-visible:ring-0 rounded-t-none"
+      />
+    </div>
+  );
+}
