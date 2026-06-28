@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat, Bold, Italic, List, ListOrdered, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { translateRow } from "@/lib/translate.functions";
+import { translateRow, translateScheduleAll } from "@/lib/translate.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -177,6 +177,7 @@ export function ScheduleEditor() {
   const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
+  const translateAllFn = useServerFn(translateScheduleAll);
 
   async function handleTranslate(id: string) {
     setTranslatingId(id);
@@ -192,27 +193,24 @@ export function ScheduleEditor() {
   }
 
   async function handleTranslateAll() {
-    if (!items) return;
-    const targets = items.filter((it) => !translationStatus(it).complete);
-    if (targets.length === 0) {
-      toast.success("All events are already translated");
-      return;
-    }
     setBulkTranslating(true);
-    setBulkProgress({ done: 0, total: targets.length });
-    let failed = 0;
-    for (let i = 0; i < targets.length; i++) {
-      try {
-        await translateFn({ data: { table: "schedule_items", id: targets[i].id } });
-      } catch {
-        failed++;
+    setBulkProgress({ done: 0, total: 1 });
+    try {
+      const res: any = await translateAllFn();
+      if (!res?.totalNeeded) {
+        toast.success("All events are already translated");
+      } else if (res.failedGroups === 0) {
+        toast.success(`Translated ${res.updatedRows} event${res.updatedRows === 1 ? "" : "s"} (${res.translatedGroups} unique)`);
+      } else {
+        toast.error(`Translated ${res.updatedRows}/${res.totalNeeded}; ${res.failedGroups} group(s) failed`);
       }
-      setBulkProgress({ done: i + 1, total: targets.length });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Translate all failed");
+    } finally {
+      setBulkTranslating(false);
+      setBulkProgress({ done: 0, total: 0 });
+      load();
     }
-    setBulkTranslating(false);
-    if (failed === 0) toast.success(`Translated ${targets.length} event${targets.length === 1 ? "" : "s"}`);
-    else toast.error(`Translated ${targets.length - failed}/${targets.length}; ${failed} failed`);
-    load();
   }
 
   function translationStatus(it: ScheduleItem) {
@@ -338,7 +336,7 @@ export function ScheduleEditor() {
             {bulkTranslating ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Translating {bulkProgress.done}/{bulkProgress.total}…
+                Translating all events…
               </>
             ) : (
               <>
