@@ -140,6 +140,8 @@ export function ScheduleEditor() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [translatingId, setTranslatingId] = useState<string | null>(null);
+  const [bulkTranslating, setBulkTranslating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [page, setPage] = useState(1);
   const translateFn = useServerFn(translateRow);
 
@@ -154,6 +156,30 @@ export function ScheduleEditor() {
     } finally {
       setTranslatingId(null);
     }
+  }
+
+  async function handleTranslateAll() {
+    if (!items) return;
+    const targets = items.filter((it) => !translationStatus(it).complete);
+    if (targets.length === 0) {
+      toast.success("All events are already translated");
+      return;
+    }
+    setBulkTranslating(true);
+    setBulkProgress({ done: 0, total: targets.length });
+    let failed = 0;
+    for (let i = 0; i < targets.length; i++) {
+      try {
+        await translateFn({ data: { table: "schedule_items", id: targets[i].id } });
+      } catch {
+        failed++;
+      }
+      setBulkProgress({ done: i + 1, total: targets.length });
+    }
+    setBulkTranslating(false);
+    if (failed === 0) toast.success(`Translated ${targets.length} event${targets.length === 1 ? "" : "s"}`);
+    else toast.error(`Translated ${targets.length - failed}/${targets.length}; ${failed} failed`);
+    load();
   }
 
   function translationStatus(it: ScheduleItem) {
@@ -250,9 +276,31 @@ export function ScheduleEditor() {
     <section className="surface-card overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="font-semibold text-primary-deep">Schedule items</h2>
-        <Button size="sm" className="rounded-full gap-1.5" onClick={() => setCreating(emptyDraft())}>
-          <Plus className="h-4 w-4" />Add event
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full gap-1.5"
+            disabled={bulkTranslating || !items || items.length === 0}
+            onClick={handleTranslateAll}
+            title="Generate translations for every event missing them"
+          >
+            {bulkTranslating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Translating {bulkProgress.done}/{bulkProgress.total}…
+              </>
+            ) : (
+              <>
+                <LanguagesIcon className="h-4 w-4" />
+                Translate all
+              </>
+            )}
+          </Button>
+          <Button size="sm" className="rounded-full gap-1.5" onClick={() => setCreating(emptyDraft())}>
+            <Plus className="h-4 w-4" />Add event
+          </Button>
+        </div>
       </div>
       <div className="overflow-x-auto">
         {items === null ? (
