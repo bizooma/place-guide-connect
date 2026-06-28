@@ -77,11 +77,32 @@ const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
   { value: "monthly", label: "Monthly" },
 ];
 
+// Timezone-safe date helpers. All schedule dates are calendar dates ("YYYY-MM-DD")
+// with no timezone semantics. We must NEVER round-trip through Date.toISOString(),
+// which converts to UTC and can shift the day in non-UTC timezones.
+function todayISOLocal(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function fromISO(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d); // local midnight, no UTC conversion
+}
+function toISOLocal(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   title: "",
   category: CATEGORIES[0],
   day: "Monday",
-  date: new Date().toISOString().slice(0, 10),
+  date: todayISOLocal(),
   start_time: "09:00",
   end_time: "10:00",
   start_time_2: null,
@@ -97,25 +118,26 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
 });
 
 function addDays(iso: string, n: number): string {
-  const d = new Date(iso + "T00:00:00");
+  const d = fromISO(iso);
   d.setDate(d.getDate() + n);
-  return d.toISOString().slice(0, 10);
+  return toISOLocal(d);
 }
 function addMonths(iso: string, n: number): string {
-  const d = new Date(iso + "T00:00:00");
+  const d = fromISO(iso);
   d.setMonth(d.getMonth() + n);
-  return d.toISOString().slice(0, 10);
+  return toISOLocal(d);
 }
 function dayName(iso: string): string {
-  const idx = new Date(iso + "T00:00:00").getDay(); // 0=Sun
+  const idx = fromISO(iso).getDay(); // 0=Sun
   return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][idx];
 }
 
 function daysBetween(a: string, b: string): number {
-  const start = new Date(b + "T00:00:00").getTime();
-  const end = new Date(a + "T00:00:00").getTime();
+  const start = fromISO(b).getTime();
+  const end = fromISO(a).getTime();
   return Math.round((end - start) / 86_400_000);
 }
+
 
 function normalizeDraftDay<T extends { date: string; day: string }>(draft: T): T {
   return { ...draft, day: dayName(draft.date) };
