@@ -1,16 +1,12 @@
-## Goal
-Revert translation back to direct Gemini API (using the client's `GEMINI_API_KEY`) and record a persistent rule so future changes don't swap to the Lovable AI Gateway.
+Add a "Weekdays (Mon–Fri)" option to the Repeats dropdown in the admin event editor, so a single event can generate occurrences for every Monday through Friday up to the chosen end date.
 
 ## Changes
 
-1. **`src/lib/translate.functions.ts`** — restore the direct Gemini call:
-   - Read `process.env.GEMINI_API_KEY` (not `LOVABLE_API_KEY`).
-   - POST to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=...`.
-   - Keep the existing retry/backoff on 429/503/5xx and the JSON `response_schema` shape.
-   - Parse `candidates[0].content.parts[0].text` into `{ translations: string[] }`.
+`src/components/admin/ScheduleEditor.tsx`
+- Extend `Recurrence` type to include `"weekdays"`.
+- Add `{ value: "weekdays", label: "Every weekday (Mon–Fri)" }` to `RECURRENCE_OPTIONS` (between Weekly and Every 2 weeks).
+- Update `generateOccurrenceDates`: when `rec === "weekdays"`, advance by 1 day and skip Saturday/Sunday (getDay() 0 and 6) when pushing dates.
+- No DB or schema change needed — occurrences are materialized as individual rows linked by `series_id`, same as existing weekly/biweekly/monthly flows. Edit/delete "entire series" already works via `series_id`.
 
-2. **`mem://index.md`** — add a Core rule:
-   > Translations and all app-runtime AI calls use the direct provider API (e.g. Gemini via `GEMINI_API_KEY`). Never switch to Lovable AI Gateway — the client supplies their own keys at launch.
-
-## Notes on the 429
-The original error was the direct Gemini free-tier quota. After reverting, that key will still 429 if the project key is on the free tier. The existing exponential-backoff retry stays in place; long-term fix is the client's paid key at launch.
+## Notes
+- The existing "Day of week" field becomes informational for weekday recurrence (each generated row gets its actual weekday label based on the date), matching how weekly already behaves.

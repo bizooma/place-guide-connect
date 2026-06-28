@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-type Recurrence = "none" | "weekly" | "biweekly" | "monthly";
+type Recurrence = "none" | "weekly" | "weekdays" | "biweekly" | "monthly";
 
 type ScheduleItem = {
   id: string;
@@ -70,6 +70,7 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 const RECURRENCE_OPTIONS: { value: Recurrence; label: string }[] = [
   { value: "none", label: "Does not repeat" },
   { value: "weekly", label: "Weekly" },
+  { value: "weekdays", label: "Every weekday (Mon–Fri)" },
   { value: "biweekly", label: "Every 2 weeks" },
   { value: "monthly", label: "Monthly" },
 ];
@@ -111,10 +112,16 @@ function generateOccurrenceDates(start: string, end: string, rec: Recurrence): s
   let cur = start;
   let i = 0;
   while (cur <= end && i < 520) {
-    dates.push(cur);
-    if (rec === "weekly") cur = addDays(cur, 7);
-    else if (rec === "biweekly") cur = addDays(cur, 14);
-    else if (rec === "monthly") cur = addMonths(cur, 1);
+    if (rec === "weekdays") {
+      const dow = new Date(cur + "T00:00:00").getDay();
+      if (dow !== 0 && dow !== 6) dates.push(cur);
+      cur = addDays(cur, 1);
+    } else {
+      dates.push(cur);
+      if (rec === "weekly") cur = addDays(cur, 7);
+      else if (rec === "biweekly") cur = addDays(cur, 14);
+      else if (rec === "monthly") cur = addMonths(cur, 1);
+    }
     i++;
   }
   return dates;
