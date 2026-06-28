@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat, Bold, Italic, List, ListOrdered, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { translateRow } from "@/lib/translate.functions";
