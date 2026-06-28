@@ -351,6 +351,7 @@ export type Database = {
           day: string
           description: string
           end_time: string
+          end_time_2: string | null
           id: string
           language: string
           location: string
@@ -359,6 +360,7 @@ export type Database = {
           registration_required: boolean
           series_id: string | null
           start_time: string
+          start_time_2: string | null
           title: string
           translations: Json
           updated_at: string
@@ -371,6 +373,7 @@ export type Database = {
           day: string
           description?: string
           end_time: string
+          end_time_2?: string | null
           id?: string
           language?: string
           location: string
@@ -379,6 +382,7 @@ export type Database = {
           registration_required?: boolean
           series_id?: string | null
           start_time: string
+          start_time_2?: string | null
           title: string
           translations?: Json
           updated_at?: string
@@ -391,6 +395,7 @@ export type Database = {
           day?: string
           description?: string
           end_time?: string
+          end_time_2?: string | null
           id?: string
           language?: string
           location?: string
@@ -399,6 +404,7 @@ export type Database = {
           registration_required?: boolean
           series_id?: string | null
           start_time?: string
+          start_time_2?: string | null
           title?: string
           translations?: Json
           updated_at?: string

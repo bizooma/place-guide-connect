@@ -10,6 +10,20 @@ import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { scheduleCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+
+function formatTimes(s: ScheduleRow): string {
+  const a = `${s.start_time} – ${s.end_time}`;
+  if (s.start_time_2 && s.end_time_2) return `${a}, ${s.start_time_2} – ${s.end_time_2}`;
+  return a;
+}
+
+const mdComponents = {
+  a: (props: any) => <a {...props} target="_blank" rel="noreferrer" className="text-primary underline" />,
+  ul: (props: any) => <ul {...props} className="list-disc pl-5 space-y-0.5" />,
+  ol: (props: any) => <ol {...props} className="list-decimal pl-5 space-y-0.5" />,
+  p: (props: any) => <p {...props} className="mb-1 last:mb-0" />,
+};
 
 export const Route = createFileRoute("/schedule")({
   head: () => ({
@@ -31,6 +45,8 @@ interface ScheduleRow {
   date: string;
   start_time: string;
   end_time: string;
+  start_time_2: string | null;
+  end_time_2: string | null;
   location: string;
   description: string;
   language: string;
@@ -284,9 +300,11 @@ function CalendarView({ items, t, tx }: { items: ScheduleRow[]; t: (k: string, f
                 <article key={s.id} className="surface-card p-4">
                   <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
                   <h4 className="mt-1 font-display text-lg font-semibold text-primary-deep">{tx(s.title)}</h4>
-                  <p className="mt-1 text-sm text-muted-foreground">{tx(s.description)}</p>
+                  <div className="mt-1 text-sm text-muted-foreground prose prose-sm max-w-none">
+                    <ReactMarkdown components={mdComponents}>{tx(s.description)}</ReactMarkdown>
+                  </div>
                   <dl className="mt-3 space-y-1 text-sm">
-                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
+                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{formatTimes(s)}</span></div>
                     <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
                   </dl>
                 </article>
@@ -336,10 +354,12 @@ function CardsView({ items, view, setView, t, tx }: { items: ScheduleRow[]; view
           <article key={s.id} className="surface-card flex flex-col p-5">
             <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(s.category)}</span>
             <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{tx(s.title)}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tx(s.description)}</p>
+            <div className="mt-2 text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none">
+              <ReactMarkdown components={mdComponents}>{tx(s.description)}</ReactMarkdown>
+            </div>
             <dl className="mt-4 space-y-1.5 text-sm">
               <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-primary" /><span>{s.day} · {s.date}</span></div>
-              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{s.start_time} – {s.end_time}</span></div>
+              <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /><span>{formatTimes(s)}</span></div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /><span>{tx(s.location)}</span></div>
               <div className="flex items-center gap-2"><LanguagesIcon className="h-4 w-4 text-primary" /><span>{tx(s.language)}</span></div>
             </dl>

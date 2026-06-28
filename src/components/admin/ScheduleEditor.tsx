@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pencil, Plus, Trash2, Loader2, Languages as LanguagesIcon, Check, Repeat, Bold, Italic, List, ListOrdered, Link as LinkIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { translateRow } from "@/lib/translate.functions";
@@ -44,6 +44,8 @@ type ScheduleItem = {
   date: string;
   start_time: string;
   end_time: string;
+  start_time_2: string | null;
+  end_time_2: string | null;
   location: string;
   description: string;
   language: string;
@@ -82,6 +84,8 @@ const emptyDraft = (): Omit<ScheduleItem, "id"> => ({
   date: new Date().toISOString().slice(0, 10),
   start_time: "09:00",
   end_time: "10:00",
+  start_time_2: null,
+  end_time_2: null,
   location: "The PLACE",
   description: "",
   language: "English",
@@ -488,6 +492,49 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
               <Input type="time" value={draft.end_time} onChange={(e) => update("end_time", e.target.value as never)} />
             </Field>
           </div>
+          <div className="grid grid-cols-3 gap-4 items-end">
+            <Field label="Second time slot (optional)">
+              {draft.start_time_2 || draft.end_time_2 ? (
+                <button
+                  type="button"
+                  className="text-xs text-muted-foreground underline self-start"
+                  onClick={() => {
+                    update("start_time_2", null as never);
+                    update("end_time_2", null as never);
+                  }}
+                >
+                  Remove second time
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="text-xs text-primary underline self-start"
+                  onClick={() => {
+                    update("start_time_2", "14:00" as never);
+                    update("end_time_2", "16:00" as never);
+                  }}
+                >
+                  + Add second time
+                </button>
+              )}
+            </Field>
+            <Field label="Start 2">
+              <Input
+                type="time"
+                disabled={!draft.start_time_2 && !draft.end_time_2}
+                value={draft.start_time_2 ?? ""}
+                onChange={(e) => update("start_time_2", (e.target.value || null) as never)}
+              />
+            </Field>
+            <Field label="End 2">
+              <Input
+                type="time"
+                disabled={!draft.start_time_2 && !draft.end_time_2}
+                value={draft.end_time_2 ?? ""}
+                onChange={(e) => update("end_time_2", (e.target.value || null) as never)}
+              />
+            </Field>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Location">
               <Input value={draft.location} onChange={(e) => update("location", e.target.value as never)} />
@@ -497,7 +544,10 @@ function EventDialog<T extends Omit<ScheduleItem, "id"> | ScheduleItem | null>({
             </Field>
           </div>
           <Field label="Description">
-            <Textarea rows={3} value={draft.description} onChange={(e) => update("description", e.target.value as never)} />
+            <RichDescriptionEditor
+              value={draft.description}
+              onChange={(v) => update("description", v as never)}
+            />
           </Field>
           {isNew && (
             <div className="grid grid-cols-2 gap-4">
@@ -557,6 +607,81 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="grid gap-1.5">
       <Label className="text-xs font-medium text-muted-foreground">{label}</Label>
       {children}
+    </div>
+  );
+}
+
+function RichDescriptionEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+
+  function wrap(before: string, after: string = before, placeholder = "text") {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = value.slice(start, end) || placeholder;
+    const next = value.slice(0, start) + before + selected + after + value.slice(end);
+    onChange(next);
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + before.length;
+      ta.setSelectionRange(pos, pos + selected.length);
+    });
+  }
+
+  function prefixLines(prefix: string | ((i: number) => string)) {
+    const ta = ref.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = end + (value.slice(end).indexOf("\n") === -1 ? value.length - end : value.slice(end).indexOf("\n"));
+    const block = value.slice(lineStart, lineEnd);
+    const lines = block.split("\n");
+    const newBlock = lines
+      .map((l, i) => (typeof prefix === "string" ? prefix : prefix(i)) + l)
+      .join("\n");
+    const next = value.slice(0, lineStart) + newBlock + value.slice(lineEnd);
+    onChange(next);
+    requestAnimationFrame(() => ta.focus());
+  }
+
+  function insertLink() {
+    const url = window.prompt("Link URL");
+    if (!url) return;
+    wrap("[", `](${url})`, "link text");
+  }
+
+  const btn =
+    "inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background hover:bg-secondary text-muted-foreground hover:text-foreground transition";
+
+  return (
+    <div className="rounded-md border border-input bg-transparent">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border p-1.5">
+        <button type="button" className={btn} title="Bold" onClick={() => wrap("**")}>
+          <Bold className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Italic" onClick={() => wrap("*")}>
+          <Italic className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Bulleted list" onClick={() => prefixLines("- ")}>
+          <List className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Numbered list" onClick={() => prefixLines((i) => `${i + 1}. `)}>
+          <ListOrdered className="h-4 w-4" />
+        </button>
+        <button type="button" className={btn} title="Insert link" onClick={insertLink}>
+          <LinkIcon className="h-4 w-4" />
+        </button>
+        <span className="ml-2 text-[11px] text-muted-foreground">Markdown supported</span>
+      </div>
+      <Textarea
+        ref={ref}
+        rows={5}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="border-0 focus-visible:ring-0 rounded-t-none"
+      />
     </div>
   );
 }
