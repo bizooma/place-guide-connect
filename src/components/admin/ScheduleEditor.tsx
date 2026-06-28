@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
-type Recurrence = "none" | "weekly" | "biweekly" | "monthly";
+type Recurrence = "none" | "weekly" | "weekdays" | "biweekly" | "monthly";
 
 type ScheduleItem = {
   id: string;
