@@ -152,3 +152,80 @@ export const translateRow = createServerFn({ method: "POST" })
 
     return { ok: true, languages: Object.keys(TARGET_LANGS) };
   });
+
+// Bulk translate all schedule_items missing translations, deduped by content.
+export const translateScheduleAll = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (roleErr) throw new Error(roleErr.message);
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error: readErr } = await supabaseAdmin
+      .from("schedule_items")
+      .select("id, title, category, description, location, language, translations");
+    if (readErr) throw new Error(readErr.message);
+
+    const langCodes = Object.keys(TARGET_LANGS);
+    const needs = (rows ?? []).filter((r: any) => {
+      const tr = r.translations ?? {};
+      return langCodes.some((c) => !tr[c] || Object.keys(tr[c]).length === 0);
+    });
+
+    const groups = new Map<string, { keys: string[]; texts: string[]; ids: string[] }>();
+    for (const r of needs as any[]) {
+      const keys: string[] = [];
+      const texts: string[] = [];
+      for (const f of SCHEDULE_FIELDS) {
+        const v = r[f];
+        if (typeof v === "string" && v.trim()) {
+          keys.push(f);
+          texts.push(v);
+        }
+      }
+      const sig = JSON.stringify([keys, texts]);
+      const g = groups.get(sig);
+      if (g) g.ids.push(r.id);
+      else groups.set(sig, { keys, texts, ids: [r.id] });
+    }
+
+    let translatedGroups = 0;
+    let failedGroups = 0;
+    let updatedRows = 0;
+
+    for (const group of groups.values()) {
+      try {
+        const translations: Record<string, Record<string, string>> = {};
+        for (const [code, name] of Object.entries(TARGET_LANGS)) {
+          const out = await callGemini(name, group.texts);
+          const map: Record<string, string> = {};
+          group.keys.forEach((k, i) => { map[k] = out[i] ?? group.texts[i]; });
+          translations[code] = map;
+        }
+        for (const id of group.ids) {
+          const { error: updErr } = await supabaseAdmin
+            .from("schedule_items")
+            .update({ translations })
+            .eq("id", id);
+          if (!updErr) updatedRows++;
+        }
+        translatedGroups++;
+      } catch {
+        failedGroups++;
+      }
+    }
+
+    return {
+      ok: true,
+      uniqueGroups: groups.size,
+      translatedGroups,
+      failedGroups,
+      updatedRows,
+      totalNeeded: needs.length,
+    };
+  });
