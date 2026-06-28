@@ -110,6 +110,17 @@ function dayName(iso: string): string {
   const idx = new Date(iso + "T00:00:00").getDay(); // 0=Sun
   return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][idx];
 }
+
+function daysBetween(a: string, b: string): number {
+  const start = new Date(b + "T00:00:00").getTime();
+  const end = new Date(a + "T00:00:00").getTime();
+  return Math.round((end - start) / 86_400_000);
+}
+
+function normalizeDraftDay<T extends { date: string; day: string }>(draft: T): T {
+  return { ...draft, day: dayName(draft.date) };
+}
+
 function generateOccurrenceDates(start: string, end: string, rec: Recurrence): string[] {
   if (rec === "none") return [start];
   const dates: string[] = [];
@@ -214,15 +225,31 @@ export function ScheduleEditor() {
       if ("id" in draft) {
         // Editing existing
         if (scope === "series" && draft.series_id) {
-          const { id, date, day, series_id, recurrence, recurrence_end_date, translations, ...patch } = draft;
-          const { error } = await supabase
-            .from("schedule_items")
-            .update(patch)
-            .eq("series_id", series_id);
-          if (error) throw error;
+          const original = items?.find((item) => item.id === draft.id);
+          const seriesItems = (items ?? []).filter((item) => item.series_id === draft.series_id);
+          const { id, date, day, series_id, recurrence, recurrence_end_date, translations, ...patch } = normalizeDraftDay(draft);
+          if (!series_id) throw new Error("Missing recurring series ID");
+          const dateDelta = original ? daysBetween(date, original.date) : 0;
+
+          if (dateDelta !== 0 && seriesItems.length > 0) {
+            for (const item of seriesItems) {
+              const nextDate = addDays(item.date, dateDelta);
+              const { error } = await supabase
+                .from("schedule_items")
+                .update({ ...patch, date: nextDate, day: dayName(nextDate) })
+                .eq("id", item.id);
+              if (error) throw error;
+            }
+          } else {
+            const { error } = await supabase
+              .from("schedule_items")
+              .update(patch)
+              .eq("series_id", series_id);
+            if (error) throw error;
+          }
           toast.success("Series updated");
         } else {
-          const { id, translations, ...patch } = draft;
+          const { id, translations, ...patch } = normalizeDraftDay(draft);
           const { error } = await supabase.from("schedule_items").update(patch).eq("id", id);
           if (error) throw error;
           toast.success("Event updated");
@@ -230,11 +257,12 @@ export function ScheduleEditor() {
         setEditing(null);
       } else {
         // Creating new
-        if (draft.recurrence !== "none" && draft.recurrence_end_date) {
+        const normalizedDraft = normalizeDraftDay(draft);
+        if (normalizedDraft.recurrence !== "none" && normalizedDraft.recurrence_end_date) {
           const seriesId = crypto.randomUUID();
-          const dates = generateOccurrenceDates(draft.date, draft.recurrence_end_date, draft.recurrence);
+          const dates = generateOccurrenceDates(normalizedDraft.date, normalizedDraft.recurrence_end_date, normalizedDraft.recurrence);
           const rows = dates.map((d) => ({
-            ...draft,
+            ...normalizedDraft,
             date: d,
             day: dayName(d),
             series_id: seriesId,
@@ -243,7 +271,7 @@ export function ScheduleEditor() {
           if (error) throw error;
           toast.success(`${rows.length} events created`);
         } else {
-          const { error } = await supabase.from("schedule_items").insert({ ...draft, series_id: null });
+          const { error } = await supabase.from("schedule_items").insert({ ...normalizedDraft, series_id: null });
           if (error) throw error;
           toast.success("Event created");
         }
