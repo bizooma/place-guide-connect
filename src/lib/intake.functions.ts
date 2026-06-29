@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-const TO_EMAIL = "joe@bizooma.com";
+const TO_EMAIL = ["joe@bizooma.com", "sara@wefindinlove.org"];
 const FROM_EMAIL = "The PLACE Intake <onboarding@resend.dev>";
+
 
 function escapeHtml(value: unknown): string {
   return String(value ?? "")
