@@ -219,26 +219,35 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
 
     const batchGroups = Array.from(groups.values()).slice(0, batchLimit);
 
-    for (const group of batchGroups) {
-      try {
-        const translations: Record<string, Record<string, string>> = {};
-        for (const [code, name] of Object.entries(TARGET_LANGS)) {
-          const out = await callGemini(name, group.texts);
+    try {
+      const translationsByGroup: Record<string, Record<string, string>>[] = batchGroups.map(() => ({}));
+
+      for (const [code, name] of Object.entries(TARGET_LANGS)) {
+        const allTexts = batchGroups.flatMap((group) => group.texts);
+        const out = await callGemini(name, allTexts);
+        let cursor = 0;
+        batchGroups.forEach((group, groupIndex) => {
           const map: Record<string, string> = {};
-          group.keys.forEach((k, i) => { map[k] = out[i] ?? group.texts[i]; });
-          translations[code] = map;
-        }
+          group.keys.forEach((key, fieldIndex) => {
+            map[key] = out[cursor + fieldIndex] ?? group.texts[fieldIndex];
+          });
+          translationsByGroup[groupIndex][code] = map;
+          cursor += group.texts.length;
+        });
+      }
+
+      for (const [groupIndex, group] of batchGroups.entries()) {
         for (const id of group.ids) {
           const { error: updErr } = await supabase
             .from("schedule_items")
-            .update({ translations })
+            .update({ translations: translationsByGroup[groupIndex] })
             .eq("id", id);
           if (!updErr) updatedRows++;
         }
-        translatedGroups++;
-      } catch {
-        failedGroups++;
       }
+      translatedGroups = batchGroups.length;
+    } catch {
+      failedGroups = batchGroups.length;
     }
 
     return {
