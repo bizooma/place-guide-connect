@@ -293,6 +293,7 @@ export type Database = {
           eligibility: string | null
           hours: string | null
           id: string
+          image_url: string | null
           languages: string[]
           name: string
           phone: string | null
@@ -312,6 +313,7 @@ export type Database = {
           eligibility?: string | null
           hours?: string | null
           id?: string
+          image_url?: string | null
           languages?: string[]
           name: string
           phone?: string | null
@@ -331,6 +333,7 @@ export type Database = {
           eligibility?: string | null
           hours?: string | null
           id?: string
+          image_url?: string | null
           languages?: string[]
           name?: string
           phone?: string | null
