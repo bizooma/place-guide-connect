@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { sendIntakeSubmission } from "@/lib/intake.functions";
+import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 
 
 export const Route = createFileRoute("/intake")({
@@ -71,12 +72,10 @@ const emptyReference: ReferenceBlock = {
 };
 
 const initialState = {
-  // Applicant
   fullLegalName: "",
   preferredName: "",
   dateOfBirth: "",
   ssn: "",
-  // Contact
   street: "",
   city: "",
   state: "",
@@ -86,62 +85,51 @@ const initialState = {
   alternatePhone: "",
   email: "",
   preferredContact: "",
-  // Eligibility
   authorizedToWork: "",
   needsSponsorship: "",
   atLeast18: "",
-  // Position preferences
   desiredJobTitles: "",
   employmentType: "",
   preferredShifts: [] as string[],
   desiredPay: "",
   earliestStartDate: "",
-  // Employment history
   employer1: { ...emptyEmployer },
   employer2: { ...emptyEmployer },
   employer3: { ...emptyEmployer },
-  // Education
   highestEducation: "",
   schoolName: "",
   schoolCityState: "",
   degree: "",
   fieldOfStudy: "",
   graduationDate: "",
-  // Cert
   certName: "",
   certIssuer: "",
   certNumber: "",
   certExpiration: "",
-  // Skills
   languages: "",
   computerSkills: "",
   machinerySkills: "",
   otherSkills: "",
-  // References
   reference1: { ...emptyReference },
   reference2: { ...emptyReference },
   reference3: { ...emptyReference },
-  // Availability
   daysAvailable: "",
   hoursAvailable: "",
   willingOvertime: "",
   willingWeekends: "",
-  // Transportation
   reliableTransportation: "",
-  // Criminal history
   hasConviction: "",
   convictionExplanation: "",
-  // EEO
   sex: "",
   ethnicity: "",
   races: [] as string[],
-  // Emergency contact
   emergencyName: "",
   emergencyRelationship: "",
   emergencyPhone: "",
 };
 
 type FormState = typeof initialState;
+type Tx = (s: string) => string;
 
 const SHIFTS = ["Day", "Evening", "Night", "Rotating", "Flexible"];
 const RACES = [
@@ -152,6 +140,106 @@ const RACES = [
   "White",
   "Two or More Races",
   "Prefer Not to Say",
+];
+const CONTACT_METHODS = ["Phone", "Email", "Text"];
+const EMPLOYMENT_TYPES = ["Full-Time", "Part-Time", "Temporary", "Contract"];
+const SEX_OPTIONS = ["Male", "Female", "Non-Binary", "Prefer Not to Say"];
+const ETHNICITY_OPTIONS = ["Hispanic or Latino", "Not Hispanic or Latino", "Prefer Not to Say"];
+
+const STRINGS_TO_TRANSLATE: string[] = [
+  "Friends, please fill out this form so we can best serve your needs.",
+  "Please complete the form below. All sections help our team match you with the right opportunity.",
+  "Applicant Information",
+  "Contact Information",
+  "Employment Eligibility",
+  "Position Preferences",
+  "Employment History",
+  "Past 7 years — most recent positions first.",
+  "Education & Training",
+  "Additional Training, Certifications, or Licenses",
+  "Skills & Qualifications",
+  "References",
+  "Three references required.",
+  "Availability",
+  "Transportation",
+  "Criminal History",
+  "Optional / when job-related. Convictions will not automatically disqualify you.",
+  "Voluntary Self-Identification (EEO)",
+  "Completion of this section is voluntary and will not affect employment opportunities.",
+  "Emergency Contact",
+  "Employer",
+  "Reference",
+  "Yes",
+  "No",
+  "Submit application",
+  "Submitting…",
+  // Field labels
+  "Full legal name",
+  "Preferred name (if different)",
+  "Date of birth",
+  "Social Security Number",
+  "Street address",
+  "City",
+  "State",
+  "ZIP code",
+  "County (optional)",
+  "Primary phone number",
+  "Alternate phone number",
+  "Email address",
+  "Preferred method of contact",
+  "Are you legally authorized to work in the United States?",
+  "Will you now or in the future require employer sponsorship for work authorization?",
+  "Are you at least 18 years old?",
+  "Desired job title(s)",
+  "Type of employment sought",
+  "Preferred shift(s)",
+  "Desired pay range (hourly or salary)",
+  "Earliest available start date",
+  "Company name",
+  "Job title",
+  "Supervisor name & title",
+  "Company address",
+  "Phone number",
+  "Start date",
+  "End date",
+  "Starting pay",
+  "Ending pay",
+  "Job duties & responsibilities",
+  "Reason for leaving",
+  "Highest level of education completed",
+  "School name",
+  "City & state",
+  "Degree / diploma / certificate earned",
+  "Field of study",
+  "Graduation date (or expected)",
+  "Certification / license name",
+  "Issuing organization",
+  "License / certificate number (if applicable)",
+  "Expiration date",
+  "Languages spoken (and proficiency level)",
+  "Computer / technical skills",
+  "Machinery or equipment experience",
+  "Other relevant skills",
+  "Name",
+  "Relationship",
+  "Company",
+  "Days available to work",
+  "Hours available",
+  "Willing to work overtime?",
+  "Willing to work weekends?",
+  "Do you have reliable transportation to and from work?",
+  "Have you ever been convicted of a felony or misdemeanor that has not been sealed or expunged?",
+  "If yes, please explain",
+  "Sex",
+  "Ethnicity",
+  "Race (check all that apply)",
+  // Options
+  ...SHIFTS,
+  ...RACES,
+  ...CONTACT_METHODS,
+  ...EMPLOYMENT_TYPES,
+  ...SEX_OPTIONS,
+  ...ETHNICITY_OPTIONS,
 ];
 
 function Section({
@@ -199,20 +287,22 @@ function YesNo({
   value,
   onChange,
   name,
+  tx,
 }: {
   value: string;
   onChange: (v: string) => void;
   name: string;
+  tx: Tx;
 }) {
   return (
     <RadioGroup value={value} onValueChange={onChange} className="flex gap-6">
       <div className="flex items-center gap-2">
         <RadioGroupItem value="yes" id={`${name}-yes`} />
-        <Label htmlFor={`${name}-yes`} className="font-normal">Yes</Label>
+        <Label htmlFor={`${name}-yes`} className="font-normal">{tx("Yes")}</Label>
       </div>
       <div className="flex items-center gap-2">
         <RadioGroupItem value="no" id={`${name}-no`} />
-        <Label htmlFor={`${name}-no`} className="font-normal">No</Label>
+        <Label htmlFor={`${name}-no`} className="font-normal">{tx("No")}</Label>
       </div>
     </RadioGroup>
   );
@@ -222,50 +312,52 @@ function EmployerSection({
   index,
   value,
   onChange,
+  tx,
 }: {
   index: number;
   value: EmployerBlock;
   onChange: (next: EmployerBlock) => void;
+  tx: Tx;
 }) {
   const prefix = `employer${index}`;
   const set = <K extends keyof EmployerBlock>(k: K, v: EmployerBlock[K]) =>
     onChange({ ...value, [k]: v });
 
   return (
-    <Section title={`Employer #${index}`}>
+    <Section title={`${tx("Employer")} #${index}`}>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field id={`${prefix}-company`} label="Company name">
+        <Field id={`${prefix}-company`} label={tx("Company name")}>
           <Input id={`${prefix}-company`} value={value.company} onChange={(e) => set("company", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-title`} label="Job title">
+        <Field id={`${prefix}-title`} label={tx("Job title")}>
           <Input id={`${prefix}-title`} value={value.jobTitle} onChange={(e) => set("jobTitle", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-supervisor`} label="Supervisor name & title" className="md:col-span-2">
+        <Field id={`${prefix}-supervisor`} label={tx("Supervisor name & title")} className="md:col-span-2">
           <Input id={`${prefix}-supervisor`} value={value.supervisor} onChange={(e) => set("supervisor", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-address`} label="Company address" className="md:col-span-2">
+        <Field id={`${prefix}-address`} label={tx("Company address")} className="md:col-span-2">
           <Input id={`${prefix}-address`} value={value.address} onChange={(e) => set("address", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-phone`} label="Phone number">
+        <Field id={`${prefix}-phone`} label={tx("Phone number")}>
           <Input id={`${prefix}-phone`} type="tel" value={value.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
         <div className="hidden md:block" />
-        <Field id={`${prefix}-start`} label="Start date">
+        <Field id={`${prefix}-start`} label={tx("Start date")}>
           <Input id={`${prefix}-start`} type="date" value={value.startDate} onChange={(e) => set("startDate", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-end`} label="End date">
+        <Field id={`${prefix}-end`} label={tx("End date")}>
           <Input id={`${prefix}-end`} type="date" value={value.endDate} onChange={(e) => set("endDate", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-startPay`} label="Starting pay">
+        <Field id={`${prefix}-startPay`} label={tx("Starting pay")}>
           <Input id={`${prefix}-startPay`} value={value.startingPay} onChange={(e) => set("startingPay", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-endPay`} label="Ending pay">
+        <Field id={`${prefix}-endPay`} label={tx("Ending pay")}>
           <Input id={`${prefix}-endPay`} value={value.endingPay} onChange={(e) => set("endingPay", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-duties`} label="Job duties & responsibilities" className="md:col-span-2">
+        <Field id={`${prefix}-duties`} label={tx("Job duties & responsibilities")} className="md:col-span-2">
           <Textarea id={`${prefix}-duties`} rows={3} value={value.duties} onChange={(e) => set("duties", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-reason`} label="Reason for leaving" className="md:col-span-2">
+        <Field id={`${prefix}-reason`} label={tx("Reason for leaving")} className="md:col-span-2">
           <Textarea id={`${prefix}-reason`} rows={2} value={value.reasonForLeaving} onChange={(e) => set("reasonForLeaving", e.target.value)} />
         </Field>
       </div>
@@ -277,10 +369,12 @@ function ReferenceSection({
   index,
   value,
   onChange,
+  tx,
 }: {
   index: number;
   value: ReferenceBlock;
   onChange: (next: ReferenceBlock) => void;
+  tx: Tx;
 }) {
   const prefix = `ref${index}`;
   const set = <K extends keyof ReferenceBlock>(k: K, v: ReferenceBlock[K]) =>
@@ -288,21 +382,21 @@ function ReferenceSection({
 
   return (
     <div className="space-y-4 rounded-lg border p-4">
-      <h3 className="font-display text-lg text-primary-deep">Reference #{index}</h3>
+      <h3 className="font-display text-lg text-primary-deep">{tx("Reference")} #{index}</h3>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field id={`${prefix}-name`} label="Name">
+        <Field id={`${prefix}-name`} label={tx("Name")}>
           <Input id={`${prefix}-name`} value={value.name} onChange={(e) => set("name", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-rel`} label="Relationship">
+        <Field id={`${prefix}-rel`} label={tx("Relationship")}>
           <Input id={`${prefix}-rel`} value={value.relationship} onChange={(e) => set("relationship", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-company`} label="Company">
+        <Field id={`${prefix}-company`} label={tx("Company")}>
           <Input id={`${prefix}-company`} value={value.company} onChange={(e) => set("company", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-phone`} label="Phone number">
+        <Field id={`${prefix}-phone`} label={tx("Phone number")}>
           <Input id={`${prefix}-phone`} type="tel" value={value.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
-        <Field id={`${prefix}-email`} label="Email address" className="md:col-span-2">
+        <Field id={`${prefix}-email`} label={tx("Email address")} className="md:col-span-2">
           <Input id={`${prefix}-email`} type="email" value={value.email} onChange={(e) => set("email", e.target.value)} />
         </Field>
       </div>
@@ -312,6 +406,7 @@ function ReferenceSection({
 
 function IntakePage() {
   const [form, setForm] = useState<FormState>(initialState);
+  const tx = useTranslatedTexts(STRINGS_TO_TRANSLATE);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -356,67 +451,67 @@ function IntakePage() {
       <div className="mx-auto max-w-4xl px-4 py-10 md:py-16">
         <header className="mb-8 space-y-2">
           <h1 className="font-display text-3xl text-primary-deep md:text-4xl">
-            Friends, please fill out this form so we can best serve your needs.
+            {tx("Friends, please fill out this form so we can best serve your needs.")}
           </h1>
           <p className="text-muted-foreground">
-            Please complete the form below. All sections help our team match you with the right opportunity.
+            {tx("Please complete the form below. All sections help our team match you with the right opportunity.")}
           </p>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Section title="Applicant Information">
+          <Section title={tx("Applicant Information")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="fullLegalName" label="Full legal name">
+              <Field id="fullLegalName" label={tx("Full legal name")}>
                 <Input id="fullLegalName" value={form.fullLegalName} onChange={(e) => update("fullLegalName", e.target.value)} />
               </Field>
-              <Field id="preferredName" label="Preferred name (if different)">
+              <Field id="preferredName" label={tx("Preferred name (if different)")}>
                 <Input id="preferredName" value={form.preferredName} onChange={(e) => update("preferredName", e.target.value)} />
               </Field>
-              <Field id="dob" label="Date of birth">
+              <Field id="dob" label={tx("Date of birth")}>
                 <Input id="dob" type="date" value={form.dateOfBirth} onChange={(e) => update("dateOfBirth", e.target.value)} />
               </Field>
-              <Field id="ssn" label="Social Security Number">
+              <Field id="ssn" label={tx("Social Security Number")}>
                 <Input id="ssn" value={form.ssn} onChange={(e) => update("ssn", e.target.value)} />
               </Field>
             </div>
           </Section>
 
-          <Section title="Contact Information">
+          <Section title={tx("Contact Information")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="street" label="Street address" className="md:col-span-2">
+              <Field id="street" label={tx("Street address")} className="md:col-span-2">
                 <Input id="street" value={form.street} onChange={(e) => update("street", e.target.value)} />
               </Field>
-              <Field id="city" label="City">
+              <Field id="city" label={tx("City")}>
                 <Input id="city" value={form.city} onChange={(e) => update("city", e.target.value)} />
               </Field>
-              <Field id="state" label="State">
+              <Field id="state" label={tx("State")}>
                 <Input id="state" value={form.state} onChange={(e) => update("state", e.target.value)} />
               </Field>
-              <Field id="zip" label="ZIP code">
+              <Field id="zip" label={tx("ZIP code")}>
                 <Input id="zip" value={form.zip} onChange={(e) => update("zip", e.target.value)} />
               </Field>
-              <Field id="county" label="County (optional)">
+              <Field id="county" label={tx("County (optional)")}>
                 <Input id="county" value={form.county} onChange={(e) => update("county", e.target.value)} />
               </Field>
-              <Field id="primaryPhone" label="Primary phone number">
+              <Field id="primaryPhone" label={tx("Primary phone number")}>
                 <Input id="primaryPhone" type="tel" value={form.primaryPhone} onChange={(e) => update("primaryPhone", e.target.value)} />
               </Field>
-              <Field id="altPhone" label="Alternate phone number">
+              <Field id="altPhone" label={tx("Alternate phone number")}>
                 <Input id="altPhone" type="tel" value={form.alternatePhone} onChange={(e) => update("alternatePhone", e.target.value)} />
               </Field>
-              <Field id="email" label="Email address">
+              <Field id="email" label={tx("Email address")}>
                 <Input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} />
               </Field>
-              <Field id="preferredContact" label="Preferred method of contact">
+              <Field id="preferredContact" label={tx("Preferred method of contact")}>
                 <RadioGroup
                   value={form.preferredContact}
                   onValueChange={(v) => update("preferredContact", v)}
                   className="flex flex-wrap gap-4 pt-1"
                 >
-                  {["Phone", "Email", "Text"].map((opt) => (
+                  {CONTACT_METHODS.map((opt) => (
                     <div key={opt} className="flex items-center gap-2">
                       <RadioGroupItem value={opt} id={`contact-${opt}`} />
-                      <Label htmlFor={`contact-${opt}`} className="font-normal">{opt}</Label>
+                      <Label htmlFor={`contact-${opt}`} className="font-normal">{tx(opt)}</Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -424,37 +519,37 @@ function IntakePage() {
             </div>
           </Section>
 
-          <Section title="Employment Eligibility">
-            <Field id="authorized" label="Are you legally authorized to work in the United States?">
-              <YesNo name="authorized" value={form.authorizedToWork} onChange={(v) => update("authorizedToWork", v)} />
+          <Section title={tx("Employment Eligibility")}>
+            <Field id="authorized" label={tx("Are you legally authorized to work in the United States?")}>
+              <YesNo name="authorized" value={form.authorizedToWork} onChange={(v) => update("authorizedToWork", v)} tx={tx} />
             </Field>
-            <Field id="sponsorship" label="Will you now or in the future require employer sponsorship for work authorization?">
-              <YesNo name="sponsorship" value={form.needsSponsorship} onChange={(v) => update("needsSponsorship", v)} />
+            <Field id="sponsorship" label={tx("Will you now or in the future require employer sponsorship for work authorization?")}>
+              <YesNo name="sponsorship" value={form.needsSponsorship} onChange={(v) => update("needsSponsorship", v)} tx={tx} />
             </Field>
-            <Field id="age18" label="Are you at least 18 years old?">
-              <YesNo name="age18" value={form.atLeast18} onChange={(v) => update("atLeast18", v)} />
+            <Field id="age18" label={tx("Are you at least 18 years old?")}>
+              <YesNo name="age18" value={form.atLeast18} onChange={(v) => update("atLeast18", v)} tx={tx} />
             </Field>
           </Section>
 
-          <Section title="Position Preferences">
-            <Field id="desiredJobTitles" label="Desired job title(s)">
+          <Section title={tx("Position Preferences")}>
+            <Field id="desiredJobTitles" label={tx("Desired job title(s)")}>
               <Input id="desiredJobTitles" value={form.desiredJobTitles} onChange={(e) => update("desiredJobTitles", e.target.value)} />
             </Field>
-            <Field id="employmentType" label="Type of employment sought">
+            <Field id="employmentType" label={tx("Type of employment sought")}>
               <RadioGroup
                 value={form.employmentType}
                 onValueChange={(v) => update("employmentType", v)}
                 className="flex flex-wrap gap-4"
               >
-                {["Full-Time", "Part-Time", "Temporary", "Contract"].map((opt) => (
+                {EMPLOYMENT_TYPES.map((opt) => (
                   <div key={opt} className="flex items-center gap-2">
                     <RadioGroupItem value={opt} id={`emp-${opt}`} />
-                    <Label htmlFor={`emp-${opt}`} className="font-normal">{opt}</Label>
+                    <Label htmlFor={`emp-${opt}`} className="font-normal">{tx(opt)}</Label>
                   </div>
                 ))}
               </RadioGroup>
             </Field>
-            <Field id="shifts" label="Preferred shift(s)">
+            <Field id="shifts" label={tx("Preferred shift(s)")}>
               <div className="flex flex-wrap gap-4">
                 {SHIFTS.map((s) => (
                   <div key={s} className="flex items-center gap-2">
@@ -463,158 +558,158 @@ function IntakePage() {
                       checked={form.preferredShifts.includes(s)}
                       onCheckedChange={() => toggleArray("preferredShifts", s)}
                     />
-                    <Label htmlFor={`shift-${s}`} className="font-normal">{s}</Label>
+                    <Label htmlFor={`shift-${s}`} className="font-normal">{tx(s)}</Label>
                   </div>
                 ))}
               </div>
             </Field>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="pay" label="Desired pay range (hourly or salary)">
+              <Field id="pay" label={tx("Desired pay range (hourly or salary)")}>
                 <Input id="pay" value={form.desiredPay} onChange={(e) => update("desiredPay", e.target.value)} />
               </Field>
-              <Field id="start" label="Earliest available start date">
+              <Field id="start" label={tx("Earliest available start date")}>
                 <Input id="start" type="date" value={form.earliestStartDate} onChange={(e) => update("earliestStartDate", e.target.value)} />
               </Field>
             </div>
           </Section>
 
           <div className="space-y-2">
-            <h2 className="font-display text-2xl text-primary-deep">Employment History</h2>
-            <p className="text-sm text-muted-foreground">Past 7 years — most recent positions first.</p>
+            <h2 className="font-display text-2xl text-primary-deep">{tx("Employment History")}</h2>
+            <p className="text-sm text-muted-foreground">{tx("Past 7 years — most recent positions first.")}</p>
           </div>
-          <EmployerSection index={1} value={form.employer1} onChange={(v) => update("employer1", v)} />
-          <EmployerSection index={2} value={form.employer2} onChange={(v) => update("employer2", v)} />
-          <EmployerSection index={3} value={form.employer3} onChange={(v) => update("employer3", v)} />
+          <EmployerSection index={1} value={form.employer1} onChange={(v) => update("employer1", v)} tx={tx} />
+          <EmployerSection index={2} value={form.employer2} onChange={(v) => update("employer2", v)} tx={tx} />
+          <EmployerSection index={3} value={form.employer3} onChange={(v) => update("employer3", v)} tx={tx} />
 
-          <Section title="Education & Training">
+          <Section title={tx("Education & Training")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="highestEd" label="Highest level of education completed" className="md:col-span-2">
+              <Field id="highestEd" label={tx("Highest level of education completed")} className="md:col-span-2">
                 <Input id="highestEd" value={form.highestEducation} onChange={(e) => update("highestEducation", e.target.value)} />
               </Field>
-              <Field id="schoolName" label="School name">
+              <Field id="schoolName" label={tx("School name")}>
                 <Input id="schoolName" value={form.schoolName} onChange={(e) => update("schoolName", e.target.value)} />
               </Field>
-              <Field id="schoolCityState" label="City & state">
+              <Field id="schoolCityState" label={tx("City & state")}>
                 <Input id="schoolCityState" value={form.schoolCityState} onChange={(e) => update("schoolCityState", e.target.value)} />
               </Field>
-              <Field id="degree" label="Degree / diploma / certificate earned">
+              <Field id="degree" label={tx("Degree / diploma / certificate earned")}>
                 <Input id="degree" value={form.degree} onChange={(e) => update("degree", e.target.value)} />
               </Field>
-              <Field id="field" label="Field of study">
+              <Field id="field" label={tx("Field of study")}>
                 <Input id="field" value={form.fieldOfStudy} onChange={(e) => update("fieldOfStudy", e.target.value)} />
               </Field>
-              <Field id="gradDate" label="Graduation date (or expected)">
+              <Field id="gradDate" label={tx("Graduation date (or expected)")}>
                 <Input id="gradDate" type="date" value={form.graduationDate} onChange={(e) => update("graduationDate", e.target.value)} />
               </Field>
             </div>
           </Section>
 
-          <Section title="Additional Training, Certifications, or Licenses">
+          <Section title={tx("Additional Training, Certifications, or Licenses")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="certName" label="Certification / license name">
+              <Field id="certName" label={tx("Certification / license name")}>
                 <Input id="certName" value={form.certName} onChange={(e) => update("certName", e.target.value)} />
               </Field>
-              <Field id="certIssuer" label="Issuing organization">
+              <Field id="certIssuer" label={tx("Issuing organization")}>
                 <Input id="certIssuer" value={form.certIssuer} onChange={(e) => update("certIssuer", e.target.value)} />
               </Field>
-              <Field id="certNumber" label="License / certificate number (if applicable)">
+              <Field id="certNumber" label={tx("License / certificate number (if applicable)")}>
                 <Input id="certNumber" value={form.certNumber} onChange={(e) => update("certNumber", e.target.value)} />
               </Field>
-              <Field id="certExp" label="Expiration date">
+              <Field id="certExp" label={tx("Expiration date")}>
                 <Input id="certExp" type="date" value={form.certExpiration} onChange={(e) => update("certExpiration", e.target.value)} />
               </Field>
             </div>
           </Section>
 
-          <Section title="Skills & Qualifications">
-            <Field id="languages" label="Languages spoken (and proficiency level)">
+          <Section title={tx("Skills & Qualifications")}>
+            <Field id="languages" label={tx("Languages spoken (and proficiency level)")}>
               <Textarea id="languages" rows={2} value={form.languages} onChange={(e) => update("languages", e.target.value)} />
             </Field>
-            <Field id="computerSkills" label="Computer / technical skills">
+            <Field id="computerSkills" label={tx("Computer / technical skills")}>
               <Textarea id="computerSkills" rows={2} value={form.computerSkills} onChange={(e) => update("computerSkills", e.target.value)} />
             </Field>
-            <Field id="machinery" label="Machinery or equipment experience">
+            <Field id="machinery" label={tx("Machinery or equipment experience")}>
               <Textarea id="machinery" rows={2} value={form.machinerySkills} onChange={(e) => update("machinerySkills", e.target.value)} />
             </Field>
-            <Field id="otherSkills" label="Other relevant skills">
+            <Field id="otherSkills" label={tx("Other relevant skills")}>
               <Textarea id="otherSkills" rows={2} value={form.otherSkills} onChange={(e) => update("otherSkills", e.target.value)} />
             </Field>
           </Section>
 
-          <Section title="References" description="Three references required.">
-            <ReferenceSection index={1} value={form.reference1} onChange={(v) => update("reference1", v)} />
-            <ReferenceSection index={2} value={form.reference2} onChange={(v) => update("reference2", v)} />
-            <ReferenceSection index={3} value={form.reference3} onChange={(v) => update("reference3", v)} />
+          <Section title={tx("References")} description={tx("Three references required.")}>
+            <ReferenceSection index={1} value={form.reference1} onChange={(v) => update("reference1", v)} tx={tx} />
+            <ReferenceSection index={2} value={form.reference2} onChange={(v) => update("reference2", v)} tx={tx} />
+            <ReferenceSection index={3} value={form.reference3} onChange={(v) => update("reference3", v)} tx={tx} />
           </Section>
 
-          <Section title="Availability">
+          <Section title={tx("Availability")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="daysAvail" label="Days available to work">
+              <Field id="daysAvail" label={tx("Days available to work")}>
                 <Input id="daysAvail" value={form.daysAvailable} onChange={(e) => update("daysAvailable", e.target.value)} />
               </Field>
-              <Field id="hoursAvail" label="Hours available">
+              <Field id="hoursAvail" label={tx("Hours available")}>
                 <Input id="hoursAvail" value={form.hoursAvailable} onChange={(e) => update("hoursAvailable", e.target.value)} />
               </Field>
             </div>
-            <Field id="overtime" label="Willing to work overtime?">
-              <YesNo name="overtime" value={form.willingOvertime} onChange={(v) => update("willingOvertime", v)} />
+            <Field id="overtime" label={tx("Willing to work overtime?")}>
+              <YesNo name="overtime" value={form.willingOvertime} onChange={(v) => update("willingOvertime", v)} tx={tx} />
             </Field>
-            <Field id="weekends" label="Willing to work weekends?">
-              <YesNo name="weekends" value={form.willingWeekends} onChange={(v) => update("willingWeekends", v)} />
+            <Field id="weekends" label={tx("Willing to work weekends?")}>
+              <YesNo name="weekends" value={form.willingWeekends} onChange={(v) => update("willingWeekends", v)} tx={tx} />
             </Field>
           </Section>
 
-          <Section title="Transportation">
-            <Field id="transport" label="Do you have reliable transportation to and from work?">
-              <YesNo name="transport" value={form.reliableTransportation} onChange={(v) => update("reliableTransportation", v)} />
+          <Section title={tx("Transportation")}>
+            <Field id="transport" label={tx("Do you have reliable transportation to and from work?")}>
+              <YesNo name="transport" value={form.reliableTransportation} onChange={(v) => update("reliableTransportation", v)} tx={tx} />
             </Field>
           </Section>
 
           <Section
-            title="Criminal History"
-            description="Optional / when job-related. Convictions will not automatically disqualify you."
+            title={tx("Criminal History")}
+            description={tx("Optional / when job-related. Convictions will not automatically disqualify you.")}
           >
-            <Field id="conviction" label="Have you ever been convicted of a felony or misdemeanor that has not been sealed or expunged?">
-              <YesNo name="conviction" value={form.hasConviction} onChange={(v) => update("hasConviction", v)} />
+            <Field id="conviction" label={tx("Have you ever been convicted of a felony or misdemeanor that has not been sealed or expunged?")}>
+              <YesNo name="conviction" value={form.hasConviction} onChange={(v) => update("hasConviction", v)} tx={tx} />
             </Field>
-            <Field id="convictionExp" label="If yes, please explain">
+            <Field id="convictionExp" label={tx("If yes, please explain")}>
               <Textarea id="convictionExp" rows={3} value={form.convictionExplanation} onChange={(e) => update("convictionExplanation", e.target.value)} />
             </Field>
           </Section>
 
           <Section
-            title="Voluntary Self-Identification (EEO)"
-            description="Completion of this section is voluntary and will not affect employment opportunities."
+            title={tx("Voluntary Self-Identification (EEO)")}
+            description={tx("Completion of this section is voluntary and will not affect employment opportunities.")}
           >
-            <Field id="sex" label="Sex">
+            <Field id="sex" label={tx("Sex")}>
               <RadioGroup
                 value={form.sex}
                 onValueChange={(v) => update("sex", v)}
                 className="flex flex-wrap gap-4"
               >
-                {["Male", "Female", "Non-Binary", "Prefer Not to Say"].map((opt) => (
+                {SEX_OPTIONS.map((opt) => (
                   <div key={opt} className="flex items-center gap-2">
                     <RadioGroupItem value={opt} id={`sex-${opt}`} />
-                    <Label htmlFor={`sex-${opt}`} className="font-normal">{opt}</Label>
+                    <Label htmlFor={`sex-${opt}`} className="font-normal">{tx(opt)}</Label>
                   </div>
                 ))}
               </RadioGroup>
             </Field>
-            <Field id="ethnicity" label="Ethnicity">
+            <Field id="ethnicity" label={tx("Ethnicity")}>
               <RadioGroup
                 value={form.ethnicity}
                 onValueChange={(v) => update("ethnicity", v)}
                 className="flex flex-wrap gap-4"
               >
-                {["Hispanic or Latino", "Not Hispanic or Latino", "Prefer Not to Say"].map((opt) => (
+                {ETHNICITY_OPTIONS.map((opt) => (
                   <div key={opt} className="flex items-center gap-2">
                     <RadioGroupItem value={opt} id={`eth-${opt}`} />
-                    <Label htmlFor={`eth-${opt}`} className="font-normal">{opt}</Label>
+                    <Label htmlFor={`eth-${opt}`} className="font-normal">{tx(opt)}</Label>
                   </div>
                 ))}
               </RadioGroup>
             </Field>
-            <Field id="race" label="Race (check all that apply)">
+            <Field id="race" label={tx("Race (check all that apply)")}>
               <div className="grid gap-2 md:grid-cols-2">
                 {RACES.map((r) => (
                   <div key={r} className="flex items-center gap-2">
@@ -623,22 +718,22 @@ function IntakePage() {
                       checked={form.races.includes(r)}
                       onCheckedChange={() => toggleArray("races", r)}
                     />
-                    <Label htmlFor={`race-${r}`} className="font-normal">{r}</Label>
+                    <Label htmlFor={`race-${r}`} className="font-normal">{tx(r)}</Label>
                   </div>
                 ))}
               </div>
             </Field>
           </Section>
 
-          <Section title="Emergency Contact">
+          <Section title={tx("Emergency Contact")}>
             <div className="grid gap-4 md:grid-cols-2">
-              <Field id="emName" label="Name">
+              <Field id="emName" label={tx("Name")}>
                 <Input id="emName" value={form.emergencyName} onChange={(e) => update("emergencyName", e.target.value)} />
               </Field>
-              <Field id="emRel" label="Relationship">
+              <Field id="emRel" label={tx("Relationship")}>
                 <Input id="emRel" value={form.emergencyRelationship} onChange={(e) => update("emergencyRelationship", e.target.value)} />
               </Field>
-              <Field id="emPhone" label="Phone number" className="md:col-span-2">
+              <Field id="emPhone" label={tx("Phone number")} className="md:col-span-2">
                 <Input id="emPhone" type="tel" value={form.emergencyPhone} onChange={(e) => update("emergencyPhone", e.target.value)} />
               </Field>
             </div>
@@ -651,7 +746,7 @@ function IntakePage() {
               disabled={submitting}
               className="rounded-full bg-primary text-primary-foreground hover:opacity-90"
             >
-              {submitting ? "Submitting…" : "Submit application"}
+              {submitting ? tx("Submitting…") : tx("Submit application")}
             </Button>
           </div>
         </form>
