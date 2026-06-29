@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { sendIntakeSubmission } from "@/lib/intake.functions";
 
 
@@ -326,11 +327,26 @@ function IntakePage() {
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  const sendIntake = useServerFn(sendIntakeSubmission);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    toast.info("Form submission wiring coming next", {
-      description: "We'll set up where submissions go in the next step.",
-    });
+    if (submitting) return;
+    setSubmitting(true);
+    const t = toast.loading("Submitting your application…");
+    try {
+      await sendIntake({ data: { submission: form as unknown as Record<string, unknown> } });
+      toast.success("Application submitted. Thank you!", { id: t });
+    } catch (err) {
+      console.error(err);
+      toast.error("Submission failed. Please try again.", {
+        id: t,
+        description: err instanceof Error ? err.message : undefined,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
