@@ -79,8 +79,9 @@ export const sendIntakeSubmission = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: [TO_EMAIL],
+        to: TO_EMAIL,
         reply_to: (submission.email as string) || undefined,
+
         subject: `New Intake Submission — ${name}`,
         html,
         text,
