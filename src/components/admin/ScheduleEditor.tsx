@@ -197,7 +197,7 @@ export function ScheduleEditor() {
     const initialNeeded = (items ?? []).filter((item) => !translationStatus(item).complete).length;
     setBulkProgress({ done: 0, total: initialNeeded });
     try {
-      let totalNeeded = 0;
+      let totalNeeded = initialNeeded;
       let totalUpdated = 0;
       let totalFailed = 0;
       let safety = 0;
@@ -206,7 +206,7 @@ export function ScheduleEditor() {
         safety++;
         const res: any = await translateAllFn({ data: { limit: 3 } });
         if (!res?.totalNeeded) break;
-        totalNeeded = Math.max(totalNeeded, res.totalNeeded + totalUpdated);
+        if (!totalNeeded) totalNeeded = res.totalNeeded;
         totalUpdated += res.updatedRows ?? 0;
         totalFailed += res.failedGroups ?? 0;
         setBulkProgress({ done: Math.min(totalUpdated, totalNeeded), total: totalNeeded });
