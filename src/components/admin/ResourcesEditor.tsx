@@ -43,8 +43,10 @@ type Resource = {
   tags: string[];
   active: boolean;
   sort_order: number;
+  image_url: string | null;
   translations?: Record<string, Record<string, string>> | null;
 };
+
 
 const REQUIRED_LANGS = ["es", "fa", "ps", "so", "ar"];
 
