@@ -39,11 +39,26 @@ async function callGemini(target: string, texts: string[]): Promise<string[]> {
   let res: Response | null = null;
   let errText = "";
   for (let attempt = 0; attempt < 4; attempt++) {
-    res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } catch (err: any) {
+      errText = err?.name === "AbortError" ? "request timed out" : (err?.message ?? "network error");
+      if (attempt < 3) {
+        const delay = 500 * Math.pow(2, attempt) + Math.random() * 250;
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      break;
+    } finally {
+      clearTimeout(timeout);
+    }
     if (res.ok) break;
     errText = await res.text();
     if (res.status === 503 || res.status === 429 || res.status >= 500) {
@@ -98,6 +113,10 @@ const SCHEDULE_FIELDS = ["title", "category", "description", "location", "langua
 const RowInput = z.object({
   table: z.enum(["resources", "schedule_items"]),
   id: z.string().uuid(),
+});
+
+const ScheduleAllInput = z.object({
+  limit: z.number().int().min(1).max(10).default(3),
 });
 
 export const translateRow = createServerFn({ method: "POST" })
@@ -155,8 +174,10 @@ export const translateRow = createServerFn({ method: "POST" })
 // Bulk translate all schedule_items missing translations, deduped by content.
 export const translateScheduleAll = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => ScheduleAllInput.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const batchLimit = data.limit;
     const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
       _user_id: userId,
       _role: "admin",
@@ -196,7 +217,9 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
     let failedGroups = 0;
     let updatedRows = 0;
 
-    for (const group of groups.values()) {
+    const batchGroups = Array.from(groups.values()).slice(0, batchLimit);
+
+    for (const group of batchGroups) {
       try {
         const translations: Record<string, Record<string, string>> = {};
         for (const [code, name] of Object.entries(TARGET_LANGS)) {
@@ -221,9 +244,11 @@ export const translateScheduleAll = createServerFn({ method: "POST" })
     return {
       ok: true,
       uniqueGroups: groups.size,
+      processedGroups: batchGroups.length,
       translatedGroups,
       failedGroups,
       updatedRows,
+      remainingAfter: Math.max(0, needs.length - updatedRows),
       totalNeeded: needs.length,
     };
   });
