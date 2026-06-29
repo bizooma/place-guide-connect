@@ -385,7 +385,14 @@ function ResourceDialog<T extends Omit<Resource, "id"> | Resource | null>({
               <Switch checked={draft.active} onCheckedChange={(v) => update("active", v as never)} />
               Active (visible to public)
             </label>
-          </div>
+          <Field label="Card photo">
+            <ImageUploadField
+              value={draft.image_url ?? null}
+              onChange={(url) => update("image_url", url as never)}
+            />
+          </Field>
+        </div>
+
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
