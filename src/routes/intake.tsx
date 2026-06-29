@@ -336,7 +336,7 @@ function IntakePage() {
       <div className="mx-auto max-w-4xl px-4 py-10 md:py-16">
         <header className="mb-8 space-y-2">
           <h1 className="font-display text-3xl text-primary-deep md:text-4xl">
-            Employment Application & Job Search Intake
+            Friends, please fill out this form so we can best serve your needs.
           </h1>
           <p className="text-muted-foreground">
             Please complete the form below. All sections help our team match you with the right opportunity.
