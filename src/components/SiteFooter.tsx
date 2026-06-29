@@ -30,6 +30,7 @@ export function SiteFooter() {
           <p className="text-xs uppercase tracking-wider text-primary-foreground/60">{t("footer.trust")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             <li><Link to="/admin" className="hover:underline">{t("footer.admin")}</Link></li>
+            <li><Link to="/intake" className="hover:underline">{t("footer.intake")}</Link></li>
             <li><Link to="/privacy" className="hover:underline">{t("footer.privacy")}</Link></li>
             <li><Link to="/terms" className="hover:underline">{t("footer.terms")}</Link></li>
           </ul>
