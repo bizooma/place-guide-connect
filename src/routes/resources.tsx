@@ -139,7 +139,7 @@ function ResourcesPage() {
           >
             <div className="relative h-44 overflow-hidden sm:h-full">
               <img
-                src={categoryImage(r.category)}
+                src={(r as any).image_url || categoryImage(r.category)}
                 alt={r.category ?? ""}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
