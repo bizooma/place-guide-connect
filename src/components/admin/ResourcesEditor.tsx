@@ -74,7 +74,9 @@ const emptyDraft = (): Omit<Resource, "id"> => ({
   tags: [],
   active: true,
   sort_order: 0,
+  image_url: null,
 });
+
 
 export function ResourcesEditor() {
   const [items, setItems] = useState<Resource[] | null>(null);
