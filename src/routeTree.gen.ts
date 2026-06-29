@@ -14,6 +14,7 @@ import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as IntakeRouteImport } from './routes/intake'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -49,6 +50,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntakeRoute = IntakeRouteImport.update({
+  id: '/intake',
+  path: '/intake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/donate': typeof DonateRoute
   '/help': typeof HelpRouteWithChildren
+  '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/donate': typeof DonateRoute
+  '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/donate': typeof DonateRoute
   '/help': typeof HelpRouteWithChildren
+  '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/donate'
     | '/help'
+    | '/intake'
     | '/offline'
     | '/privacy'
     | '/resources'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/donate'
+    | '/intake'
     | '/offline'
     | '/privacy'
     | '/resources'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/donate'
     | '/help'
+    | '/intake'
     | '/offline'
     | '/privacy'
     | '/resources'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DonateRoute: typeof DonateRoute
   HelpRoute: typeof HelpRouteWithChildren
+  IntakeRoute: typeof IntakeRoute
   OfflineRoute: typeof OfflineRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -262,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/offline'
       fullPath: '/offline'
       preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intake': {
+      id: '/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof IntakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DonateRoute: DonateRoute,
   HelpRoute: HelpRouteWithChildren,
+  IntakeRoute: IntakeRoute,
   OfflineRoute: OfflineRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
