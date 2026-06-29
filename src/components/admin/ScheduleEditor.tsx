@@ -194,7 +194,8 @@ export function ScheduleEditor() {
 
   async function handleTranslateAll() {
     setBulkTranslating(true);
-    setBulkProgress({ done: 0, total: 0 });
+    const initialNeeded = (items ?? []).filter((item) => !translationStatus(item).complete).length;
+    setBulkProgress({ done: 0, total: initialNeeded });
     try {
       let totalNeeded = 0;
       let totalUpdated = 0;
