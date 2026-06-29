@@ -646,9 +646,10 @@ function IntakePage() {
             <Button
               type="submit"
               size="lg"
+              disabled={submitting}
               className="rounded-full bg-primary text-primary-foreground hover:opacity-90"
             >
-              Submit application
+              {submitting ? "Submitting…" : "Submit application"}
             </Button>
           </div>
         </form>
