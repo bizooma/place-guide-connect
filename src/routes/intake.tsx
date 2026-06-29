@@ -338,6 +338,8 @@ function IntakePage() {
     try {
       await sendIntake({ data: { submission: form as unknown as Record<string, unknown> } });
       toast.success("Application submitted. Thank you!", { id: t });
+      setForm(initialState);
+
     } catch (err) {
       console.error(err);
       toast.error("Submission failed. Please try again.", {
