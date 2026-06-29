@@ -194,15 +194,31 @@ export function ScheduleEditor() {
 
   async function handleTranslateAll() {
     setBulkTranslating(true);
-    setBulkProgress({ done: 0, total: 1 });
+    setBulkProgress({ done: 0, total: 0 });
     try {
-      const res: any = await translateAllFn();
-      if (!res?.totalNeeded) {
+      let totalNeeded = 0;
+      let totalUpdated = 0;
+      let totalFailed = 0;
+      let safety = 0;
+
+      while (safety < 150) {
+        safety++;
+        const res: any = await translateAllFn({ data: { limit: 3 } });
+        if (!res?.totalNeeded) break;
+        totalNeeded = Math.max(totalNeeded, res.totalNeeded + totalUpdated);
+        totalUpdated += res.updatedRows ?? 0;
+        totalFailed += res.failedGroups ?? 0;
+        setBulkProgress({ done: Math.min(totalUpdated, totalNeeded), total: totalNeeded });
+        if ((res.remainingAfter ?? 0) <= 0 || (res.processedGroups ?? 0) === 0) break;
+        if ((res.updatedRows ?? 0) === 0 && (res.failedGroups ?? 0) > 0) break;
+      }
+
+      if (!totalNeeded) {
         toast.success("All events are already translated");
-      } else if (res.failedGroups === 0) {
-        toast.success(`Translated ${res.updatedRows} event${res.updatedRows === 1 ? "" : "s"} (${res.translatedGroups} unique)`);
+      } else if (totalFailed === 0) {
+        toast.success(`Translated ${totalUpdated} event${totalUpdated === 1 ? "" : "s"}`);
       } else {
-        toast.error(`Translated ${res.updatedRows}/${res.totalNeeded}; ${res.failedGroups} group(s) failed`);
+        toast.error(`Translated ${totalUpdated}/${totalNeeded}; ${totalFailed} group(s) failed`);
       }
     } catch (e: any) {
       toast.error(e?.message ?? "Translate all failed");
@@ -336,7 +352,9 @@ export function ScheduleEditor() {
             {bulkTranslating ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Translating all events…
+                {bulkProgress.total > 0
+                  ? `Translating ${bulkProgress.done}/${bulkProgress.total}…`
+                  : "Preparing translations…"}
               </>
             ) : (
               <>
