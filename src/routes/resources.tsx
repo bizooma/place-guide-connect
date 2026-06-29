@@ -129,28 +129,92 @@ function ResourcesPage() {
         </select>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
         {isLoading && <p className="col-span-full text-muted-foreground">{t("resources.loading")}</p>}
         {!isLoading && filtered.length === 0 && <p className="col-span-full text-muted-foreground">{t("resources.none")}</p>}
         {filtered.map((r) => (
-          <article key={r.id} className="surface-card flex flex-col p-5">
-            <span className="text-xs font-medium uppercase tracking-wider text-accent">{tx(r.category)}</span>
-            <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">{tx(r.name)}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tx(r.description)}</p>
-            <ul className="mt-4 space-y-1.5 text-sm">
-              {r.hours && <li className="text-muted-foreground">{tx(r.hours)}</li>}
-              {r.address && <li className="text-muted-foreground">{r.address}</li>}
-              <li className="text-muted-foreground">{t("resources.languages")}: {(r.languages ?? []).join(", ")}</li>
-              <li className="text-muted-foreground">{t("resources.cost")}: {r.cost}{r.eligibility ? ` · ${tx(r.eligibility)}` : ""}</li>
-            </ul>
-            <div className="mt-auto pt-4 flex flex-wrap gap-2">
-              {r.phone && <Button asChild size="sm" className="rounded-full bg-primary hover:bg-primary-deep gap-1.5"><a href={`tel:${r.phone}`}><Phone className="h-3.5 w-3.5" />{t("resources.call")}</a></Button>}
-              {r.website && <Button asChild size="sm" variant="outline" className="rounded-full gap-1.5"><a href={r.website} target="_blank" rel="noreferrer"><Globe className="h-3.5 w-3.5" />{t("resources.website")}</a></Button>}
-              {r.address && <Button asChild size="sm" variant="outline" className="rounded-full gap-1.5"><a href={`https://maps.google.com/?q=${encodeURIComponent(r.address)}`} target="_blank" rel="noreferrer"><MapPin className="h-3.5 w-3.5" />{t("resources.directions")}</a></Button>}
+          <article
+            key={r.id}
+            className="group surface-card relative grid grid-cols-1 overflow-hidden border-border/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift sm:grid-cols-[14rem_minmax(0,1fr)]"
+          >
+            <div className="relative h-44 overflow-hidden sm:h-full">
+              <img
+                src={categoryImage(r.category)}
+                alt={r.category ?? ""}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary-deep/40 via-transparent to-transparent" />
+              <span className="absolute left-3 top-3 rounded-full bg-background/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent shadow-sm backdrop-blur-sm">
+                {tx(r.category)}
+              </span>
+              {r.phone && (
+                <a
+                  href={`tel:${r.phone}`}
+                  aria-label={t("resources.call")}
+                  className="absolute bottom-3 right-3 grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-lift transition-transform hover:scale-110 sm:hidden"
+                >
+                  <Phone className="h-5 w-5" />
+                </a>
+              )}
+            </div>
+
+            <div className="flex min-w-0 flex-col p-5">
+              <h3 className="font-display text-2xl font-semibold leading-tight text-primary-deep">
+                {tx(r.name)}
+              </h3>
+              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                {tx(r.description)}
+              </p>
+
+              <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
+                {r.hours && (
+                  <li className="flex items-start gap-2">
+                    <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                    <span className="min-w-0">{tx(r.hours)}</span>
+                  </li>
+                )}
+                {r.address && (
+                  <li className="flex items-start gap-2">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                    <span className="min-w-0">{r.address}</span>
+                  </li>
+                )}
+                <li className="flex items-start gap-2">
+                  <LanguagesIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                  <span className="min-w-0">{(r.languages ?? []).join(", ")}</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <DollarSign className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                  <span className="min-w-0">
+                    {r.cost}
+                    {r.eligibility ? ` · ${tx(r.eligibility)}` : ""}
+                  </span>
+                </li>
+              </ul>
+
+              <div className="mt-auto flex flex-wrap gap-2 pt-4">
+                {r.phone && (
+                  <Button asChild size="sm" className="rounded-full bg-primary hover:bg-primary-deep gap-1.5">
+                    <a href={`tel:${r.phone}`}><Phone className="h-3.5 w-3.5" />{t("resources.call")}</a>
+                  </Button>
+                )}
+                {r.website && (
+                  <Button asChild size="sm" variant="ghost" className="rounded-full gap-1.5 text-primary-deep hover:bg-accent/10">
+                    <a href={r.website} target="_blank" rel="noreferrer"><Globe className="h-3.5 w-3.5" />{t("resources.website")}</a>
+                  </Button>
+                )}
+                {r.address && (
+                  <Button asChild size="sm" variant="ghost" className="rounded-full gap-1.5 text-primary-deep hover:bg-accent/10">
+                    <a href={`https://maps.google.com/?q=${encodeURIComponent(r.address)}`} target="_blank" rel="noreferrer"><MapPin className="h-3.5 w-3.5" />{t("resources.directions")}</a>
+                  </Button>
+                )}
+              </div>
             </div>
           </article>
         ))}
       </div>
+
 
       <section className="mt-16 surface-card overflow-hidden">
         <div className="grid gap-0 md:grid-cols-[auto_1fr]">
