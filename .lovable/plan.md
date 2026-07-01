@@ -1,41 +1,46 @@
-# Intake Page Plan
+# Plan: Build AI Assistant Training Document
 
-Create a new route `/intake` that renders the full Job In-take Form from the PDF as a web form. This first pass focuses purely on **structure and fields** — no required-field validation and no submission destination yet (submit button will be disabled or show a placeholder toast).
+Create a single Markdown file that captures everything on The PLACE site so it can be uploaded as chatbot training content.
 
-## File to create
+## Steps
 
-- `src/routes/intake.tsx` — TanStack Start route with `createFileRoute("/intake")`, site header/footer inherited from `__root.tsx`.
+1. **Inventory all public routes** and read their source to extract on-page copy:
+   - `/` (index)
+   - `/about`
+   - `/help`, `/help/index`, `/help/document`
+   - `/resources` (including Congressman Ronny Jackson section)
+   - `/schedule` (pull current events live from Supabase `schedule_items`)
+   - `/donate` (mission copy, contact info, ways to give)
+   - `/intake` (form purpose + fields)
+   - `/privacy`, `/terms`
+   - Footer content (hours, address, partners, copyright)
 
-## Sections & fields (mirrors the PDF exactly)
+2. **Pull live database content** so the training reflects what visitors actually see:
+   - `resources` (name, category, description, contact, hours)
+   - `triage_categories` (help choices)
+   - `schedule_items` (recurring + one-off events with times)
+   - `languages` (supported list)
+   - `training_docs` (existing knowledge base entries — include verbatim so nothing is lost)
 
-1. **Applicant Information** — Full legal name, Preferred name, Date of birth, SSN
-2. **Contact Information** — Street, City, State, ZIP, County (optional), Primary phone, Alternate phone, Email, Preferred contact method (Phone/Email/Text)
-3. **Employment Eligibility** — Authorized to work in US (Y/N), Need sponsorship (Y/N), At least 18 (Y/N)
-4. **Position Preferences** — Desired job title(s), Employment type (FT/PT/Temp/Contract), Preferred shifts (Day/Evening/Night/Rotating/Flexible — multi), Desired pay range, Earliest start date
-5. **Employment History (past 7 years)** — Three employer blocks (Employer #1, #2, #3), each with: Company, Job title, Supervisor name & title, Address, Phone, Start date, End date, Starting pay, Ending pay, Duties, Reason for leaving
-6. **Education & Training** — Highest level, School name, City & state, Degree/diploma/certificate, Field of study, Graduation date
-7. **Additional Training, Certifications, or Licenses** — Name, Issuing org, License #, Expiration date
-8. **Skills & Qualifications** — Languages spoken & proficiency, Computer/technical skills, Machinery/equipment experience, Other relevant skills
-9. **References (3)** — Three blocks, each: Name, Relationship, Company, Phone, Email
-10. **Availability** — Days available, Hours available, Willing to work overtime (Y/N), Willing to work weekends (Y/N)
-11. **Transportation** — Reliable transportation (Y/N)
-12. **Criminal History (optional)** — Convicted of felony/misdemeanor not sealed (Y/N), Explanation textarea
-13. **Voluntary Self-Identification (EEO)** — Sex, Ethnicity, Race (multi-select)
-14. **Emergency Contact** — Name, Relationship, Phone
+3. **Extract locale strings** from `src/locales/en.json` for any UI copy not hard-coded in routes (nav labels, hours line, disclaimers).
 
-(Office-use-only block from the PDF is omitted — that belongs in admin, not the public form.)
+4. **Compose `/mnt/documents/place-ai-training.md`** organized as:
+   - About The PLACE (mission, partners, location, hours, contact)
+   - Services & Programs (from schedule + resources + help categories)
+   - Resources Directory (grouped by category, with contact details)
+   - Weekly Schedule (day-by-day, 12-hour times)
+   - How to Get Help (chatbot, document helper, intake form, in-person)
+   - Donate & Volunteer (ways to give, PayPal link, volunteer signup)
+   - Government Contacts (Congressman Jackson block)
+   - Languages Supported
+   - Policies (privacy + terms summaries)
+   - FAQ seed (answers to the starter questions used in HeroChat)
+   - Appendix: existing training_docs content verbatim
 
-## Technical details
+5. **Deliver** the file via a `<presentation-artifact>` tag so you can download it and paste/upload into the chatbot training editor.
 
-- Use existing shadcn primitives: `Input`, `Textarea`, `Label`, `Checkbox`, `RadioGroup`, `Select`, `Button`, `Card`/`CardHeader`/`CardContent` for section grouping.
-- Single-page form, sections rendered as stacked cards with clear headings. Two-column responsive grid (`md:grid-cols-2`) for short fields; full-width for textareas.
-- Local React state via `useState` holding one flat object; no Zod / no `required` attributes in this pass.
-- Submit button present but wired to a no-op `toast.info("Form submission wiring coming next")` so the UI is testable.
-- No nav link added yet — page reachable directly at `/intake`. We can add nav placement after the submission destination is decided.
+## Notes
 
-## Out of scope (next steps after you review)
-
-- Required-field rules
-- Submission destination (Supabase table + admin tab vs. email vs. PDF export)
-- Nav/menu placement
-- Translation wrapping (`tx()` / `useTranslatedTexts`)
+- Read-only: no site code changes.
+- Schedule times will be normalized to 12-hour format to match the public view.
+- If any route has dynamic/translated content, only the English source is captured (the assistant translates at runtime).
