@@ -10,7 +10,8 @@ import { resourceCategories } from "@/data/mock";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryImage } from "@/lib/resourceCategoryImage";
 import jacksonLogo from "@/assets/jackson-logo.png.asset.json";
-import jacksonPortrait from "@/assets/jackson-portrait.jpg.asset.json";
+import seal from "@/assets/seal.png.asset.json";
+
 
 
 export const Route = createFileRoute("/resources")({
@@ -220,8 +221,8 @@ function ResourcesPage() {
         <div className="grid gap-0 md:grid-cols-[auto_1fr]">
           <div className="bg-warm flex items-center justify-center p-6 md:p-8">
             <img
-              src={jacksonPortrait.url}
-              alt="Congressman Ronny Jackson"
+              src={seal.url}
+              alt="U.S. House of Representatives seal"
               className="h-48 w-48 md:h-56 md:w-56 rounded-full object-cover shadow-md ring-4 ring-background"
               loading="lazy"
             />
