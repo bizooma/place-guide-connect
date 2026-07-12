@@ -29,7 +29,7 @@ export function SiteHeader() {
           <img
             src={logoAsset.url}
             alt="Find - wefindonline.org"
-            className="h-10 w-auto max-w-[220px] object-contain"
+            className="h-12 w-auto max-w-[260px] object-contain"
           />
         </Link>
 
