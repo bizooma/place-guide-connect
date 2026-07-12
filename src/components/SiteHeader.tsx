@@ -4,7 +4,7 @@ import { Menu, X, Home, CalendarDays, BookOpen, Info, Heart } from "lucide-react
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import logoAsset from "@/assets/theplace-logowhite.webp.asset.json";
+import logoAsset from "@/assets/find_logo.png.asset.json";
 import { HeaderUser } from "@/components/HeaderUser";
 
 const nav = [
@@ -28,7 +28,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2.5 group" aria-label={t("app.name")}>
           <img
             src={logoAsset.url}
-            alt="The PLACE Online"
+            alt="Find - wefindonline.org"
             className="h-10 w-auto max-w-[220px] object-contain"
           />
         </Link>
