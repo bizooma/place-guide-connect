@@ -52,10 +52,12 @@ function HomePage() {
   return (
     <>
       {/* Hero with background image */}
-      <section
-        className="relative overflow-hidden"
-        style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center bottom' }}
-      >
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center bottom', transform: 'scaleX(-1)' }}
+          aria-hidden
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-primary-deep/75 via-primary-deep/45 to-primary-deep/25" aria-hidden />
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="max-w-2xl">
