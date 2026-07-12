@@ -39,7 +39,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 sm:flex-row">
-          <p className="text-xs text-primary-foreground/60">© 2026 The PLACE - A Community Center In Cooperation With The Refugee Language Project, Square Mile, And We Find In Love | All Rights Reserved</p>
+          <p className="text-xs text-primary-foreground/60">© 2026 We find Online - An online resource developed by  We Find In Love | All Rights Reserved</p>
           <p className="text-xs text-primary-foreground/60">
             Website by{" "}
             <a href="https://bizooma.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary-foreground">
