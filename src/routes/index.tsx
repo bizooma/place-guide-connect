@@ -14,20 +14,20 @@ const ASSISTANT_STRINGS = {
   subtitle: "Get answers based on The PLACE's resources and guides.",
 };
 import heroBg from "@/assets/find-hero-gentle-valley-1920x600.png.asset.json";
-import cardBill from "@/assets/cards/bill.jpg";
-import cardJob from "@/assets/cards/job.jpg";
-import cardDocument from "@/assets/cards/document.jpg";
-import cardEnglish from "@/assets/cards/english.jpg";
-import cardNeeds from "@/assets/cards/needs.jpg";
-import cardUnsure from "@/assets/cards/unsure.jpg";
+import cardBill from "@/assets/cards/bill.jpg.asset.json";
+import cardJob from "@/assets/cards/job.jpg.asset.json";
+import cardDocument from "@/assets/cards/document.jpg.asset.json";
+import cardEnglish from "@/assets/cards/english.jpg.asset.json";
+import cardNeeds from "@/assets/cards/needs.jpg.asset.json";
+import cardUnsure from "@/assets/cards/unsure.jpg.asset.json";
 
 const CARD_IMAGES: Record<string, string> = {
-  bill: cardBill,
-  job: cardJob,
-  document: cardDocument,
-  english: cardEnglish,
-  needs: cardNeeds,
-  unsure: cardUnsure,
+  bill: cardBill.url,
+  job: cardJob.url,
+  document: cardDocument.url,
+  english: cardEnglish.url,
+  needs: cardNeeds.url,
+  unsure: cardUnsure.url,
 };
 
 export const Route = createFileRoute("/")({
