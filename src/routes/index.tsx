@@ -13,7 +13,7 @@ const ASSISTANT_STRINGS = {
   title: "Ask the assistant",
   subtitle: "Get answers based on The PLACE's resources and guides.",
 };
-import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
+import heroBg from "@/assets/find-hero-gentle-valley-1920x600.png.asset.json";
 import cardBill from "@/assets/cards/bill.jpg";
 import cardJob from "@/assets/cards/job.jpg";
 import cardDocument from "@/assets/cards/document.jpg";
@@ -54,9 +54,9 @@ function HomePage() {
       {/* Hero with background image */}
       <section
         className="relative overflow-hidden"
-        style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+        style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center bottom' }}
       >
-        <div className="absolute inset-0 bg-primary-deep/85" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-deep/75 via-primary-deep/45 to-primary-deep/25" aria-hidden />
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
