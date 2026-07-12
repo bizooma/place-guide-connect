@@ -13,7 +13,7 @@ const ASSISTANT_STRINGS = {
   title: "Ask the assistant",
   subtitle: "Get answers based on The PLACE's resources and guides.",
 };
-import heroBg from "@/assets/place-computer-lab.jpg.asset.json";
+import heroBg from "@/assets/find-hero-gentle-valley-1920x600.png.asset.json";
 import cardBill from "@/assets/cards/bill.jpg";
 import cardJob from "@/assets/cards/job.jpg";
 import cardDocument from "@/assets/cards/document.jpg";
