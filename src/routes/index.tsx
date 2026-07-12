@@ -54,8 +54,8 @@ function HomePage() {
       {/* Hero with background image */}
       <section className="relative overflow-hidden">
         <div
-          className="absolute inset-0 scale-x-[-1]"
-          style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center bottom' }}
+          className="absolute inset-0"
+          style={{ backgroundImage: `url(${heroBg.url})`, backgroundSize: 'cover', backgroundPosition: 'center bottom', transform: 'scaleX(-1)' }}
           aria-hidden
         />
         <div className="absolute inset-0 bg-gradient-to-br from-primary-deep/75 via-primary-deep/45 to-primary-deep/25" aria-hidden />
