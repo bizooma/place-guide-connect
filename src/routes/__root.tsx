@@ -84,6 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-ND5FN4LCQX');`,
       },
+      {
+        src: "https://datarightsos.com/functions/widgetJs",
+        "data-tessera-site": "sk_87um5lx2xrzsojlvfaka5oiw",
+      },
     ],
   }),
   shellComponent: RootShell,
