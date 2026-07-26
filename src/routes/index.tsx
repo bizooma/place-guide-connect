@@ -148,10 +148,91 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Change of address */}
+      <ResourceSection
+        title={tx(ASSISTANT_STRINGS.addressTitle)}
+        subtitle={tx(ASSISTANT_STRINGS.addressSubtitle)}
+        items={[
+          { icon: MapPin, title: "USCIS", desc: tx(ASSISTANT_STRINGS.uscisDesc), href: "https://www.uscis.gov/ar-11", accent: "text-primary" },
+          { icon: Mail, title: "USPS", desc: tx(ASSISTANT_STRINGS.uspsDesc), href: "https://moversguide.usps.com/mgo/disclaimer", accent: "text-accent" },
+          { icon: IdCard, title: "Driver License", desc: tx(ASSISTANT_STRINGS.dlDesc), href: "https://www.dps.texas.gov/section/driver-license/change-your-address", accent: "text-primary-deep" },
+        ]}
+        visitLabel={tx(ASSISTANT_STRINGS.visit)}
+      />
+
+      {/* Study and certifications */}
+      <ResourceSection
+        title={tx(ASSISTANT_STRINGS.studyTitle)}
+        subtitle={tx(ASSISTANT_STRINGS.studySubtitle)}
+        items={[
+          { icon: GraduationCap, title: "GED", desc: tx(ASSISTANT_STRINGS.gedDesc), href: "https://ged.com/", accent: "text-primary" },
+          { icon: Truck, title: "CDL", desc: tx(ASSISTANT_STRINGS.cdlDesc), href: "https://www.dps.texas.gov/section/driver-license/commercial-driver-license", accent: "text-accent" },
+          { icon: Flag, title: "Citizenship", desc: tx(ASSISTANT_STRINGS.citizenshipDesc), href: "https://www.uscis.gov/citizenship", accent: "text-primary-deep" },
+        ]}
+        visitLabel={tx(ASSISTANT_STRINGS.visit)}
+        tinted
+      />
+
       {/* Disclaimer */}
       <section className="mx-auto max-w-3xl px-4 pb-16">
         <Disclaimer tone="warn">{t("disclaimer.compassion")}</Disclaimer>
       </section>
     </>
+  );
+}
+
+type ResourceItem = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+  href: string;
+  accent: string;
+};
+
+function ResourceSection({
+  title,
+  subtitle,
+  items,
+  visitLabel,
+  tinted,
+}: {
+  title: string;
+  subtitle: string;
+  items: ResourceItem[];
+  visitLabel: string;
+  tinted?: boolean;
+}) {
+  return (
+    <section className={tinted ? "bg-secondary/40 border-y border-border/60" : ""}>
+      <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
+        <div className="mb-8 text-center">
+          <h2 className="font-display text-3xl font-semibold text-primary-deep md:text-4xl">{title}</h2>
+          <p className="mt-2 text-muted-foreground">{subtitle}</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a
+                key={item.title}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col rounded-2xl border border-white/50 bg-white/60 p-6 shadow-card backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white hover:shadow-lift"
+              >
+                <span className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary ${item.accent}`}>
+                  <Icon className="h-6 w-6" />
+                </span>
+                <span className="mt-4 font-display text-xl font-semibold text-primary-deep">{item.title}</span>
+                <span className="mt-1 flex-1 text-sm text-muted-foreground">{item.desc}</span>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+                  {visitLabel} <ExternalLink className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
