@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, HeartHandshake } from "lucide-react";
+import { ArrowRight, HeartHandshake, MapPin, Mail, IdCard, GraduationCap, Truck, Flag, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
