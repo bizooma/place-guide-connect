@@ -88,8 +88,8 @@ function PersonCard({
         <div className="flex flex-col items-center gap-1">
           <Avatar name={person.name} photoUrl={person.photoUrl} />
           {person.photoAttribution && (
-            <p className="text-[10px] leading-tight text-muted-foreground text-center max-w-[6rem]">
-              {person.photoAttribution}
+            <p className="text-[10px] leading-tight text-muted-foreground text-center max-w-[6rem] break-words overflow-hidden">
+              {person.photoAttribution.replace(/\s*\(https?:\/\/[^)]+\)\s*/g, "")}
             </p>
           )}
         </div>
