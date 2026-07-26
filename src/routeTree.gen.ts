@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as RepresentativesRouteImport } from './routes/representatives'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as IntakeRouteImport } from './routes/intake'
@@ -40,6 +41,11 @@ const ScheduleRoute = ScheduleRouteImport.update({
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RepresentativesRoute = RepresentativesRouteImport.update({
+  id: '/representatives',
+  path: '/representatives',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/representatives': typeof RepresentativesRoute
   '/resources': typeof ResourcesRoute
   '/schedule': typeof ScheduleRoute
   '/terms': typeof TermsRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/representatives': typeof RepresentativesRoute
   '/resources': typeof ResourcesRoute
   '/schedule': typeof ScheduleRoute
   '/terms': typeof TermsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/intake': typeof IntakeRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/representatives': typeof RepresentativesRoute
   '/resources': typeof ResourcesRoute
   '/schedule': typeof ScheduleRoute
   '/terms': typeof TermsRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/intake'
     | '/offline'
     | '/privacy'
+    | '/representatives'
     | '/resources'
     | '/schedule'
     | '/terms'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/intake'
     | '/offline'
     | '/privacy'
+    | '/representatives'
     | '/resources'
     | '/schedule'
     | '/terms'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/intake'
     | '/offline'
     | '/privacy'
+    | '/representatives'
     | '/resources'
     | '/schedule'
     | '/terms'
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   IntakeRoute: typeof IntakeRoute
   OfflineRoute: typeof OfflineRoute
   PrivacyRoute: typeof PrivacyRoute
+  RepresentativesRoute: typeof RepresentativesRoute
   ResourcesRoute: typeof ResourcesRoute
   ScheduleRoute: typeof ScheduleRoute
   TermsRoute: typeof TermsRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/representatives': {
+      id: '/representatives'
+      path: '/representatives'
+      fullPath: '/representatives'
+      preLoaderRoute: typeof RepresentativesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -399,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntakeRoute: IntakeRoute,
   OfflineRoute: OfflineRoute,
   PrivacyRoute: PrivacyRoute,
+  RepresentativesRoute: RepresentativesRoute,
   ResourcesRoute: ResourcesRoute,
   ScheduleRoute: ScheduleRoute,
   TermsRoute: TermsRoute,
@@ -407,13 +428,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

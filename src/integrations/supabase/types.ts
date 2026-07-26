@@ -282,6 +282,45 @@ export type Database = {
         }
         Relationships: []
       }
+      rep_lookup_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          id: string
+          payload: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          id?: string
+          payload: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          id?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
+      rep_lookup_rate_limit: {
+        Row: {
+          count: number
+          ip_hash: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          ip_hash: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          ip_hash?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           active: boolean
