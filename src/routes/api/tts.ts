@@ -10,8 +10,8 @@ export const Route = createFileRoute("/api/tts")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) return new Response("LOVABLE_API_KEY not configured", { status: 500 });
+        const apiKey = process.env.OPENAI_API_KEY;
+        if (!apiKey) return new Response("OPENAI_API_KEY not configured", { status: 500 });
 
         let parsed: z.infer<typeof Body>;
         try {
@@ -24,14 +24,14 @@ export const Route = createFileRoute("/api/tts")({
         const instructions = `Speak the text aloud in ${lang} with a calm, warm, easy-to-follow pace. Pronounce naturally for native ${lang} speakers.`;
 
         try {
-          const upstream = await fetch("https://ai.gateway.lovable.dev/v1/audio/speech", {
+          const upstream = await fetch("https://api.openai.com/v1/audio/speech", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${apiKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "openai/gpt-4o-mini-tts",
+              model: "gpt-4o-mini-tts",
               input: parsed.text,
               voice: "alloy",
               instructions,
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/tts")({
 
           if (!upstream.ok) {
             const text = await upstream.text().catch(() => "");
-            console.error("[tts] gateway error", upstream.status, text);
+            console.error("[tts] openai error", upstream.status, text);
             return new Response("TTS failed", { status: upstream.status });
           }
 
