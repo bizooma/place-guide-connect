@@ -68,7 +68,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Understand documents, find resources, view classes, and connect with support — inspired by The PLACE in Amarillo." },
       { property: "og:image", content: "https://wefindonline.org/__l5e/assets-v1/e218d98d-5c27-459b-8f89-12b179cf5022/og-find.png" },
       { name: "twitter:image", content: "https://wefindonline.org/__l5e/assets-v1/e218d98d-5c27-459b-8f89-12b179cf5022/og-find.png" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
