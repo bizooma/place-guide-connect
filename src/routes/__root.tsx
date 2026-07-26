@@ -63,7 +63,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "The PLACE Online — Help is closer than you think." },
       { property: "og:description", content: "Understand documents, find resources, view classes, and connect with support — inspired by The PLACE in Amarillo." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "The PLACE Online — Help is closer than you think." },
       { name: "twitter:description", content: "Understand documents, find resources, view classes, and connect with support — inspired by The PLACE in Amarillo." },
       { property: "og:image", content: "https://wefindonline.org/__l5e/assets-v1/e218d98d-5c27-459b-8f89-12b179cf5022/og-find.png" },
