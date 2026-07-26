@@ -66,8 +66,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "The PLACE Online — Help is closer than you think." },
       { name: "twitter:description", content: "Understand documents, find resources, view classes, and connect with support — inspired by The PLACE in Amarillo." },
-      { property: "og:image", content: "https://theplaceonline.org/__l5e/assets-v1/02496877-4315-4d53-bbf7-3216b88c7925/og-card.webp" },
-      { name: "twitter:image", content: "https://theplaceonline.org/__l5e/assets-v1/02496877-4315-4d53-bbf7-3216b88c7925/og-card.webp" },
+      { property: "og:image", content: "https://wefindonline.org/__l5e/assets-v1/e218d98d-5c27-459b-8f89-12b179cf5022/og-find.png" },
+      { name: "twitter:image", content: "https://wefindonline.org/__l5e/assets-v1/e218d98d-5c27-459b-8f89-12b179cf5022/og-find.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
