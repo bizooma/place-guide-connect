@@ -1,7 +1,7 @@
 {
-  "name": "The PLACE Online",
-  "short_name": "PLACE Online",
-  "description": "Online support inspired by The PLACE in Amarillo. Understand documents, find resources, view classes, and connect with help.",
+  "name": "We Find Online",
+  "short_name": "We Find Online",
+  "description": "An online resource from We Find In Love. Understand documents, find resources, view classes, and connect with support.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
