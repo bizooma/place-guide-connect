@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { categoryImage } from "@/lib/resourceCategoryImage";
 import jacksonLogo from "@/assets/jackson-logo.png.asset.json";
 import seal from "@/assets/seal.png.asset.json";
+import { RepresentativeFinder } from "@/components/RepresentativeFinder";
 
 
 
