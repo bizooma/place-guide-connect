@@ -98,7 +98,19 @@ export const lookupRepresentatives = createServerFn({ method: "POST" })
     const ip = fwd.split(",")[0]?.trim() || "unknown";
     const ipHash = createHash("sha256").update(ip).digest("hex");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createClient } = await import("@supabase/supabase-js");
+    const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const supabaseAdmin = createClient(process.env.SUPABASE_URL!, pubKey, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (pubKey.startsWith("sb_") && h.get("Authorization") === `Bearer ${pubKey}`) h.delete("Authorization");
+          h.set("apikey", pubKey);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
 
     // Rolling 1-hour window
     const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
