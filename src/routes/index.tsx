@@ -12,6 +12,17 @@ import { useTriageCategories } from "@/hooks/useTriageCategories";
 const ASSISTANT_STRINGS = {
   title: "Ask the assistant",
   subtitle: "Get answers based on The PLACE's resources and guides.",
+  addressTitle: "Changing your address",
+  addressSubtitle: "Update your address with these agencies after you move.",
+  studyTitle: "Study and certifications",
+  studySubtitle: "Official resources to help you prepare and apply.",
+  uscisDesc: "File Form AR-11 online within 10 days of moving.",
+  uspsDesc: "Forward your mail from your old address to your new one.",
+  dlDesc: "Update the address on your Texas driver license or ID.",
+  gedDesc: "Register, study, and schedule your high school equivalency test.",
+  cdlDesc: "Learn the steps to earn a Texas Commercial Driver License.",
+  citizenshipDesc: "Study materials and the path to U.S. citizenship.",
+  visit: "Visit site",
 };
 import heroBg from "@/assets/find-hero-gentle-valley-1920x600.png.asset.json";
 import cardBill from "@/assets/cards/bill.jpg.asset.json";
