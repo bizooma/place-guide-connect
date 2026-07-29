@@ -44,7 +44,7 @@ async function callGemini(target: string, texts: string[]): Promise<string[]> {
     try {
       res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
         body: JSON.stringify(body),
         signal: controller.signal,
       });
