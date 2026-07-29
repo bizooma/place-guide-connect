@@ -138,7 +138,7 @@ function DocumentPage() {
         }
       }
 
-      const rawExt = (f.name || "").includes(".") ? f.name.split(".").pop()! : "";
+      const rawExt = (f.name || "").includes(".") ? (f.name.split(".").pop() ?? "") : "";
       const ext = (rawExt.replace(/[^a-zA-Z0-9]/g, "") || EXT_BY_MIME[mimeType] || "jpg").toLowerCase();
       const displayName = f.name || `photo.${ext}`;
       const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
