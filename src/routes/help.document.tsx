@@ -147,22 +147,22 @@ function DocumentPage() {
         .upload(path, f, { contentType: mimeType, upsert: false });
       if (upErr) throw upErr;
 
-      const { data: insRow, error: insErr } = await supabase
+      const uploadId = crypto.randomUUID();
+      const { error: insErr } = await supabase
         .from("document_uploads")
         .insert({
+          id: uploadId,
           storage_path: path,
           original_filename: displayName,
           mime_type: mimeType,
           size_bytes: f.size,
-        })
-        .select("id")
-        .single();
+        });
       if (insErr) throw insErr;
 
       const analysis = await runAnalysis({
         data: { storagePath: path, mimeType, language },
       });
-      setResult({ fileName: displayName, storagePath: path, uploadId: insRow.id, ...analysis });
+      setResult({ fileName: displayName, storagePath: path, uploadId, ...analysis });
     } catch (err) {
       console.error(err);
       const msg = err instanceof Error && err.message ? err.message : "Upload failed. Please try again.";
