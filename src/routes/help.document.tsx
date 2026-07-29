@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Upload, Camera, FileText, Calendar, Phone, MapPin, ListChecks, Sparkles, Trash2, ArrowLeft, Languages } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -51,6 +51,8 @@ function DocumentPage() {
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const runAnalysis = useServerFn(analyzeDocument);
 
   const { data: resources = [] } = useQuery({
@@ -136,7 +138,7 @@ function DocumentPage() {
         }
       }
 
-      const rawExt = (f.name || "").includes(".") ? f.name.split(".").pop()! : "";
+      const rawExt = (f.name || "").includes(".") ? (f.name.split(".").pop() ?? "") : "";
       const ext = (rawExt.replace(/[^a-zA-Z0-9]/g, "") || EXT_BY_MIME[mimeType] || "jpg").toLowerCase();
       const displayName = f.name || `photo.${ext}`;
       const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
@@ -169,6 +171,12 @@ function DocumentPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function openPicker(input: HTMLInputElement | null) {
+    if (!consent) { toast.error("Please check the consent box first."); return; }
+    if (loading) return;
+    input?.click();
   }
 
 
@@ -233,18 +241,19 @@ function DocumentPage() {
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <label className={"surface-card flex cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed p-8 text-center transition " + (consent ? "border-primary/30 hover:border-primary hover:bg-secondary/40" : "opacity-60 cursor-not-allowed")}>
+            <Button type="button" variant="outline" onClick={() => openPicker(uploadInputRef.current)} disabled={!consent || loading} className={"surface-card h-auto min-h-40 flex-col gap-2 border-2 border-dashed p-8 text-center transition " + (consent ? "border-primary/30 hover:border-primary hover:bg-secondary/40" : "opacity-60 cursor-not-allowed")}>
               <Upload className="h-8 w-8 text-primary" />
               <span className="font-medium text-primary-deep">{t("document.upload")}</span>
               <span className="text-xs text-muted-foreground">PDF, JPG, PNG, HEIC</span>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,image/*" className="hidden" disabled={!consent || loading} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
-            </label>
-            <label className={"surface-card flex cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed p-8 text-center transition " + (consent ? "border-accent/30 hover:border-accent hover:bg-accent/5" : "opacity-60 cursor-not-allowed")}>
+            </Button>
+            <input ref={uploadInputRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.pdf,.jpg,.jpeg,.png,.webp,.heic,.heif" className="sr-only" disabled={!consent || loading} onChange={(e) => { void handleFile(e.target.files?.[0] ?? null); e.currentTarget.value = ""; }} />
+
+            <Button type="button" variant="outline" onClick={() => openPicker(cameraInputRef.current)} disabled={!consent || loading} className={"surface-card h-auto min-h-40 flex-col gap-2 border-2 border-dashed p-8 text-center transition " + (consent ? "border-accent/30 hover:border-accent hover:bg-accent/5" : "opacity-60 cursor-not-allowed")}>
               <Camera className="h-8 w-8 text-accent" />
               <span className="font-medium text-primary-deep">{t("document.takePhoto")}</span>
               <span className="text-xs text-muted-foreground">Use your camera</span>
-              <input type="file" accept="image/*" capture="environment" className="hidden" disabled={!consent || loading} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} />
-            </label>
+            </Button>
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="sr-only" disabled={!consent || loading} onChange={(e) => { void handleFile(e.target.files?.[0] ?? null); e.currentTarget.value = ""; }} />
           </div>
 
           {loading && (
