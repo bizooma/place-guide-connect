@@ -13,6 +13,16 @@ export const Route = createFileRoute("/api/tts")({
         const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey) return new Response("OPENAI_API_KEY not configured", { status: 500 });
 
+        const { hashIp, checkRateLimit } = await import("@/lib/rate-limit.server");
+        const allowed = await checkRateLimit(
+          "tts",
+          hashIp(request.headers.get("x-forwarded-for")),
+          30,
+        );
+        if (!allowed) {
+          return new Response("Please try again later.", { status: 429 });
+        }
+
         let parsed: z.infer<typeof Body>;
         try {
           parsed = Body.parse(await request.json());
