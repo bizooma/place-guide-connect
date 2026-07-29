@@ -66,30 +66,79 @@ function DocumentPage() {
     },
   });
 
+  // Camera captures (especially inside an installed PWA) can arrive with an empty
+  // filename, no extension, an empty MIME type, or as a very large photo. All of
+  // those break the storage upload, so normalise everything before uploading.
+  const EXT_BY_MIME: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/heic": "heic",
+    "image/heif": "heic",
+    "application/pdf": "pdf",
+  };
+
+  async function downscaleImage(input: File): Promise<File> {
+    const MAX_DIM = 2200;
+    try {
+      const bitmap = await createImageBitmap(input);
+      const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+      if (scale === 1 && input.size < 4_000_000) {
+        bitmap.close?.();
+        return input;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return input;
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close?.();
+      const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/jpeg", 0.85));
+      if (!blob) return input;
+      return new File([blob], "photo.jpg", { type: "image/jpeg" });
+    } catch (err) {
+      console.warn("Image downscale skipped", err);
+      return input;
+    }
+  }
+
   async function handleFile(f: File | null) {
     if (!f) return;
     if (!consent) { toast.error("Please check the consent box first."); return; }
     setFile(f);
     setLoading(true);
     try {
-      const nameLower = f.name.toLowerCase();
+      const nameLower = (f.name || "").toLowerCase();
       const isHeic = /image\/hei[cf]/i.test(f.type) || nameLower.endsWith(".heic") || nameLower.endsWith(".heif");
-      let mimeType = f.type || "application/octet-stream";
+      let mimeType = f.type || (isHeic ? "image/heic" : "image/jpeg");
       if (isHeic) {
         mimeType = "image/heic";
         try {
           const { default: heic2any } = await import("heic2any");
           const converted = await heic2any({ blob: f, toType: "image/jpeg", quality: 0.9 });
           const blob = Array.isArray(converted) ? converted[0] : converted;
-          f = new File([blob], f.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+          f = new File([blob], (f.name || "photo").replace(/\.(heic|heif)$/i, "") + ".jpg", { type: "image/jpeg" });
           mimeType = "image/jpeg";
         } catch (convErr) {
           console.warn("HEIC client conversion failed, uploading original for server processing", convErr);
           // Fall through: upload raw HEIC; Gemini supports image/heic natively.
-          f = new File([f], f.name, { type: "image/heic" });
+          f = new File([f], f.name || "photo.heic", { type: "image/heic" });
         }
       }
-      const ext = f.name.split(".").pop() ?? "bin";
+
+      if (mimeType.startsWith("image/") && mimeType !== "image/heic") {
+        const shrunk = await downscaleImage(f);
+        if (shrunk !== f) {
+          f = shrunk;
+          mimeType = f.type || "image/jpeg";
+        }
+      }
+
+      const rawExt = (f.name || "").includes(".") ? f.name.split(".").pop()! : "";
+      const ext = (rawExt.replace(/[^a-zA-Z0-9]/g, "") || EXT_BY_MIME[mimeType] || "jpg").toLowerCase();
+      const displayName = f.name || `photo.${ext}`;
       const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("document-uploads")
@@ -100,7 +149,7 @@ function DocumentPage() {
         .from("document_uploads")
         .insert({
           storage_path: path,
-          original_filename: f.name,
+          original_filename: displayName,
           mime_type: mimeType,
           size_bytes: f.size,
         })
@@ -111,16 +160,17 @@ function DocumentPage() {
       const analysis = await runAnalysis({
         data: { storagePath: path, mimeType, language },
       });
-      setResult({ fileName: f.name, storagePath: path, uploadId: insRow.id, ...analysis });
+      setResult({ fileName: displayName, storagePath: path, uploadId: insRow.id, ...analysis });
     } catch (err) {
       console.error(err);
-      const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
+      const msg = err instanceof Error && err.message ? err.message : "Upload failed. Please try again.";
       toast.error(msg);
 
     } finally {
       setLoading(false);
     }
   }
+
 
   async function deleteAll() {
     if (!result) { setFile(null); return; }
