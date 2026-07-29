@@ -184,15 +184,10 @@ function DocumentPage() {
     if (!result) { setFile(null); return; }
     setDeleting(true);
     try {
-      const { error: storageErr } = await supabase.storage
-        .from("document-uploads")
-        .remove([result.storagePath]);
-      if (storageErr) throw storageErr;
-      const { error: dbErr } = await supabase
-        .from("document_uploads")
-        .delete()
-        .eq("id", result.uploadId);
-      if (dbErr) throw dbErr;
+      const { error: rpcErr } = await supabase.rpc("delete_document_upload", {
+        upload_id: result.uploadId,
+      });
+      if (rpcErr) throw rpcErr;
       setFile(null);
       setResult(null);
       toast.success("Document and result deleted.");

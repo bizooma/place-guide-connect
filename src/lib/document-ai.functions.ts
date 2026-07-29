@@ -24,22 +24,33 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabasePublic = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const { hashIp, checkRateLimit } = await import("./rate-limit.server");
+    const allowed = await checkRateLimit(
+      "analyze_document",
+      hashIp(getRequestHeader("x-forwarded-for")),
+      10,
     );
-    const { data: file, error } = await supabasePublic.storage
+    if (!allowed) {
+      throw new Error("You've reached the limit for now. Please try again later.");
+    }
+
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabaseServer = createClient(process.env.SUPABASE_URL!, serviceKey, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+    const { data: file, error } = await supabaseServer.storage
       .from("document-uploads")
       .download(data.storagePath);
     if (error || !file) throw new Error("Could not load uploaded document.");
     if (file.size > MAX_BYTES) throw new Error("File is too large to analyze (max 10 MB).");
 
     const buf = new Uint8Array(await file.arrayBuffer());
-    let binary = "";
-    for (let i = 0; i < buf.length; i++) binary += String.fromCharCode(buf[i]);
-    const b64 = btoa(binary);
+    const b64 = Buffer.from(buf).toString("base64");
+
 
     const body = {
       system_instruction: {
@@ -82,10 +93,10 @@ export const analyzeDocument = createServerFn({ method: "POST" })
     outer: for (const model of models) {
       for (let attempt = 0; attempt < 3; attempt++) {
         const r = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
             body: JSON.stringify(body),
           },
         );
