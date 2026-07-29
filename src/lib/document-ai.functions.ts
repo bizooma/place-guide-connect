@@ -35,8 +35,11 @@ export const analyzeDocument = createServerFn({ method: "POST" })
       throw new Error("You've reached the limit for now. Please try again later.");
     }
 
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
+    // The SUPABASE_ prefix is reserved, so the service-role key is also accepted
+    // under DOCUMENT_SERVICE_ROLE_KEY. Server-only: never sent to the browser.
+    const serviceKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.DOCUMENT_SERVICE_ROLE_KEY;
+    if (!serviceKey) throw new Error("Document reading is not configured yet (missing service key).");
 
     const { createClient } = await import("@supabase/supabase-js");
     const supabaseServer = createClient(process.env.SUPABASE_URL!, serviceKey, {
