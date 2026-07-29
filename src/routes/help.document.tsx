@@ -12,6 +12,7 @@ import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDocument, type DocumentAnalysis } from "@/lib/document-ai.functions";
+import { deleteDocumentUpload } from "@/lib/document-delete.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/help/document")({
@@ -54,6 +55,7 @@ function DocumentPage() {
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const runAnalysis = useServerFn(analyzeDocument);
+  const runDelete = useServerFn(deleteDocumentUpload);
 
   const { data: resources = [] } = useQuery({
     queryKey: ["resources", "doc-helper"],
@@ -184,10 +186,7 @@ function DocumentPage() {
     if (!result) { setFile(null); return; }
     setDeleting(true);
     try {
-      const { error: rpcErr } = await supabase.rpc("delete_document_upload", {
-        upload_id: result.uploadId,
-      });
-      if (rpcErr) throw rpcErr;
+      await runDelete({ data: { uploadId: result.uploadId } });
       setFile(null);
       setResult(null);
       toast.success("Document and result deleted.");
