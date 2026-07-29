@@ -35,7 +35,7 @@ async function callGemini(target: string, texts: string[]): Promise<string[]> {
     },
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
   let res: Response | null = null;
   let errText = "";
   for (let attempt = 0; attempt < 4; attempt++) {
