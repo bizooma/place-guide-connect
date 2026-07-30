@@ -5,6 +5,8 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { HeroChat } from "@/components/home/HeroChat";
+import { RepresentativeFinder } from "@/components/RepresentativeFinder";
+
 import { useI18n } from "@/lib/i18n";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { useTriageCategories } from "@/hooks/useTriageCategories";
@@ -135,7 +137,25 @@ function HomePage() {
             );
           })}
         </div>
+
+        <div className="mt-10 surface-card p-6 md:p-8">
+          <header className="mb-6">
+            <span className="text-xs font-medium uppercase tracking-wider text-accent">
+              {tx("Not in Texas 13?")}
+            </span>
+            <h2 className="mt-1 font-display text-2xl font-semibold text-primary-deep md:text-3xl">
+              {tx("Find Your Representative")}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              {tx(
+                "Enter your home address to see your U.S. House representative and two U.S. senators.",
+              )}
+            </p>
+          </header>
+          <RepresentativeFinder />
+        </div>
       </section>
+
 
       {/* Ask the assistant */}
       <section className="bg-secondary/40 border-y border-border/60">
