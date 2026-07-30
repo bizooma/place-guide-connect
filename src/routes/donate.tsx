@@ -146,7 +146,7 @@ function DonatePage() {
             <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Corporate Sponsorship")}</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            {tx("Are you a local business or organization looking to make a lasting difference? Partnering with the PLACE is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.")}
+            {tx("Are you a local business or organization looking to make a lasting difference? Partnering with We Find Online is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.")}
           </p>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
             {tx("We offer custom sponsorship tiers to align with your organization's community impact goals.")}
@@ -183,7 +183,7 @@ function DonatePage() {
             />
           </div>
           <div className="mt-4 px-3 pb-3">
-            <h3 className="font-display text-lg font-semibold text-primary-deep">{tx("The PLACE")}</h3>
+            <h3 className="font-display text-lg font-semibold text-primary-deep">{tx("We Find Online")}</h3>
             <p className="mt-1 text-sm text-foreground/80">3107 Plains Blvd Space 500,<br />Amarillo, TX 79102</p>
             <p className="mt-2 text-sm text-foreground/80">
               {tx("Phone:")} <a href="tel:+18065535155" className="text-primary underline hover:no-underline">(806) 553-5155</a>
