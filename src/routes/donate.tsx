@@ -41,7 +41,7 @@ const STRINGS = [
   "At We Find Online, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads, they are looking for community, connection, and a chance to thrive.",
   "By partnering with us, you are directly investing in the language acquisition, artistic expression, cultural integration, and economic growth of our new neighbors.",
   "Financial Giving",
-  "Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees. Every dollar builds a stronger, more inclusive Amarillo.",
+  "Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees as well as providing our online resources. Every dollar builds a stronger, more inclusive Amarillo.",
   "helps provide essential learning supplies for language classes.",
   "funds community art and cultural integration workshops.",
   "helps scale economic growth pathways and workforce mentorship programs.",
@@ -101,7 +101,7 @@ function DonatePage() {
             <h2 className="font-display text-2xl font-semibold text-primary-deep">{tx("Financial Giving")}</h2>
           </div>
           <p className="mt-3 text-base leading-relaxed text-foreground/85">
-            {tx("Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees. Every dollar builds a stronger, more inclusive Amarillo.")}
+            {tx("Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees as well as providing our online resources. Every dollar builds a stronger, more inclusive Amarillo.")}
           </p>
           <ul className="mt-5 space-y-3">
             <li className="flex items-start gap-3 text-base text-foreground/85">
