@@ -11,7 +11,7 @@ import { useTriageCategories } from "@/hooks/useTriageCategories";
 
 const ASSISTANT_STRINGS = {
   title: "Ask the assistant",
-  subtitle: "Get answers based on The PLACE's resources and guides.",
+  subtitle: "Get answers based on We Find Online's resources and guides.",
   addressTitle: "Changing your address",
   addressSubtitle: "Update your address with these agencies after you move.",
   studyTitle: "Study and certifications",
