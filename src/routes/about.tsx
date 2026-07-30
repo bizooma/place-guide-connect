@@ -8,10 +8,10 @@ import wfilLogo from "@/assets/wfil-logo.webp.asset.json";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — The PLACE Online" },
-      { name: "description", content: "About The PLACE Online and our mission to bring in-person support to anyone with a phone." },
-      { property: "og:title", content: "About — The PLACE Online" },
-      { property: "og:description", content: "Online support inspired by The PLACE in Amarillo." },
+      { title: "About — We Find Online" },
+      { name: "description", content: "About We Find Online and our mission to bring support to anyone with a phone." },
+      { property: "og:title", content: "About — We Find Online" },
+      { property: "og:description", content: "Online support from We Find Online." },
     ],
   }),
   component: AboutPage,
