@@ -38,7 +38,7 @@ export const Route = createFileRoute("/donate")({
 const STRINGS = [
   "Invest in Belonging.",
   "Support We Find in Love.",
-  "At the PLACE, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads — they are looking for community, connection, and a chance to thrive.",
+  "At We Find Online, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads, they are looking for community, connection, and a chance to thrive.",
   "By partnering with us, you are directly investing in the language acquisition, artistic expression, cultural integration, and economic growth of our new neighbors.",
   "Financial Giving",
   "Your financial contributions go directly toward sustaining our multicultural community center and expanding vital programs for local refugees. Every dollar builds a stronger, more inclusive Amarillo.",
