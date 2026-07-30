@@ -17,10 +17,10 @@ import { useChatbot } from "@/hooks/useChatbot";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 
-const TITLE = "Ask The PLACE";
+const TITLE = "Ask We Find Online";
 const SUBTITLE = "Answers based on our community info";
 const GREETING =
-  "Hi — I can answer questions about The PLACE: classes, hours, services, and how to get help. What can I help you with?";
+  "Hi — I can answer questions about We Find Online: classes, hours, services, and how to get help. What can I help you with?";
 const STARTERS = [
   "What classes are offered?",
   "What hours are you open?",
