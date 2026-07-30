@@ -26,10 +26,10 @@ function CardImage({ src, alt }: { src: string; alt: string }) {
 export const Route = createFileRoute("/donate")({
   head: () => ({
     meta: [
-      { title: "Donate — The PLACE Online" },
-      { name: "description", content: "Invest in belonging. Support The PLACE in Amarillo through financial giving, corporate sponsorship, or volunteering your time." },
-      { property: "og:title", content: "Donate — The PLACE Online" },
-      { property: "og:description", content: "Invest in belonging. Support The PLACE in Amarillo through financial giving, corporate sponsorship, or volunteering your time." },
+      { title: "Donate — We Find Online" },
+      { name: "description", content: "Invest in belonging. Support We Find Online through financial giving, corporate sponsorship, or volunteering your time." },
+      { property: "og:title", content: "Donate — We Find Online" },
+      { property: "og:description", content: "Invest in belonging. Support We Find Online through financial giving, corporate sponsorship, or volunteering your time." },
     ],
   }),
   component: DonatePage,
@@ -47,10 +47,10 @@ const STRINGS = [
   "helps scale economic growth pathways and workforce mentorship programs.",
   "Give Now",
   "Corporate Sponsorship",
-  "Are you a local business or organization looking to make a lasting difference? Partnering with the PLACE is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.",
+  "Are you a local business or organization looking to make a lasting difference? Partnering with We Find Online is a powerful way to invest in the economic and cultural future of our city. Corporate sponsors help us scale our infrastructure, bridge systemic gaps, and build a prosperous, diverse local economy.",
   "We offer custom sponsorship tiers to align with your organization's community impact goals.",
   "Contact Our Team to Learn More",
-  "The PLACE",
+  "We Find Online",
   "Phone:",
   "Email:",
   "Volunteer",
@@ -81,7 +81,7 @@ function DonatePage() {
         {tx("Support We Find in Love.")}
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-foreground/85">
-        {tx("At the PLACE, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads — they are looking for community, connection, and a chance to thrive.")}
+        {tx("At We Find Online, we believe that everyone deserves a place to call home. When resettled and new refugees arrive in Amarillo, Texas, they aren't just looking for a new roof over their heads, they are looking for community, connection, and a chance to thrive.")}
       </p>
       <p className="mt-4 text-lg leading-relaxed text-foreground/85">
         {tx("By partnering with us, you are directly investing in the language acquisition, artistic expression, cultural integration, and economic growth of our new neighbors.")}
