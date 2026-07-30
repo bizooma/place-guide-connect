@@ -44,9 +44,9 @@ const CARD_IMAGES: Record<string, string> = {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The PLACE Online — Everyone deserves a PLACE." },
-      { name: "description", content: "Online support inspired by The PLACE in Amarillo. Understand documents, find resources, view classes, connect with help." },
-      { property: "og:title", content: "The PLACE Online" },
+      { title: "We Find Online — Everyone deserves a PLACE." },
+      { name: "description", content: "Online support from We Find Online. Understand documents, find resources, view classes, connect with help." },
+      { property: "og:title", content: "We Find Online" },
       { property: "og:description", content: "Everyone deserves a PLACE." },
       { property: "og:image", content: "/icon-512.png" },
     ],
