@@ -18,9 +18,9 @@ import { RepresentativeFinder } from "@/components/RepresentativeFinder";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Resources — The PLACE Online" },
+      { title: "Resources — We Find Online" },
       { name: "description", content: "Community resources for food, housing, jobs, health, legal help, and more." },
-      { property: "og:title", content: "Resources — The PLACE Online" },
+      { property: "og:title", content: "Resources — We Find Online" },
       { property: "og:description", content: "Find help in your community." },
     ],
   }),
