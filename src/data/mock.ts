@@ -138,7 +138,6 @@ export const triageFlows: Record<string, TriageFlow> = {
       summary: `Based on your answers, we can connect you with job help that fits your English level (${a.english ?? "unspecified"}) and transportation (${a.transport ?? "unspecified"}).`,
       nextSteps: [
         "Visit the Resume & Job Help Drop-in this week.",
-        "Workforce Solutions Panhandle offers free training and job placement.",
         "Bring a photo ID and any past work history you can remember.",
       ],
       relatedTags: ["resume", "training", "bus"],
