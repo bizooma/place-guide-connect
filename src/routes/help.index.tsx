@@ -23,7 +23,7 @@ export const Route = createFileRoute("/help/")({
       { property: "og:description", content: "Guided help in plain English." },
     ],
   }),
-  validateSearch: (search) => ({
+  validateSearch: (search): { category?: string } => ({
     category: (search.category as string | undefined) ?? undefined,
   }),
   component: HelpPage,
