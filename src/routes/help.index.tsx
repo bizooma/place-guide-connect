@@ -13,6 +13,8 @@ import { useTranslatedTexts } from "@/lib/useTranslatedTexts";
 import { triageFlows, resources } from "@/data/mock";
 import { useTriageCategories } from "@/hooks/useTriageCategories";
 import { toast } from "sonner";
+import { getAmarilloJobs } from "@/lib/jobs/jobs.functions";
+import { JobListings } from "@/components/jobs/JobListings";
 
 export const Route = createFileRoute("/help/")({
   head: () => ({
@@ -26,6 +28,8 @@ export const Route = createFileRoute("/help/")({
   validateSearch: (search): { category?: string } => ({
     category: (search.category as string | undefined) ?? undefined,
   }),
+  loaderDeps: ({ search }) => ({ category: search.category }),
+  loader: async ({ deps }) => ({ jobs: deps.category === "job" ? await getAmarilloJobs() : [] }),
   component: HelpPage,
 });
 
@@ -33,6 +37,7 @@ function HelpPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const search = useSearch({ from: "/help/" });
+  const { jobs } = Route.useLoaderData();
   const [selected, setSelected] = useState<string | null>(search.category ?? null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -77,7 +82,7 @@ function HelpPage() {
             return (
               <button
                 key={cat.id}
-                onClick={() => isDoc ? navigate({ to: "/help/document" }) : setSelected(cat.slug)}
+                onClick={() => isDoc ? navigate({ to: "/help/document" }) : (setSelected(cat.slug), navigate({ to: "/help", search: { category: cat.slug } }))}
                 className="surface-card group flex w-full items-start gap-4 p-5 text-left transition hover:-translate-y-0.5 hover:shadow-lift focus-visible:-translate-y-0.5"
               >
                 <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary-deep transition group-hover:bg-primary group-hover:text-primary-foreground">
@@ -153,6 +158,8 @@ function HelpPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 md:py-16">
       <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Back")}</Button>
+
+      {selected === "job" && <JobListings jobs={jobs} />}
 
       <div className="surface-card p-6 md:p-8">
         <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx(currentCategory?.title ?? "")}</h1>
