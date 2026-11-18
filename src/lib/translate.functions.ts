@@ -116,6 +116,26 @@ const RowInput = z.object({
   id: z.string().uuid(),
 });
 
+// job_postings has no write grants for signed-in users (by design), so after the
+// admin check the write goes through a server-only service-role client built here
+// rather than the auto-generated one, which reads only SUPABASE_SERVICE_ROLE_KEY.
+// That prefix is reserved by the platform, so the key is also accepted under
+// PLACE_SERVICE_ROLE_KEY. Server-only: never sent to the browser.
+async function serviceRoleWriter() {
+  const serviceKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.PLACE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    throw new Error("Saving job translations is not configured yet (missing SUPABASE_SERVICE_ROLE_KEY or PLACE_SERVICE_ROLE_KEY).");
+  }
+  const url = process.env.SUPABASE_URL;
+  if (!url) throw new Error("Saving job translations is not configured yet (missing SUPABASE_URL).");
+
+  const { createClient } = await import("@supabase/supabase-js");
+  return createClient(url, serviceKey, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+}
+
 const ScheduleAllInput = z.object({
   limit: z.number().int().min(1).max(10).default(3),
 });
@@ -166,10 +186,7 @@ export const translateRow = createServerFn({ method: "POST" })
 
     // job_postings has no write grants for signed-in users (by design), so after the
     // admin check above the write goes through the server-only service-role client.
-    const writer =
-      data.table === "job_postings"
-        ? (await import("@/integrations/supabase/client.server")).supabaseAdmin
-        : supabase;
+    const writer = data.table === "job_postings" ? await serviceRoleWriter() : supabase;
     const { error: updErr } = await writer
       .from(data.table)
       .update({ translations })

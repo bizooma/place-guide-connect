@@ -36,9 +36,11 @@ type ListItem = { title?: string; externalPath?: string; locationsText?: string;
 type Detail = { jobPostingInfo?: { title?: string; jobDescription?: string; startDate?: string; timeType?: string; externalUrl?: string; jobReqId?: string } };
 
 function adminClient() {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // The SUPABASE_ prefix is reserved by the platform, so the service-role key is
+  // also accepted under PLACE_SERVICE_ROLE_KEY. Server-only: never sent to the browser.
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.PLACE_SERVICE_ROLE_KEY;
   const url = process.env.SUPABASE_URL;
-  if (!key) throw new Error("Job sync not configured: SUPABASE_SERVICE_ROLE_KEY is missing.");
+  if (!key) throw new Error("Job sync not configured: SUPABASE_SERVICE_ROLE_KEY (or PLACE_SERVICE_ROLE_KEY) is missing.");
   if (!url) throw new Error("Job sync not configured: SUPABASE_URL is missing.");
   return createClient(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
