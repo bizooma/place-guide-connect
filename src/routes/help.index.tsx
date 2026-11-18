@@ -29,7 +29,7 @@ export const Route = createFileRoute("/help/")({
     category: (search.category as string | undefined) ?? undefined,
   }),
   loaderDeps: ({ search }) => ({ category: search.category }),
-  loader: async ({ deps }) => ({ jobs: deps.category === "job" ? await getAmarilloJobs() : [] }),
+  loader: async ({ deps }) => ({ jobs: deps.category === "job" ? await getAmarilloJobs() : null }),
   component: HelpPage,
 });
 
@@ -159,7 +159,7 @@ function HelpPage() {
     <div className="mx-auto max-w-2xl px-4 py-10 md:py-16">
       <Button variant="ghost" onClick={reset} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> {tx("Back")}</Button>
 
-      {selected === "job" && <JobListings jobs={jobs} />}
+      {selected === "job" && (jobs ? <JobListings result={jobs} /> : <p className="mb-8 text-sm text-muted-foreground">Loading job listings…</p>)}
 
       <div className="surface-card p-6 md:p-8">
         <h1 className="font-display text-2xl font-semibold text-primary-deep">{tx(currentCategory?.title ?? "")}</h1>

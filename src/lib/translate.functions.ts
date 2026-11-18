@@ -109,9 +109,10 @@ const TARGET_LANGS: Record<string, string> = {
 
 const RESOURCE_FIELDS = ["name", "category", "description", "hours", "eligibility"] as const;
 const SCHEDULE_FIELDS = ["title", "category", "description", "location", "language"] as const;
+const JOB_FIELDS = ["title", "description", "eligibility"] as const;
 
 const RowInput = z.object({
-  table: z.enum(["resources", "schedule_items"]),
+  table: z.enum(["resources", "schedule_items", "job_postings"]),
   id: z.string().uuid(),
 });
 
@@ -133,7 +134,8 @@ export const translateRow = createServerFn({ method: "POST" })
     if (roleErr) throw new Error(roleErr.message);
     if (!isAdmin) throw new Error("Forbidden");
 
-    const fields = data.table === "resources" ? RESOURCE_FIELDS : SCHEDULE_FIELDS;
+    const fields: readonly string[] =
+      data.table === "resources" ? RESOURCE_FIELDS : data.table === "job_postings" ? JOB_FIELDS : SCHEDULE_FIELDS;
 
     const { data: row, error: readErr } = await supabase
       .from(data.table)
@@ -162,7 +164,13 @@ export const translateRow = createServerFn({ method: "POST" })
       translations[code] = map;
     }
 
-    const { error: updErr } = await supabase
+    // job_postings has no write grants for signed-in users (by design), so after the
+    // admin check above the write goes through the server-only service-role client.
+    const writer =
+      data.table === "job_postings"
+        ? (await import("@/integrations/supabase/client.server")).supabaseAdmin
+        : supabase;
+    const { error: updErr } = await writer
       .from(data.table)
       .update({ translations })
       .eq("id", data.id);

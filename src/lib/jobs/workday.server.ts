@@ -36,9 +36,10 @@ type ListItem = { title?: string; externalPath?: string; locationsText?: string;
 type Detail = { jobPostingInfo?: { title?: string; jobDescription?: string; startDate?: string; timeType?: string; externalUrl?: string; jobReqId?: string } };
 
 function adminClient() {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.DOCUMENT_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const url = process.env.SUPABASE_URL;
-  if (!key || !url) throw new Error("Job sync not configured (missing service key).");
+  if (!key) throw new Error("Job sync not configured: SUPABASE_SERVICE_ROLE_KEY is missing.");
+  if (!url) throw new Error("Job sync not configured: SUPABASE_URL is missing.");
   return createClient(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
@@ -155,6 +156,17 @@ async function syncSource(src: Source, runStart: string) {
     });
   }
   if (rows.length) {
+    // Separate read of stored hashes (never chained onto the upsert).
+    const { data: existing, error: exErr } = await admin
+      .from("job_postings")
+      .select("external_id, content_hash")
+      .eq("source_tenant", src.tenant);
+    if (exErr) throw new Error(`${src.tenant} read hashes: ${exErr.message}`);
+    const stored = new Map((existing ?? []).map((r) => [r.external_id as string, r.content_hash as string | null]));
+    for (const r of rows as Array<Record<string, unknown>>) {
+      // New posting or changed text: drop any translation of the old text.
+      if (stored.get(r.external_id as string) !== r.content_hash) r.translations = {};
+    }
     // No .select(): write without reading rows back under RLS.
     const { error } = await admin.from("job_postings").upsert(rows, { onConflict: "source_tenant,external_id" });
     if (error) throw new Error(`${src.tenant} upsert: ${error.message}`);
@@ -169,9 +181,23 @@ async function syncSource(src: Source, runStart: string) {
   return rows.length;
 }
 
-export async function syncWorkdayJobs() {
+export type SyncResult = Record<string, { ok: boolean; count?: number; error?: string }>;
+
+// In-process guard: concurrent callers share the in-flight run.
+let inFlight: Promise<SyncResult> | null = null;
+
+export function syncWorkdayJobs(): Promise<SyncResult> {
+  if (!inFlight) {
+    inFlight = runSync().finally(() => {
+      inFlight = null;
+    });
+  }
+  return inFlight;
+}
+
+async function runSync(): Promise<SyncResult> {
   const runStart = new Date().toISOString();
-  const results: Record<string, { ok: boolean; count?: number; error?: string }> = {};
+  const results: SyncResult = {};
   for (const src of SOURCES) {
     try {
       results[src.tenant] = { ok: true, count: await syncSource(src, runStart) };

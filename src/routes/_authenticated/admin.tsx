@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain, HeartHandshake } from "lucide-react";
+import { Pencil, Shield, Users, FileText, CalendarDays, BookOpen, Languages as LangIcon, Settings, UserCircle, Brain, HeartHandshake, Briefcase } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { DocumentUploadsList } from "@/components/admin/DocumentUploadsList";
 import { LanguagesEditor } from "@/components/admin/LanguagesEditor";
 import { SettingsEditor } from "@/components/admin/SettingsEditor";
 import { TrainingDocsEditor } from "@/components/admin/TrainingDocsEditor";
+import { JobsTranslateList } from "@/components/admin/JobsTranslateList";
 import { VolunteerSignupsList } from "@/components/admin/VolunteerSignupsList";
 import { usePendingUploadsCount } from "@/hooks/usePendingUploadsCount";
 
@@ -78,6 +79,7 @@ function AdminPage() {
           <TabsTrigger value="triage" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><FileText className="h-4 w-4" />Help choices</TabsTrigger>
           <TabsTrigger value="schedule" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><CalendarDays className="h-4 w-4" />Schedule</TabsTrigger>
           <TabsTrigger value="resources" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><BookOpen className="h-4 w-4" />Resources</TabsTrigger>
+          <TabsTrigger value="jobs" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep"><Briefcase className="h-4 w-4" />Jobs</TabsTrigger>
           <TabsTrigger value="requests" className="gap-1.5 rounded-full text-white/80 hover:text-white data-[state=active]:bg-white data-[state=active]:text-primary-deep">
             <Users className="h-4 w-4" />Requests
             {pendingCount > 0 && (
@@ -100,6 +102,9 @@ function AdminPage() {
         </TabsContent>
         <TabsContent value="resources" className="mt-6">
           <ResourcesEditor />
+        </TabsContent>
+        <TabsContent value="jobs" className="mt-6">
+          <JobsTranslateList />
         </TabsContent>
         <TabsContent value="requests" className="mt-6">
           <DocumentUploadsList />

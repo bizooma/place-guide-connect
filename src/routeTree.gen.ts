@@ -27,6 +27,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as HelpDocumentRouteImport } from './routes/help.document'
+import { Route as ApiJobsSyncRouteImport } from './routes/api/jobs/sync'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -117,6 +118,11 @@ const HelpDocumentRoute = HelpDocumentRouteImport.update({
   path: '/document',
   getParentRoute: () => HelpRoute,
 } as any)
+const ApiJobsSyncRoute = ApiJobsSyncRouteImport.update({
+  id: '/api/jobs/sync',
+  path: '/api/jobs/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
   '/help/': typeof HelpIndexRoute
+  '/api/jobs/sync': typeof ApiJobsSyncRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
   '/help': typeof HelpIndexRoute
+  '/api/jobs/sync': typeof ApiJobsSyncRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/api/tts': typeof ApiTtsRoute
   '/help/document': typeof HelpDocumentRoute
   '/help/': typeof HelpIndexRoute
+  '/api/jobs/sync': typeof ApiJobsSyncRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/api/tts'
     | '/help/document'
     | '/help/'
+    | '/api/jobs/sync'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/api/tts'
     | '/help/document'
     | '/help'
+    | '/api/jobs/sync'
   id:
     | '__root__'
     | '/'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/api/tts'
     | '/help/document'
     | '/help/'
+    | '/api/jobs/sync'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   ScheduleRoute: typeof ScheduleRoute
   TermsRoute: typeof TermsRoute
   ApiTtsRoute: typeof ApiTtsRoute
+  ApiJobsSyncRoute: typeof ApiJobsSyncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpDocumentRouteImport
       parentRoute: typeof HelpRoute
     }
+    '/api/jobs/sync': {
+      id: '/api/jobs/sync'
+      path: '/api/jobs/sync'
+      fullPath: '/api/jobs/sync'
+      preLoaderRoute: typeof ApiJobsSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -424,6 +444,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScheduleRoute: ScheduleRoute,
   TermsRoute: TermsRoute,
   ApiTtsRoute: ApiTtsRoute,
+  ApiJobsSyncRoute: ApiJobsSyncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
