@@ -249,6 +249,87 @@ export type Database = {
         }
         Relationships: []
       }
+      job_postings: {
+        Row: {
+          active: boolean
+          apply_url: string
+          content_hash: string | null
+          created_at: string
+          description: string | null
+          eligibility: string | null
+          employer: string
+          external_id: string
+          first_seen_at: string
+          id: string
+          job_type: string | null
+          last_seen_at: string
+          location_text: string | null
+          posted_at: string | null
+          requires_diploma: boolean
+          requires_english: boolean
+          requires_experience: boolean
+          sort_order: number
+          source: string
+          source_tenant: string
+          tags: string[]
+          title: string
+          translations: Json
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          apply_url: string
+          content_hash?: string | null
+          created_at?: string
+          description?: string | null
+          eligibility?: string | null
+          employer: string
+          external_id: string
+          first_seen_at?: string
+          id?: string
+          job_type?: string | null
+          last_seen_at?: string
+          location_text?: string | null
+          posted_at?: string | null
+          requires_diploma?: boolean
+          requires_english?: boolean
+          requires_experience?: boolean
+          sort_order?: number
+          source?: string
+          source_tenant: string
+          tags?: string[]
+          title: string
+          translations?: Json
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          apply_url?: string
+          content_hash?: string | null
+          created_at?: string
+          description?: string | null
+          eligibility?: string | null
+          employer?: string
+          external_id?: string
+          first_seen_at?: string
+          id?: string
+          job_type?: string | null
+          last_seen_at?: string
+          location_text?: string | null
+          posted_at?: string | null
+          requires_diploma?: boolean
+          requires_english?: boolean
+          requires_experience?: boolean
+          sort_order?: number
+          source?: string
+          source_tenant?: string
+          tags?: string[]
+          title?: string
+          translations?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       languages: {
         Row: {
           active: boolean
